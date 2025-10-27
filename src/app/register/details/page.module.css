@@ -1,0 +1,164 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 32px clamp(16px, 5vw, 64px);
+  gap: 32px;
+  background: linear-gradient(135deg, var(--color-sand), var(--color-warm-gray));
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.logo {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 12px 18px;
+  border-radius: 999px;
+  border: 2px solid rgba(47, 47, 47, 0.3);
+  background: rgba(255, 255, 255, 0.45);
+  box-shadow: 0 6px 12px var(--color-card-shadow);
+}
+
+.backLink {
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-deep-gray);
+  border-bottom: 1px solid rgba(47, 47, 47, 0.3);
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.summary {
+  max-width: 680px;
+  display: grid;
+  gap: 12px;
+}
+
+.summary h1 {
+  font-size: clamp(28px, 5vw, 40px);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+}
+
+.summary p {
+  font-size: 16px;
+  line-height: 1.6;
+  color: rgba(47, 47, 47, 0.75);
+}
+
+.form {
+  display: grid;
+  gap: 20px;
+  max-width: 720px;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 24px;
+  border: 1px solid rgba(47, 47, 47, 0.12);
+  padding: 28px;
+  box-shadow: 0 16px 30px rgba(47, 47, 47, 0.12);
+}
+
+.fieldRow {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.fieldGroup {
+  display: grid;
+  gap: 8px;
+}
+
+.fieldGroup label {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.fieldGroup input,
+.fieldGroup select,
+.fieldGroup textarea {
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(47, 47, 47, 0.2);
+  background: rgba(255, 255, 255, 0.92);
+  font-size: 14px;
+  color: var(--color-deep-gray);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.fieldGroup input:focus,
+.fieldGroup select:focus,
+.fieldGroup textarea:focus {
+  outline: none;
+  border-color: var(--color-deep-gray);
+  box-shadow: 0 0 0 4px rgba(47, 47, 47, 0.08);
+}
+
+.errorMessage {
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: rgba(200, 30, 30, 0.12);
+  color: rgba(120, 20, 20, 0.9);
+  font-size: 13px;
+}
+
+.successMessage {
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: rgba(60, 150, 90, 0.12);
+  color: rgba(40, 95, 60, 0.9);
+  font-size: 13px;
+}
+
+.loading {
+  font-size: 14px;
+  color: rgba(47, 47, 47, 0.7);
+}
+
+.submitButton {
+  justify-self: start;
+  border: 1px solid var(--color-deep-gray);
+  border-radius: 999px;
+  background: var(--color-deep-gray);
+  color: var(--color-sand);
+  padding: 12px 24px;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.submitButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 20px rgba(47, 47, 47, 0.15);
+}
+
+@media (max-width: 768px) {
+  .page {
+    padding: 24px 16px 40px;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .backLink {
+    border-bottom: none;
+  }
+}

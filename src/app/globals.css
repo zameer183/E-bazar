@@ -1,0 +1,32 @@
+:root {
+  --color-sand: #f6f0e4;
+  --color-warm-gray: #e6e2db;
+  --color-deep-gray: #2f2f2f;
+  --color-accent: #b68c57;
+  --color-card-shadow: rgba(47, 47, 47, 0.1);
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  color: var(--color-deep-gray);
+  background: linear-gradient(135deg, var(--color-sand), var(--color-warm-gray));
+  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+a {
+  color: var(--color-deep-gray);
+  text-decoration: none;
+}

@@ -1,0 +1,318 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 24px clamp(16px, 4vw, 48px);
+  gap: clamp(32px, 6vw, 64px);
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.registerButton {
+  border: 1px solid rgba(47, 47, 47, 0.2);
+  background-color: var(--color-deep-gray);
+  color: var(--color-sand);
+  padding: 10px 20px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.registerButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px var(--color-card-shadow);
+}
+
+.tagline {
+  flex: 1 1 220px;
+  display: grid;
+  gap: 4px;
+  text-align: center;
+}
+
+.taglineTitle {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.taglineCopy {
+  font-size: 14px;
+  color: rgba(47, 47, 47, 0.75);
+}
+
+.logo {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 12px 20px;
+  border-radius: 999px;
+  border: 2px solid rgba(47, 47, 47, 0.3);
+  background: rgba(255, 255, 255, 0.45);
+  box-shadow: 0 6px 12px var(--color-card-shadow);
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(32px, 6vw, 56px);
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: clamp(20px, 4vw, 32px);
+  align-items: center;
+}
+
+.heroCopy {
+  grid-column: span 3;
+  display: grid;
+  gap: 20px;
+  max-width: 520px;
+}
+
+.heroCopy h1 {
+  font-size: clamp(28px, 5vw, 40px);
+  font-weight: 700;
+  color: var(--color-deep-gray);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.heroCopy p {
+  font-size: 16px;
+  line-height: 1.6;
+  color: rgba(47, 47, 47, 0.75);
+}
+
+.heroSlider {
+  grid-column: span 3;
+  display: grid;
+  gap: 12px;
+}
+
+.sliderViewport {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow: 0 18px 32px rgba(47, 47, 47, 0.18);
+}
+
+.sliderTrack {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  transition: transform 0.6s ease;
+}
+
+.slide {
+  position: relative;
+  min-width: 100%;
+  flex: 0 0 100%;
+  height: 100%;
+}
+
+.slideImage {
+  object-fit: cover;
+}
+
+.sliderButton {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(246, 240, 228, 0.85);
+  color: var(--color-deep-gray);
+  font-size: 22px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 18px rgba(47, 47, 47, 0.18);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.sliderButton:hover {
+  transform: translateY(-50%) scale(1.05);
+  background: rgba(246, 240, 228, 0.95);
+}
+
+.sliderButtonLeft {
+  left: 16px;
+}
+
+.sliderButtonRight {
+  right: 16px;
+}
+
+.sliderDots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.sliderDot,
+.sliderDotActive {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(47, 47, 47, 0.25);
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.sliderDotActive {
+  background: var(--color-deep-gray);
+  transform: scale(1.2);
+}
+
+.cityGrid {
+  display: grid;
+  gap: clamp(20px, 4vw, 28px);
+  grid-template-columns: repeat(auto-fit, minmax(280px, 320px));
+  justify-content: center;
+}
+
+.cityCard {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(47, 47, 47, 0.12);
+  border-radius: 24px;
+  box-shadow: 0 16px 30px var(--color-card-shadow);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.cityCard:hover {
+  transform: translateY(-10px) scale(1.01);
+  box-shadow: 0 26px 44px rgba(47, 47, 47, 0.15);
+}
+
+.imageWrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background: rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.cityImage {
+  position: absolute;
+  inset: 0;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.cityCard:hover .cityImage {
+  transform: scale(1.05);
+}
+
+.cardContent {
+  display: grid;
+  gap: 18px;
+  padding: 24px;
+  background: rgba(246, 240, 228, 0.78);
+}
+
+.cardContent h2 {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.cardIntro {
+  font-size: 14px;
+  line-height: 1.5;
+  color: rgba(47, 47, 47, 0.7);
+}
+
+.industryList {
+  list-style: none;
+  display: grid;
+  gap: 12px;
+}
+
+.industryButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(47, 47, 47, 0.25);
+  background: rgba(230, 226, 219, 0.6);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 13px;
+  color: var(--color-deep-gray);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.industryButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(47, 47, 47, 0.12);
+}
+
+@media (max-width: 900px) {
+  .hero {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .heroCopy {
+    grid-column: span 4;
+  }
+
+  .heroSlider {
+    grid-column: span 4;
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    justify-content: center;
+  }
+
+  .logo {
+    order: -1;
+  }
+
+  .registerButton {
+    width: 100%;
+    max-width: 240px;
+  }
+
+  .tagline {
+    order: 1;
+  }
+
+  .hero {
+    grid-template-columns: 1fr;
+  }
+
+  .heroCopy,
+  .heroSlider {
+    grid-column: span 1;
+  }
+}

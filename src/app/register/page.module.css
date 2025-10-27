@@ -1,0 +1,144 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 32px clamp(16px, 5vw, 64px);
+  gap: 32px;
+  background: linear-gradient(135deg, var(--color-sand), var(--color-warm-gray));
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.logo {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 12px 18px;
+  border-radius: 999px;
+  border: 2px solid rgba(47, 47, 47, 0.3);
+  background: rgba(255, 255, 255, 0.45);
+  box-shadow: 0 6px 12px var(--color-card-shadow);
+}
+
+.backLink {
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-deep-gray);
+  border-bottom: 1px solid rgba(47, 47, 47, 0.3);
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.hero {
+  max-width: 680px;
+  display: grid;
+  gap: 12px;
+}
+
+.hero h1 {
+  font-size: clamp(28px, 5vw, 40px);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+}
+
+.hero p {
+  font-size: 16px;
+  line-height: 1.6;
+  color: rgba(47, 47, 47, 0.75);
+}
+
+.packageGrid {
+  display: grid;
+  gap: clamp(20px, 4vw, 32px);
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.packageCard {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(47, 47, 47, 0.12);
+  border-radius: 24px;
+  padding: 24px;
+  display: grid;
+  gap: 16px;
+  box-shadow: 0 16px 30px rgba(47, 47, 47, 0.12);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.packageCard:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 24px 42px rgba(47, 47, 47, 0.15);
+}
+
+.packageCard h2 {
+  font-size: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.packagePrice {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgba(47, 47, 47, 0.8);
+}
+
+.packageDescription {
+  font-size: 14px;
+  line-height: 1.5;
+  color: rgba(47, 47, 47, 0.75);
+}
+
+.packageFeatures {
+  list-style: disc inside;
+  display: grid;
+  gap: 8px;
+  font-size: 13px;
+  color: rgba(47, 47, 47, 0.75);
+}
+
+.selectButton {
+  margin-top: 8px;
+  border: 1px solid var(--color-deep-gray);
+  border-radius: 999px;
+  background: var(--color-deep-gray);
+  color: var(--color-sand);
+  padding: 10px 18px;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.selectButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 20px rgba(47, 47, 47, 0.15);
+}
+
+@media (max-width: 768px) {
+  .page {
+    padding: 24px 16px 40px;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .backLink {
+    border-bottom: none;
+  }
+}
