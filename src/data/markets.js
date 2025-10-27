@@ -27,27 +27,27 @@ export const HERO_SLIDES = [
   { src: "/images/faisalabad-hero.jpg", alt: "Ghanta Ghar, Faisalabad clock tower" },
   { src: "/images/quetta.jpg", alt: "Miri Fort, Quetta hill view" },
   {
-    src: "https://images.unsplash.com/photo-1606667366575-0400d7e3d34b?auto=format&fit=crop&w=1920&q=95",
+    src: "https://upload.wikimedia.org/wikipedia/commons/e/e0/Ali_Mujtaba_WLM2017_FAISAL_MOSQUE_019.jpg",
     alt: "Faisal Mosque framed by Margalla Hills in Islamabad",
   },
   {
-    src: "https://images.unsplash.com/photo-1615479635748-3b6a9839a9fd?auto=format&fit=crop&w=1920&q=95",
+    src: "https://upload.wikimedia.org/wikipedia/commons/c/c8/Badshahi_Mosque_front_picture.jpg",
     alt: "Badshahi Mosque courtyard during golden hour in Lahore",
   },
   {
-    src: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1920&q=95",
-    alt: "Hunza Valley with snow capped peaks",
+    src: "https://upload.wikimedia.org/wikipedia/commons/4/4f/Rakaposhi%2C_Nagar_GB_%28Pakistan%29.jpg",
+    alt: "Hunza Valley and Rakaposhi peaks",
   },
   {
-    src: "https://images.unsplash.com/photo-1584367369853-8b966cf22b76?auto=format&fit=crop&w=1920&q=95",
-    alt: "Derawar Fort standing tall in Cholistan Desert",
+    src: "https://upload.wikimedia.org/wikipedia/commons/0/00/Derawar_Fort%2C_Bahawalpur_I.jpg",
+    alt: "Derawar Fort standing tall in the Cholistan Desert",
   },
   {
-    src: "https://images.unsplash.com/photo-1578924548120-52185f8a0b23?auto=format&fit=crop&w=1920&q=95",
-    alt: "Boats anchored at Gwadar coastline",
+    src: "https://upload.wikimedia.org/wikipedia/commons/f/f7/Gwadar_city%2C_the_doors_of_Air.jpg",
+    alt: "Gwadar coastline and deep-sea port",
   },
   {
-    src: "https://images.unsplash.com/photo-1625040925275-61ef17b6a76f?auto=format&fit=crop&w=1920&q=95",
+    src: "https://upload.wikimedia.org/wikipedia/commons/3/3a/Thatta_collage.jpg",
     alt: "Shah Jahan Mosque domes in Thatta",
   },
 ];

@@ -16,9 +16,11 @@ export function generateStaticParams() {
   );
 }
 
-export default function CityCategoryPage({ params }) {
-  const citySlug = params.city.toLowerCase();
-  const categorySlug = params.category.toLowerCase();
+export default async function CityCategoryPage({ params }) {
+  const { city: cityParam, category: categoryParam } = await params;
+
+  const citySlug = cityParam.toLowerCase();
+  const categorySlug = categoryParam.toLowerCase();
 
   const city = getCityBySlug(citySlug);
   if (!city) {
