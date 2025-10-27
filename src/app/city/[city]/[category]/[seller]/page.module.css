@@ -52,82 +52,100 @@
 .hero {
   display: grid;
   gap: clamp(24px, 4vw, 32px);
-  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-  align-items: stretch;
+  grid-template-columns: minmax(280px, 400px) 1fr;
+  align-items: start;
 }
 
-.heroImage {
+.shopImageContainer {
   position: relative;
-  border-radius: 28px;
+  border-radius: 24px;
   overflow: hidden;
-  min-height: 320px;
+  min-height: 400px;
+  height: 100%;
   box-shadow: 0 24px 44px rgba(47, 47, 47, 0.2);
 }
 
-.heroAsset {
+.shopImage {
   object-fit: cover;
 }
 
-.heroOverlay {
-  position: absolute;
-  inset: auto 0 0 0;
-  padding: 24px;
-  background: linear-gradient(180deg, rgba(12, 11, 10, 0) 0%, rgba(12, 11, 10, 0.78) 100%);
-  color: #ffffff;
-  display: grid;
-  gap: 12px;
-}
-
-.heroOverlay h1 {
-  font-size: clamp(26px, 4vw, 36px);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-weight: 700;
-}
-
-.heroOverlay p {
-  font-size: 14px;
-  line-height: 1.6;
-  color: rgba(255, 255, 255, 0.88);
-}
-
-.heroStats {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  font-size: 12px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-.heroStats span {
-  background: rgba(255, 255, 255, 0.16);
-  border-radius: 999px;
-  padding: 6px 10px;
-}
-
-.contactCard {
-  background: rgba(255, 255, 255, 0.88);
+.shopInfoCard {
+  background: rgba(255, 255, 255, 0.92);
   border: 1px solid rgba(47, 47, 47, 0.14);
   border-radius: 24px;
-  padding: 24px;
-  display: grid;
-  gap: 16px;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
   box-shadow: 0 18px 34px rgba(47, 47, 47, 0.15);
 }
 
-.contactCard h2 {
-  font-size: 18px;
+.shopHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(47, 47, 47, 0.1);
+}
+
+.shopHeader h1 {
+  font-size: clamp(22px, 4vw, 32px);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   font-weight: 700;
+  color: var(--color-deep-gray);
+  flex: 1;
 }
 
-.contactDetails {
+.planBadge {
+  background: var(--color-accent);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  box-shadow: 0 4px 12px rgba(182, 140, 87, 0.3);
+  white-space: nowrap;
+}
+
+.shopDetails {
   display: grid;
-  gap: 6px;
-  font-size: 13px;
+  gap: 14px;
+}
+
+.detailRow {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 12px;
+  font-size: 14px;
+  align-items: baseline;
+}
+
+.detailLabel {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(47, 47, 47, 0.6);
+  font-size: 12px;
+}
+
+.detailValue {
+  color: var(--color-deep-gray);
+  font-weight: 500;
+}
+
+.shopDescription {
+  font-size: 14px;
+  line-height: 1.7;
   color: rgba(47, 47, 47, 0.75);
+  padding: 16px;
+  background: var(--color-sand);
+  border-radius: 12px;
+  border: 1px solid rgba(47, 47, 47, 0.08);
 }
 
 .serviceNotice {
@@ -277,26 +295,117 @@
     grid-template-columns: 1fr;
   }
 
-  .contactCard {
-    order: -1;
+  .shopImageContainer {
+    min-height: 320px;
+  }
+
+  .productsGrid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   }
 }
 
 @media (max-width: 600px) {
   .page {
     padding: 24px 16px 40px;
+    gap: 24px;
   }
 
   .main {
     padding-bottom: 140px;
+    gap: 32px;
   }
 
-  
+  .breadcrumbs {
+    font-size: 11px;
+  }
+
+  .shopImageContainer {
+    min-height: 280px;
+  }
+
+  .shopInfoCard {
+    padding: 20px;
+    gap: 16px;
+  }
+
+  .shopHeader {
+    padding-bottom: 12px;
+  }
+
+  .shopHeader h1 {
+    font-size: 20px;
+  }
+
+  .planBadge {
+    font-size: 11px;
+    padding: 6px 12px;
+  }
+
+  .detailRow {
+    grid-template-columns: 90px 1fr;
+    gap: 10px;
+    font-size: 13px;
+  }
+
+  .detailLabel {
+    font-size: 11px;
+  }
+
+  .shopDescription {
+    font-size: 13px;
+    padding: 14px;
+  }
+
+  .sectionHeader h2 {
+    font-size: 18px;
+  }
+
+  .sectionHeader p {
+    font-size: 13px;
+  }
+
+  .productsGrid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .productCard {
+    grid-template-rows: 160px 1fr;
+  }
+
+  .productDetails {
+    padding: 14px 16px;
+  }
+
+  .productDetails h3 {
+    font-size: 14px;
+  }
+
+  .productPrice {
+    font-size: 13px;
+  }
 
   .productRatings {
     flex-direction: column;
     align-items: flex-start;
     gap: 4px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 400px) {
+  .shopHeader h1 {
+    font-size: 18px;
+  }
+
+  .planBadge {
+    font-size: 10px;
+    padding: 5px 10px;
+  }
+
+  .detailRow {
+    grid-template-columns: 80px 1fr;
+    font-size: 12px;
   }
 }
 

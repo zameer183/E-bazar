@@ -15,7 +15,7 @@ body {
 body {
   color: var(--color-deep-gray);
   background: linear-gradient(135deg, var(--color-sand), var(--color-warm-gray));
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-poppins), 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

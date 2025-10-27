@@ -122,13 +122,61 @@
 }
 
 @media (max-width: 640px) {
+  .page {
+    padding: 32px 16px 60px;
+    gap: 32px;
+  }
+
+  .hero h1 {
+    font-size: 28px;
+  }
+
+  .hero p {
+    font-size: 14px;
+  }
+
+  .section {
+    padding: 20px;
+  }
+
+  .section h2 {
+    font-size: 20px;
+  }
+
+  .section p {
+    font-size: 14px;
+  }
+
+  .list li {
+    font-size: 13px;
+  }
+
   .cta {
     flex-direction: column;
     align-items: flex-start;
+    padding: 24px;
+  }
+
+  .cta h3 {
+    font-size: 16px;
+  }
+
+  .cta p {
+    font-size: 13px;
   }
 
   .ctaButton {
     width: 100%;
     text-align: center;
+  }
+}
+
+@media (max-width: 400px) {
+  .hero h1 {
+    font-size: 24px;
+  }
+
+  .section h2 {
+    font-size: 18px;
   }
 }

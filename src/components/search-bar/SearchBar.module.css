@@ -1,135 +1,164 @@
 .wrapper {
   position: relative;
   margin: 0 auto;
-  width: min(960px, 100%);
-  display: grid;
-  gap: 12px;
+  width: 100%;
+  max-width: 900px;
 }
 
 .form {
   display: grid;
+  grid-template-columns: 180px 1fr auto;
   gap: 12px;
-  grid-template-columns: minmax(0, 220px) 1fr auto;
   align-items: end;
-  background: rgba(255, 255, 255, 0.78);
-  border: 1px solid rgba(47, 47, 47, 0.12);
-  border-radius: 18px;
-  padding: 16px 20px;
-  box-shadow: 0 12px 22px rgba(47, 47, 47, 0.12);
+  background: white;
+  border: 1px solid rgba(47, 47, 47, 0.1);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 16px rgba(47, 47, 47, 0.08);
 }
 
 .citySelect,
 .inputGroup {
-  display: grid;
-  gap: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .citySelect label,
 .inputGroup label {
-  font-size: 11px;
-  letter-spacing: 0.06em;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(47, 47, 47, 0.65);
   text-transform: uppercase;
-  color: rgba(47, 47, 47, 0.6);
+  letter-spacing: 0.05em;
 }
 
 .citySelect select,
 .inputGroup input {
-  padding: 10px 14px;
-  border-radius: 12px;
-  border: 1px solid rgba(47, 47, 47, 0.2);
-  background: rgba(255, 255, 255, 0.92);
-  font-size: 14px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(47, 47, 47, 0.15);
+  background: var(--color-sand);
+  font-size: 15px;
   color: var(--color-deep-gray);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  font-family: inherit;
+  transition: all 0.2s ease;
 }
 
 .citySelect select:focus,
 .inputGroup input:focus {
   outline: none;
-  border-color: var(--color-deep-gray);
-  box-shadow: 0 0 0 4px rgba(47, 47, 47, 0.08);
+  border-color: var(--color-accent);
+  background: white;
+  box-shadow: 0 0 0 3px rgba(182, 140, 87, 0.1);
+}
+
+.citySelect select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .submitButton {
-  align-self: stretch;
-  padding: 12px 20px;
-  border-radius: 12px;
-  border: 1px solid var(--color-deep-gray);
+  padding: 12px 24px;
+  border-radius: 8px;
+  border: none;
   background: var(--color-deep-gray);
-  color: var(--color-sand);
-  font-size: 13px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  color: white;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
 }
 
 .submitButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 18px rgba(47, 47, 47, 0.16);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(47, 47, 47, 0.2);
+  background: rgba(47, 47, 47, 0.9);
+}
+
+.submitButton:active {
+  transform: translateY(0);
 }
 
 .resultsPanel {
   position: absolute;
-  top: calc(100% + 4px);
+  top: calc(100% + 8px);
   left: 0;
-  width: 100%;
-  background: rgba(255, 255, 255, 0.95);
-  border: 1px solid rgba(47, 47, 47, 0.12);
-  border-radius: 16px;
-  box-shadow: 0 18px 34px rgba(47, 47, 47, 0.16);
+  right: 0;
+  background: white;
+  border: 1px solid rgba(47, 47, 47, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(47, 47, 47, 0.15);
   z-index: 10;
   padding: 8px;
-  display: grid;
-  gap: 6px;
+  max-height: 400px;
+  overflow-y: auto;
 }
 
 .resultItem {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
   width: 100%;
-  padding: 10px 14px;
-  border-radius: 12px;
+  padding: 12px 16px;
+  border-radius: 8px;
   border: none;
-  background: rgba(230, 226, 219, 0.45);
+  background: transparent;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: background 0.15s ease;
+  text-align: left;
 }
 
 .resultItem:hover {
-  background: rgba(230, 226, 219, 0.75);
+  background: var(--color-sand);
 }
 
 .resultLabel {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--color-deep-gray);
+  flex: 1;
 }
 
 .resultMeta {
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: rgba(47, 47, 47, 0.55);
+  color: var(--color-accent);
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 .empty {
-  font-size: 12px;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: rgba(47, 47, 47, 0.6);
-  padding: 10px;
+  font-size: 13px;
+  color: rgba(47, 47, 47, 0.5);
+  padding: 16px;
+  text-align: center;
 }
 
 @media (max-width: 768px) {
   .form {
     grid-template-columns: 1fr;
+    padding: 16px;
   }
 
   .submitButton {
     width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .form {
+    gap: 12px;
+  }
+
+  .citySelect select,
+  .inputGroup input {
+    font-size: 14px;
+    padding: 10px 14px;
   }
 }

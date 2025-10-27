@@ -164,8 +164,8 @@
 
 .sellerGrid {
   display: grid;
-  gap: clamp(16px, 3vw, 20px);
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
 }
 
 .emptyState {
@@ -205,19 +205,21 @@
 }
 
 .sellerCard {
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(47, 47, 47, 0.12);
-  border-radius: 20px;
+  background: white;
+  border: 1px solid rgba(47, 47, 47, 0.06);
+  border-radius: 10px;
   padding: 20px;
-  display: grid;
-  gap: 10px;
-  box-shadow: 0 16px 30px rgba(47, 47, 47, 0.12);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(47, 47, 47, 0.08);
+  transition: all 0.2s ease;
 }
 
 .sellerCard:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 22px 36px rgba(47, 47, 47, 0.16);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(47, 47, 47, 0.1);
+  border-color: var(--color-accent);
 }
 
 .sellerHeader {
@@ -241,14 +243,27 @@
   font-weight: 700;
 }
 
+.subcategoryTag {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(47, 47, 47, 0.08);
+  color: rgba(47, 47, 47, 0.7);
+  font-weight: 600;
+}
+
 .planTag {
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  padding: 4px 8px;
+  padding: 6px 12px;
   border-radius: 999px;
-  background: rgba(182, 140, 87, 0.18);
-  color: var(--color-deep-gray);
+  background: var(--color-accent);
+  color: white;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(182, 140, 87, 0.25);
 }
 
 .sellerMeta {
@@ -309,26 +324,109 @@
   .heroImage {
     aspect-ratio: 16 / 9;
   }
+
+  .sellerGrid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
 }
 
 @media (max-width: 600px) {
   .page {
     padding: 24px 16px 40px;
+    gap: 24px;
   }
 
   .main {
     padding-bottom: 140px;
+    gap: 32px;
+  }
+
+  .header {
+    gap: 12px;
+  }
+
+  .breadcrumbs {
+    font-size: 11px;
+  }
+
+  .heroCopy h1 {
+    font-size: 24px;
+  }
+
+  .heroCopy p {
+    font-size: 14px;
+  }
+
+  .subcategoryBar {
+    gap: 8px;
+  }
+
+  .subcategoryLink,
+  .subcategoryLinkActive {
+    padding: 8px 14px;
+    font-size: 11px;
+  }
+
+  .sectionHeader h2 {
+    font-size: 18px;
+  }
+
+  .sectionHeader p {
+    font-size: 13px;
+  }
+
+  .sellerGrid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .sellerCard {
+    padding: 16px;
+  }
+
+  .sellerHeader h3 {
+    font-size: 14px;
+  }
+
+  .sellerMeta {
+    font-size: 12px;
   }
 
   .sellerRatings {
     flex-direction: column;
     gap: 4px;
     align-items: flex-start;
+    font-size: 11px;
   }
 
   .ctaBanner {
     flex-direction: column;
     align-items: flex-start;
+    padding: 20px;
+  }
+
+  .ctaBanner h3 {
+    font-size: 16px;
+  }
+
+  .ctaBanner p {
+    font-size: 13px;
+  }
+
+  .ctaHint {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 400px) {
+  .subcategoryBar {
+    gap: 6px;
+  }
+
+  .subcategoryLink,
+  .subcategoryLinkActive {
+    padding: 6px 12px;
+    font-size: 10px;
   }
 }
 

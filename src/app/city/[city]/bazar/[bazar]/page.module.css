@@ -179,7 +179,7 @@
 .sellerGrid {
   display: grid;
   gap: 16px;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
 }
 
 .sellerLink {
@@ -187,19 +187,21 @@
 }
 
 .sellerCard {
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(47, 47, 47, 0.12);
-  border-radius: 20px;
+  background: white;
+  border: 1px solid rgba(47, 47, 47, 0.06);
+  border-radius: 10px;
   padding: 20px;
-  display: grid;
-  gap: 10px;
-  box-shadow: 0 16px 30px rgba(47, 47, 47, 0.12);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(47, 47, 47, 0.08);
+  transition: all 0.2s ease;
 }
 
 .sellerCard:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 22px 34px rgba(47, 47, 47, 0.16);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(47, 47, 47, 0.1);
+  border-color: var(--color-accent);
 }
 
 .sellerHeader {
@@ -220,10 +222,12 @@
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  padding: 4px 8px;
+  padding: 6px 12px;
   border-radius: 999px;
-  background: rgba(182, 140, 87, 0.18);
-  color: var(--color-deep-gray);
+  background: var(--color-accent);
+  color: white;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(182, 140, 87, 0.25);
 }
 
 .sellerMeta {

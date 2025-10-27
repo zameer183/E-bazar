@@ -116,42 +116,51 @@ export default function SellerPageClient({ city, industry, baseSeller, slugs }) 
         <SearchBar citySlug={city.slug} lockCity />
 
         <section className={styles.hero}>
-          <div className={styles.heroImage}>
+          <div className={styles.shopImageContainer}>
             <Image
-              src={city.detailImage ?? city.image}
-              alt={`${city.name} landmark`}
+              src={seller.shopImage || city.detailImage || city.image}
+              alt={`${seller.name} shop`}
               fill
-              className={styles.heroAsset}
-              sizes="(max-width: 768px) 100vw, 60vw"
+              className={styles.shopImage}
+              sizes="(max-width: 768px) 100vw, 40vw"
               priority
             />
-            <div className={styles.heroOverlay}>
+          </div>
+          <div className={styles.shopInfoCard}>
+            <div className={styles.shopHeader}>
               <h1>{seller.name}</h1>
-              <p>
-                {seller.description ||
-                  `${seller.name} serves ${industry.name.toLowerCase()} buyers across ${city.name}.`}
-              </p>
-              <div className={styles.heroStats}>
-                <span>
+              <span className={styles.planBadge}>{seller.plan || "Marketplace Partner"}</span>
+            </div>
+            <div className={styles.shopDetails}>
+              <div className={styles.detailRow}>
+                <span className={styles.detailLabel}>Address:</span>
+                <span className={styles.detailValue}>{seller.address}</span>
+              </div>
+              <div className={styles.detailRow}>
+                <span className={styles.detailLabel}>Contact:</span>
+                <span className={styles.detailValue}>{seller.contact}</span>
+              </div>
+              <div className={styles.detailRow}>
+                <span className={styles.detailLabel}>Rating:</span>
+                <span className={styles.detailValue}>
                   {seller.rating ? `${seller.rating.toFixed(1)} ★` : "New Store"}
                 </span>
-                <span>
+              </div>
+              <div className={styles.detailRow}>
+                <span className={styles.detailLabel}>Reviews:</span>
+                <span className={styles.detailValue}>
                   {seller.reviews ? `${seller.reviews} reviews` : "Awaiting reviews"}
                 </span>
-                <span>{industry.name}</span>
               </div>
-              {focusProduct && (
-                <p className={styles.focusProduct}>Viewing: {focusProduct}</p>
-              )}
             </div>
+            <p className={styles.shopDescription}>
+              {seller.description ||
+                `${seller.name} serves ${industry.name.toLowerCase()} buyers across ${city.name}.`}
+            </p>
+            {focusProduct && (
+              <p className={styles.focusProduct}>Viewing: {focusProduct}</p>
+            )}
           </div>
-          <aside className={styles.contactCard}>
-            <h2>Contact & Location</h2>
-            <div className={styles.contactDetails}>
-              <span>{seller.address}</span>
-              <span>{seller.contact}</span>
-            </div>
-          </aside>
         </section>
 
         <section className={styles.productsSection}>
@@ -199,19 +208,6 @@ export default function SellerPageClient({ city, industry, baseSeller, slugs }) 
               );
             })}
           </div>
-        </section>
-
-        <section className={styles.ctaBanner}>
-          <div>
-            <h3>Showcase your products on E-Bazar</h3>
-            <p>
-              Feature your store and product lineup in the digital bazaar, while you
-              continue to manage payments and deliveries.
-            </p>
-          </div>
-          <p className={styles.ctaHint}>
-            Tap the bottom-right button to start your registration.
-          </p>
         </section>
 
         <BazaarFooter note={SERVICE_NOTE} topRatedSellers={GLOBAL_TOP_RATED} />

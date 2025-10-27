@@ -124,8 +124,74 @@
   color: rgba(47, 47, 47, 0.6);
 }
 
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+}
+
 @media (max-width: 640px) {
+  .page {
+    padding: 32px 16px 100px;
+    gap: 32px;
+  }
+
+  .hero h1 {
+    font-size: 28px;
+  }
+
+  .hero p {
+    font-size: 14px;
+  }
+
+  .tips {
+    padding: 20px;
+  }
+
+  .tips h2 {
+    font-size: 20px;
+  }
+
+  .tips ul {
+    font-size: 13px;
+  }
+
+  .tips p {
+    font-size: 13px;
+  }
+
   .grid {
     grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .card {
+    padding: 16px 18px;
+  }
+
+  .cardHeader h3 {
+    font-size: 14px;
+  }
+
+  .rating {
+    font-size: 11px;
+  }
+
+  .meta {
+    font-size: 12px;
+  }
+
+  .reviews {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 400px) {
+  .hero h1 {
+    font-size: 24px;
+  }
+
+  .tips h2 {
+    font-size: 18px;
   }
 }

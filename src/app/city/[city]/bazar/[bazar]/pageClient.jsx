@@ -138,19 +138,6 @@ export default function BazaarPageClient({ city, bazaar, fragranceSellers, heroI
           </section>
         )}
 
-        <section className={styles.ctaBanner}>
-          <div>
-            <h3>List your stall with E-Bazar</h3>
-            <p>
-              Register your business, showcase your specialty, and let shoppers reach
-              you instantly.
-            </p>
-          </div>
-          <p className={styles.ctaHint}>
-            Tap the bottom-right button to start your registration.
-          </p>
-        </section>
-
         <BazaarFooter note={SERVICE_NOTE} topRatedSellers={GLOBAL_TOP_RATED} />
       </main>
     </div>

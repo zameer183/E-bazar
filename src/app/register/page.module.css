@@ -131,14 +131,52 @@
 @media (max-width: 768px) {
   .page {
     padding: 24px 16px 40px;
+    gap: 24px;
   }
 
   .header {
     flex-direction: column;
     align-items: flex-start;
+    gap: 12px;
+  }
+
+  .logo {
+    font-size: 18px;
+    padding: 10px 16px;
   }
 
   .backLink {
     border-bottom: none;
+  }
+
+  .hero h1 {
+    font-size: 24px;
+  }
+
+  .hero p {
+    font-size: 14px;
+  }
+
+  .packageGrid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .packageCard {
+    padding: 20px;
+  }
+
+  .packageCard h2 {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 400px) {
+  .logo {
+    font-size: 16px;
+  }
+
+  .hero h1 {
+    font-size: 22px;
   }
 }

@@ -138,30 +138,20 @@ export default function Home() {
               <Link
                 key={city.slug}
                 href={`/city/${city.slug}/${primaryCategory}`}
-                className={styles.cityCardLink}
+                className={styles.cityButton}
                 aria-label={`Explore ${city.name} marketplace`}
               >
-                <article className={styles.cityCard}>
-                  <div className={styles.imageWrapper}>
-                    <Image
-                      src={city.image}
-                      alt={`${city.name} landmark`}
-                      fill
-                      className={styles.cityImage}
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 45vw, 300px"
-                      priority={city.slug === "karachi"}
-                    />
-                  </div>
-                  <div className={styles.cardContent}>
-                    <h2>{city.name}</h2>
-                    <p className={styles.cardIntro}>
-                      Step into the digital lanes of {city.name} inspired by its historic bazaars.
-                    </p>
-                    <p className={styles.cardStats}>
-                      {categorySlugs.length} curated industry lanes ready for buyers.
-                    </p>
-                  </div>
-                </article>
+                <div className={styles.cityButtonImage}>
+                  <Image
+                    src={city.image}
+                    alt={`${city.name} landmark`}
+                    fill
+                    className={styles.buttonImage}
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 30vw, 200px"
+                    priority={city.slug === "karachi"}
+                  />
+                </div>
+                <span className={styles.cityButtonName}>{city.name}</span>
               </Link>
             );
           })}

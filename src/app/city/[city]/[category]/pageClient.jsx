@@ -279,19 +279,6 @@ function CategoryPageContent({ city, industry, categories }) {
           )}
         </section>
 
-        <section className={styles.ctaBanner}>
-          <div>
-            <h3>List your store with E-Bazar</h3>
-            <p>
-              Select a subscription package, register your bazaar stall, and
-              appear instantly in the right city lane.
-            </p>
-          </div>
-          <p className={styles.ctaHint}>
-            Tap the bottom-right button to start your registration.
-          </p>
-        </section>
-
         <BazaarFooter note={SERVICE_NOTE} topRatedSellers={GLOBAL_TOP_RATED} />
       </main>
     </div>
