@@ -21,7 +21,7 @@ export default function Signup() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus({ type: "idle", message: "" });
 
@@ -49,33 +49,21 @@ export default function Signup() {
       return;
     }
 
-    // Check if email already exists
-    const stored = window.localStorage.getItem("eBazarUsers");
-    const users = stored ? JSON.parse(stored) : [];
+    // Use Firebase Auth
+    const { signUpUser } = await import("@/lib/auth");
+    const result = await signUpUser(formData.email, formData.password, formData.name);
 
-    if (users.find((u) => u.email === formData.email)) {
+    if (!result.success) {
       setStatus({
         type: "error",
-        message: "Email already registered. Please login instead.",
+        message: result.error,
       });
       return;
     }
 
-    // Save new user
-    const newUser = {
-      id: Date.now(),
-      name: formData.name,
-      email: formData.email,
-      password: formData.password,
-      createdAt: new Date().toISOString(),
-    };
-
-    users.push(newUser);
-    window.localStorage.setItem("eBazarUsers", JSON.stringify(users));
-
-    // Set logged in status
+    // Set logged in status in localStorage for compatibility
     window.localStorage.setItem("eBazarLoggedIn", "true");
-    window.localStorage.setItem("eBazarCurrentUser", formData.email);
+    window.localStorage.setItem("eBazarCurrentUser", result.user.uid);
 
     setStatus({
       type: "success",

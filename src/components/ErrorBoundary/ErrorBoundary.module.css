@@ -1,0 +1,150 @@
+.errorContainer {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+}
+
+.errorCard {
+  background: white;
+  border-radius: 16px;
+  padding: 48px 32px;
+  max-width: 600px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.errorIcon {
+  font-size: 72px;
+  margin-bottom: 24px;
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+}
+
+.errorTitle {
+  font-size: 32px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 16px;
+}
+
+.errorMessage {
+  font-size: 18px;
+  color: #666;
+  margin-bottom: 32px;
+  line-height: 1.6;
+}
+
+.errorDetails {
+  text-align: left;
+  margin: 24px 0;
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+}
+
+.errorDetails summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: #dc3545;
+  margin-bottom: 12px;
+}
+
+.errorStack {
+  margin-top: 12px;
+  padding: 12px;
+  background: #212529;
+  color: #f8f9fa;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: 12px;
+  font-family: 'Courier New', monospace;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.errorActions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 32px;
+}
+
+.primaryButton {
+  padding: 14px 28px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.primaryButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.secondaryButton {
+  padding: 14px 28px;
+  background: white;
+  color: #667eea;
+  border: 2px solid #667eea;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.secondaryButton:hover {
+  background: #f8f9fa;
+  transform: translateY(-2px);
+}
+
+.linkButton {
+  padding: 14px 28px;
+  background: transparent;
+  color: #666;
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.2s;
+  display: inline-block;
+}
+
+.linkButton:hover {
+  background: #f8f9fa;
+  color: #333;
+}
+
+@media (max-width: 640px) {
+  .errorCard {
+    padding: 32px 24px;
+  }
+
+  .errorTitle {
+    font-size: 24px;
+  }
+
+  .errorMessage {
+    font-size: 16px;
+  }
+
+  .errorIcon {
+    font-size: 56px;
+  }
+}

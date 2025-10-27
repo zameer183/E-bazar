@@ -25,20 +25,39 @@ export default function SellerDashboard() {
   const [shopImages, setShopImages] = useState([]);
   const [imagePreview, setImagePreview] = useState(null);
   const [selectedShopId, setSelectedShopId] = useState(null);
+  const [shopVideo, setShopVideo] = useState(null);
+  const [videoError, setVideoError] = useState("");
+  const [productImages, setProductImages] = useState([]);
 
   useEffect(() => {
     loadShopData();
   }, []);
 
-  const loadShopData = (shopId = null) => {
+  const loadShopData = async (shopId = null) => {
     try {
       if (typeof window === "undefined") return;
-      const stored = window.localStorage.getItem(STORAGE_KEY);
-      if (!stored) {
-        router.push("/register");
+
+      // Get current user from Firebase
+      const { getCurrentUser } = await import("@/lib/auth");
+      const currentUser = getCurrentUser();
+
+      if (!currentUser) {
+        router.push("/login");
         return;
       }
-      const shops = JSON.parse(stored);
+
+      // Fetch shops from Firestore
+      const { getShopsByOwner } = await import("@/lib/firestore");
+      const result = await getShopsByOwner(currentUser.uid);
+
+      if (!result.success) {
+        console.error("Error loading shops:", result.error);
+        setLoading(false);
+        return;
+      }
+
+      const shops = result.data;
+
       if (shops.length === 0) {
         router.push("/register");
         return;
@@ -48,8 +67,8 @@ export default function SellerDashboard() {
 
       // Select shop by ID or default to most recent
       const currentShop = shopId
-        ? shops.find(s => s.id === shopId) || shops[shops.length - 1]
-        : shops[shops.length - 1];
+        ? shops.find(s => s.id === shopId) || shops[0]
+        : shops[0];
 
       setShop(currentShop);
       setSelectedShopId(currentShop.id);
@@ -59,13 +78,34 @@ export default function SellerDashboard() {
         address: currentShop.address,
         description: currentShop.description,
       });
-      // Load images from localStorage
-      const storedImages = window.localStorage.getItem(`${STORAGE_KEY}_images_${currentShop.id}`);
-      if (storedImages) {
-        setShopImages(JSON.parse(storedImages));
+
+      // Load images from Firestore
+      const { getShopImages } = await import("@/lib/firestore");
+      const imagesResult = await getShopImages(currentShop.id);
+      if (imagesResult.success) {
+        setShopImages(imagesResult.data);
       } else {
         setShopImages([]);
       }
+
+      // Load video from Firestore
+      const { getShopVideo } = await import("@/lib/firestore");
+      const videoResult = await getShopVideo(currentShop.id);
+      if (videoResult.success) {
+        setShopVideo(videoResult.data);
+      } else {
+        setShopVideo(null);
+      }
+
+      // Load product images from Firestore
+      const { getProductImages } = await import("@/lib/firestore");
+      const productImagesResult = await getProductImages(currentShop.id);
+      if (productImagesResult.success) {
+        setProductImages(productImagesResult.data);
+      } else {
+        setProductImages([]);
+      }
+
       setLoading(false);
     } catch (error) {
       console.error("Error loading shop data:", error);
@@ -92,16 +132,17 @@ export default function SellerDashboard() {
     });
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     try {
-      const stored = window.localStorage.getItem(STORAGE_KEY);
-      const shops = JSON.parse(stored);
-      const updatedShops = shops.map((s) =>
-        s.id === shop.id
-          ? { ...s, ...formData }
-          : s
-      );
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedShops));
+      // Update in Firestore
+      const { updateShop } = await import("@/lib/firestore");
+      const result = await updateShop(shop.id, formData);
+
+      if (!result.success) {
+        alert("Failed to update shop details. Please try again.");
+        return;
+      }
+
       setShop({ ...shop, ...formData });
       setIsEditing(false);
       alert("Shop details updated successfully!");
@@ -116,44 +157,281 @@ export default function SellerDashboard() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleImageUpload = (e) => {
+  const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
+      // Check if free package and already has 1 image
+      if (shop.plan === "free" && shopImages.length >= 1) {
+        alert("Free package users can only upload 1 shop image. Upgrade to Standard or Premium for unlimited images.");
+        return;
+      }
+
+      try {
+        // Upload to Firebase Storage
+        const { uploadShopImage } = await import("@/lib/storage");
+        const { saveShopImage } = await import("@/lib/firestore");
+
+        const result = await uploadShopImage(shop.id, file);
+
+        if (!result.success) {
+          alert("Failed to upload image. Please try again.");
+          return;
+        }
+
+        // Save metadata to Firestore
+        const imageData = {
+          imageUrl: result.url,
+          name: file.name,
+        };
+
+        const saveResult = await saveShopImage(shop.id, imageData);
+
+        if (!saveResult.success) {
+          alert("Failed to save image data. Please try again.");
+          return;
+        }
+
+        // Update local state
         const newImage = {
-          id: Date.now(),
-          data: reader.result,
+          id: saveResult.imageId,
+          imageUrl: result.url,
           name: file.name,
         };
         const updatedImages = [...shopImages, newImage];
         setShopImages(updatedImages);
-        window.localStorage.setItem(
-          `${STORAGE_KEY}_images_${shop.id}`,
-          JSON.stringify(updatedImages)
-        );
-      };
-      reader.readAsDataURL(file);
+      } catch (error) {
+        console.error("Error uploading image:", error);
+        alert("Failed to upload image. Please try again.");
+      }
     }
   };
 
-  const handleDeleteImage = (imageId) => {
-    const updatedImages = shopImages.filter((img) => img.id !== imageId);
-    setShopImages(updatedImages);
-    window.localStorage.setItem(
-      `${STORAGE_KEY}_images_${shop.id}`,
-      JSON.stringify(updatedImages)
-    );
+  const handleDeleteImage = async (imageId) => {
+    try {
+      // Find the image to get its URL
+      const image = shopImages.find(img => img.id === imageId);
+      if (!image) return;
+
+      // Delete from Firebase Storage
+      const { deleteShopImage: deleteStorageImage } = await import("@/lib/storage");
+      await deleteStorageImage(image.imageUrl);
+
+      // Delete metadata from Firestore
+      const { deleteShopImage } = await import("@/lib/firestore");
+      await deleteShopImage(imageId);
+
+      // Update local state
+      const updatedImages = shopImages.filter((img) => img.id !== imageId);
+      setShopImages(updatedImages);
+    } catch (error) {
+      console.error("Error deleting image:", error);
+      alert("Failed to delete image. Please try again.");
+    }
   };
 
-  const handleDeleteShop = () => {
+  const handleVideoUpload = async (e) => {
+    const file = e.target.files[0];
+    setVideoError("");
+
+    if (file) {
+      // Check if file is a video
+      if (!file.type.startsWith('video/')) {
+        setVideoError("Please upload a valid video file");
+        return;
+      }
+
+      // Check video duration
+      const video = document.createElement('video');
+      video.preload = 'metadata';
+
+      video.onloadedmetadata = async function() {
+        window.URL.revokeObjectURL(video.src);
+        const duration = video.duration;
+
+        if (duration > 10) {
+          setVideoError("Video must be 10 seconds or less");
+          return;
+        }
+
+        try {
+          // Upload to Firebase Storage
+          const { uploadShopVideo } = await import("@/lib/storage");
+          const { saveShopVideo } = await import("@/lib/firestore");
+
+          const result = await uploadShopVideo(shop.id, file, (progress) => {
+            // Optional: Add progress indicator here
+            console.log(`Upload progress: ${progress}%`);
+          });
+
+          if (!result.success) {
+            setVideoError("Failed to upload video. Please try again.");
+            return;
+          }
+
+          // Save metadata to Firestore
+          const videoData = {
+            videoUrl: result.url,
+            name: file.name,
+            duration: duration,
+          };
+
+          const saveResult = await saveShopVideo(shop.id, videoData);
+
+          if (!saveResult.success) {
+            setVideoError("Failed to save video data. Please try again.");
+            return;
+          }
+
+          // Update local state
+          const newVideo = {
+            id: saveResult.videoId,
+            videoUrl: result.url,
+            name: file.name,
+            duration: duration,
+          };
+          setShopVideo(newVideo);
+        } catch (error) {
+          console.error("Error uploading video:", error);
+          setVideoError("Failed to upload video. Please try again.");
+        }
+      };
+
+      video.src = URL.createObjectURL(file);
+    }
+  };
+
+  const handleDeleteVideo = async () => {
     try {
-      const stored = window.localStorage.getItem(STORAGE_KEY);
-      const shops = JSON.parse(stored);
-      const updatedShops = shops.filter((s) => s.id !== shop.id);
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedShops));
-      // Also delete shop images
+      if (!shopVideo) return;
+
+      // Delete from Firebase Storage if it's a URL
+      if (shopVideo.videoUrl && shopVideo.videoUrl.startsWith('http')) {
+        const { deleteFile } = await import("@/lib/storage");
+        await deleteFile(shopVideo.videoUrl);
+      } else if (shopVideo.data && shopVideo.data.startsWith('http')) {
+        // Backward compatibility
+        const { deleteFile } = await import("@/lib/storage");
+        await deleteFile(shopVideo.data);
+      }
+
+      // Delete metadata from Firestore
+      const { deleteShopVideo } = await import("@/lib/firestore");
+      await deleteShopVideo(shop.id);
+
+      // Clear local state
+      setShopVideo(null);
+
+      // Also remove from localStorage for compatibility
+      window.localStorage.removeItem(`${STORAGE_KEY}_video_${shop.id}`);
+    } catch (error) {
+      console.error("Error deleting video:", error);
+      alert("Failed to delete video. Please try again.");
+    }
+  };
+
+  const handleProductImageUpload = async (e, productName) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Check if free package and already has 2 images for this product
+      const currentProductImages = productImages.filter(img => img.productName === productName);
+      if (shop.plan === "free" && currentProductImages.length >= 2) {
+        alert("Free package users can only upload 2 images per product. Upgrade to Standard or Premium for unlimited images.");
+        return;
+      }
+
+      try {
+        // Upload to Firebase Storage
+        const { uploadProductImage } = await import("@/lib/storage");
+        const { saveProductImage } = await import("@/lib/firestore");
+
+        const result = await uploadProductImage(shop.id, productName, file);
+
+        if (!result.success) {
+          alert("Failed to upload product image. Please try again.");
+          return;
+        }
+
+        // Save metadata to Firestore
+        const imageData = {
+          imageUrl: result.url,
+          name: file.name,
+          productName: productName,
+        };
+
+        const saveResult = await saveProductImage(shop.id, imageData);
+
+        if (!saveResult.success) {
+          alert("Failed to save product image data. Please try again.");
+          return;
+        }
+
+        // Update local state
+        const newImage = {
+          id: saveResult.imageId,
+          imageUrl: result.url,
+          name: file.name,
+          productName: productName,
+        };
+        const updatedImages = [...productImages, newImage];
+        setProductImages(updatedImages);
+      } catch (error) {
+        console.error("Error uploading product image:", error);
+        alert("Failed to upload product image. Please try again.");
+      }
+    }
+  };
+
+  const handleDeleteProductImage = async (imageId) => {
+    try {
+      // Find the image to get its URL
+      const image = productImages.find(img => img.id === imageId);
+      if (!image) return;
+
+      // Delete from Firebase Storage if it's a URL
+      if (image.imageUrl && image.imageUrl.startsWith('http')) {
+        const { deleteFile } = await import("@/lib/storage");
+        await deleteFile(image.imageUrl);
+      } else if (image.data && image.data.startsWith('http')) {
+        // Backward compatibility
+        const { deleteFile } = await import("@/lib/storage");
+        await deleteFile(image.data);
+      }
+
+      // Delete metadata from Firestore
+      const { deleteProductImage } = await import("@/lib/firestore");
+      await deleteProductImage(imageId);
+
+      // Update local state
+      const updatedImages = productImages.filter((img) => img.id !== imageId);
+      setProductImages(updatedImages);
+
+      // Also update localStorage for compatibility
+      window.localStorage.setItem(
+        `${STORAGE_KEY}_product_images_${shop.id}`,
+        JSON.stringify(updatedImages)
+      );
+    } catch (error) {
+      console.error("Error deleting product image:", error);
+      alert("Failed to delete product image. Please try again.");
+    }
+  };
+
+  const handleDeleteShop = async () => {
+    try {
+      // Delete from Firestore
+      const { deleteShop } = await import("@/lib/firestore");
+      const result = await deleteShop(shop.id);
+
+      if (!result.success) {
+        alert("Failed to delete shop. Please try again.");
+        return;
+      }
+
+      // Also delete shop images from localStorage (will migrate to Storage later)
       window.localStorage.removeItem(`${STORAGE_KEY}_images_${shop.id}`);
+      window.localStorage.removeItem(`${STORAGE_KEY}_video_${shop.id}`);
+      window.localStorage.removeItem(`${STORAGE_KEY}_product_images_${shop.id}`);
+
       router.push("/?deleted=1");
     } catch (error) {
       console.error("Error deleting shop:", error);
@@ -392,7 +670,7 @@ export default function SellerDashboard() {
             ) : (
               shopImages.map((image) => (
                 <div key={image.id} className={styles.imageCard}>
-                  <img src={image.data} alt={image.name} />
+                  <img src={image.imageUrl || image.data} alt={image.name} />
                   <button
                     onClick={() => handleDeleteImage(image.id)}
                     className={styles.deleteImageButton}
@@ -404,6 +682,105 @@ export default function SellerDashboard() {
             )}
           </div>
         </div>
+
+        {/* Shop Video */}
+        <div className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <h2>Shop Video (Max 10 seconds)</h2>
+            {!shopVideo && (
+              <label className={styles.uploadButton}>
+                🎥 Upload Video
+                <input
+                  type="file"
+                  accept="video/*"
+                  onChange={handleVideoUpload}
+                  style={{ display: "none" }}
+                />
+              </label>
+            )}
+          </div>
+          {videoError && (
+            <div className={styles.errorMessage} style={{ marginBottom: "16px" }}>
+              {videoError}
+            </div>
+          )}
+          <div className={styles.videoContainer}>
+            {shopVideo ? (
+              <div className={styles.videoCard}>
+                <video
+                  src={shopVideo.videoUrl || shopVideo.data}
+                  controls
+                  className={styles.videoPlayer}
+                >
+                  Your browser does not support the video tag.
+                </video>
+                <button
+                  onClick={handleDeleteVideo}
+                  className={styles.deleteVideoButton}
+                >
+                  🗑️ Delete Video
+                </button>
+              </div>
+            ) : (
+              <p className={styles.noVideo}>No video uploaded yet. Add a short video (max 10 seconds) to showcase your shop!</p>
+            )}
+          </div>
+        </div>
+
+        {/* Product Images - Free Package Only */}
+        {shop.plan === "free" && (
+          <div className={styles.section}>
+            <div className={styles.sectionHeader}>
+              <h2>Product Images (Max 2 per product)</h2>
+            </div>
+            <div className={styles.productsList}>
+              {shop.products && shop.products.length > 0 ? (
+                shop.products.map((product, index) => {
+                  // Handle both string products and object products
+                  const productName = typeof product === 'string' ? product : product.name;
+                  const productImgs = productImages.filter(img => img.productName === productName);
+                  return (
+                    <div key={`${productName}-${index}`} className={styles.productItem}>
+                      <div className={styles.productHeader}>
+                        <h3>{productName}</h3>
+                        {productImgs.length < 2 && (
+                          <label className={styles.uploadButtonSmall}>
+                            📷 Add Image
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => handleProductImageUpload(e, productName)}
+                              style={{ display: "none" }}
+                            />
+                          </label>
+                        )}
+                      </div>
+                      <div className={styles.productImageGrid}>
+                        {productImgs.length === 0 ? (
+                          <p className={styles.noProductImages}>No images for this product yet. Add up to 2 images!</p>
+                        ) : (
+                          productImgs.map((image) => (
+                            <div key={image.id} className={styles.productImageCard}>
+                              <img src={image.imageUrl || image.data} alt={image.name} />
+                              <button
+                                onClick={() => handleDeleteProductImage(image.id)}
+                                className={styles.deleteImageButton}
+                              >
+                                ✕
+                              </button>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <p className={styles.noProducts}>No products available for this shop.</p>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Danger Zone */}
         <div className={styles.section}>

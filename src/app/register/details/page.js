@@ -47,6 +47,7 @@ function RegisterDetailsClient() {
     categorySlug: CATEGORY_OPTIONS[0]?.slug || "",
     contact: "",
     address: "",
+    webLink: "",
   });
 
   const [status, setStatus] = useState({ type: "idle", message: "" });
@@ -56,7 +57,7 @@ function RegisterDetailsClient() {
     setFormState((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     setStatus({ type: "idle", message: "" });
 
@@ -75,32 +76,58 @@ function RegisterDetailsClient() {
         (category) => category.slug === formState.categorySlug
       ) || null;
 
-    const newShop = {
-      id: Date.now(),
-      name: formState.name,
-      city: cityOption?.name ?? formState.citySlug,
-      citySlug: cityOption?.slug ?? formState.citySlug,
-      category: categoryOption?.name ?? formState.categorySlug,
-      categorySlug: categoryOption?.slug ?? formState.categorySlug,
-      contact: formState.contact,
-      address: formState.address,
-      plan: selectedPackage.id,
-      planLabel: selectedPackage.label,
-      slug: createSellerSlug(cityOption?.name ?? formState.citySlug, formState.name),
-      description: `${formState.name} connects with buyers looking for ${categoryOption?.name?.toLowerCase() ?? "marketplace goods"} in ${cityOption?.name ?? formState.citySlug}.`,
-      products: createProductShowcase(formState.categorySlug, Math.floor(Math.random() * 50)),
-      rating: 0,
-      reviews: 0,
-    };
-
     try {
-      if (typeof window === "undefined") return;
+      // Get current user from Firebase Auth
+      const { getCurrentUser } = await import("@/lib/auth");
+      const currentUser = getCurrentUser();
+
+      if (!currentUser) {
+        setStatus({
+          type: "error",
+          message: "Please log in to register a shop",
+        });
+        router.push("/login");
+        return;
+      }
+
+      const newShop = {
+        ownerId: currentUser.uid,
+        name: formState.name,
+        city: cityOption?.name ?? formState.citySlug,
+        citySlug: cityOption?.slug ?? formState.citySlug,
+        category: categoryOption?.name ?? formState.categorySlug,
+        categorySlug: categoryOption?.slug ?? formState.categorySlug,
+        contact: formState.contact,
+        address: formState.address,
+        plan: selectedPackage.id,
+        planLabel: selectedPackage.label,
+        slug: createSellerSlug(cityOption?.name ?? formState.citySlug, formState.name),
+        description: `${formState.name} connects with buyers looking for ${categoryOption?.name?.toLowerCase() ?? "marketplace goods"} in ${cityOption?.name ?? formState.citySlug}.`,
+        products: createProductShowcase(formState.categorySlug, Math.floor(Math.random() * 50)),
+        rating: 0,
+        reviews: 0,
+        visitors: 0,
+        ...(formState.webLink && { webLink: formState.webLink }),
+      };
+
+      // Save to Firestore
+      const { createShop } = await import("@/lib/firestore");
+      const result = await createShop(newShop);
+
+      if (!result.success) {
+        setStatus({
+          type: "error",
+          message: "Failed to register shop. Please try again.",
+        });
+        return;
+      }
+
+      // Also save to localStorage for compatibility
       const stored = window.localStorage.getItem(STORAGE_KEY);
       const shops = stored ? JSON.parse(stored) : [];
-      shops.push(newShop);
+      shops.push({ ...newShop, id: result.shopId });
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(shops));
-      // Set user as logged in
-      window.localStorage.setItem("eBazarLoggedIn", "true");
+
       setStatus({
         type: "success",
         message: "Shop registered! Redirecting you to your dashboard...",
@@ -205,6 +232,20 @@ function RegisterDetailsClient() {
               required
             />
           </div>
+
+          {(selectedPackage.id === "standard" || selectedPackage.id === "premium") && (
+            <div className={styles.fieldGroup}>
+              <label htmlFor="webLink">Website/Social Media Link (Optional)</label>
+              <input
+                id="webLink"
+                name="webLink"
+                type="url"
+                value={formState.webLink}
+                onChange={handleChange}
+                placeholder="https://www.yourwebsite.com or social media profile"
+              />
+            </div>
+          )}
 
           {status.type !== "idle" && (
             <div

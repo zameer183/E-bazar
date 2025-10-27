@@ -19,7 +19,7 @@ export default function Login() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus({ type: "idle", message: "" });
 
@@ -31,32 +31,21 @@ export default function Login() {
       return;
     }
 
-    // Get stored users
-    const stored = window.localStorage.getItem("eBazarUsers");
-    if (!stored) {
+    // Use Firebase Auth
+    const { signInUser } = await import("@/lib/auth");
+    const result = await signInUser(formData.email, formData.password);
+
+    if (!result.success) {
       setStatus({
         type: "error",
-        message: "No account found. Please sign up first.",
+        message: result.error,
       });
       return;
     }
 
-    const users = JSON.parse(stored);
-    const user = users.find(
-      (u) => u.email === formData.email && u.password === formData.password
-    );
-
-    if (!user) {
-      setStatus({
-        type: "error",
-        message: "Invalid email or password",
-      });
-      return;
-    }
-
-    // Set logged in status
+    // Set logged in status in localStorage for compatibility
     window.localStorage.setItem("eBazarLoggedIn", "true");
-    window.localStorage.setItem("eBazarCurrentUser", formData.email);
+    window.localStorage.setItem("eBazarCurrentUser", result.user.uid);
 
     setStatus({
       type: "success",
