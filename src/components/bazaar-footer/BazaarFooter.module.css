@@ -1,33 +1,50 @@
 .footer {
   display: flex;
   flex-direction: column;
-  gap: 32px;
-  padding: 48px clamp(24px, 5vw, 80px);
-  margin-top: 64px;
-  background: white;
-  border-top: 1px solid rgba(47, 47, 47, 0.1);
+  gap: 40px;
+  padding: 64px clamp(32px, 5vw, 100px) 56px;
+  margin-top: 80px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(246, 240, 228, 0.6) 100%);
+  border-top: 2px solid rgba(182, 140, 87, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.footer::before {
+  content: '';
+  position: absolute;
+  bottom: -30%;
+  right: -15%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(182, 140, 87, 0.06) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
 }
 
 .headerRow {
   display: flex;
   flex-wrap: wrap;
-  gap: 32px;
+  gap: 40px;
   justify-content: space-between;
   align-items: flex-start;
+  position: relative;
+  z-index: 1;
 }
 
 .titleBlock {
-  max-width: 500px;
+  max-width: 550px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
 
 .titleBlock h2 {
-  font-size: 24px;
-  font-weight: 800;
+  font-size: 28px;
+  font-weight: 900;
   color: var(--color-deep-gray);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
 }
 
 .titleBlock p {
@@ -72,13 +89,22 @@
 .topRatedBlock {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 18px;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 24px;
-  border-radius: 12px;
-  border: 1px solid rgba(47, 47, 47, 0.1);
-  background: var(--color-sand);
+  padding: 24px 28px;
+  border-radius: 14px;
+  border: 2px solid rgba(182, 140, 87, 0.2);
+  background: linear-gradient(135deg, white 0%, var(--color-sand) 100%);
+  box-shadow: 0 4px 12px rgba(47, 47, 47, 0.06);
+  position: relative;
+  z-index: 1;
+  transition: all 0.3s ease;
+}
+
+.topRatedBlock:hover {
+  box-shadow: 0 6px 16px rgba(47, 47, 47, 0.1);
+  border-color: var(--color-accent);
 }
 
 .topRatedLabel {
@@ -110,21 +136,48 @@
 
 .grid {
   display: grid;
-  gap: 32px 24px;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 40px 28px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  position: relative;
+  z-index: 1;
 }
 
 .column {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
+  padding: 20px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(5px);
+  transition: all 0.3s ease;
+}
+
+.column:hover {
+  background: rgba(255, 255, 255, 0.8);
+  transform: translateY(-2px);
+}
+
+.sectionTitle {
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.sectionTitle:hover {
+  opacity: 0.7;
 }
 
 .column h3 {
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 17px;
+  font-weight: 800;
   color: var(--color-deep-gray);
-  margin-bottom: 4px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.sectionTitle:hover h3 {
+  color: var(--color-accent);
 }
 
 .column ul {
@@ -136,8 +189,37 @@
 
 .column li {
   font-size: 14px;
-  color: rgba(47, 47, 47, 0.7);
   line-height: 1.5;
+}
+
+.itemLink {
+  color: rgba(47, 47, 47, 0.7);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  display: inline-block;
+  position: relative;
+  padding-left: 12px;
+}
+
+.itemLink::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: all 0.2s ease;
+  color: var(--color-accent);
+}
+
+.itemLink:hover {
+  color: var(--color-accent);
+  padding-left: 18px;
+  font-weight: 600;
+}
+
+.itemLink:hover::before {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 .note {

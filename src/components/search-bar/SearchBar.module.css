@@ -2,19 +2,26 @@
   position: relative;
   margin: 0 auto;
   width: 100%;
-  max-width: 900px;
+  max-width: 960px;
 }
 
 .form {
   display: grid;
-  grid-template-columns: 180px 1fr auto;
-  gap: 12px;
+  grid-template-columns: 200px 1fr auto;
+  gap: 16px;
   align-items: end;
-  background: white;
-  border: 1px solid rgba(47, 47, 47, 0.1);
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 4px 16px rgba(47, 47, 47, 0.08);
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(182, 140, 87, 0.2);
+  border-radius: 24px;
+  padding: 32px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.form:hover {
+  box-shadow: 0 12px 48px rgba(182, 140, 87, 0.15);
+  border-color: rgba(182, 140, 87, 0.4);
 }
 
 .citySelect,
@@ -35,14 +42,15 @@
 
 .citySelect select,
 .inputGroup input {
-  padding: 12px 16px;
-  border-radius: 8px;
-  border: 1px solid rgba(47, 47, 47, 0.15);
-  background: var(--color-sand);
+  padding: 14px 18px;
+  border-radius: 16px;
+  border: 1px solid rgba(182, 140, 87, 0.25);
+  background: rgba(246, 240, 228, 0.5);
   font-size: 15px;
   color: var(--color-deep-gray);
   font-family: inherit;
-  transition: all 0.2s ease;
+  font-weight: 600;
+  transition: all 0.3s ease;
 }
 
 .citySelect select:focus,
@@ -50,7 +58,7 @@
   outline: none;
   border-color: var(--color-accent);
   background: white;
-  box-shadow: 0 0 0 3px rgba(182, 140, 87, 0.1);
+  box-shadow: 0 0 0 4px rgba(182, 140, 87, 0.1);
 }
 
 .citySelect select:disabled {
@@ -59,43 +67,40 @@
 }
 
 .submitButton {
-  padding: 12px 24px;
-  border-radius: 8px;
+  padding: 14px 32px;
+  border-radius: 18px;
   border: none;
-  background: var(--color-deep-gray);
+  background: linear-gradient(135deg, var(--color-accent) 0%, #a67b4a 100%);
   color: white;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s ease;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   white-space: nowrap;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 20px rgba(182, 140, 87, 0.3);
 }
 
 .submitButton:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(47, 47, 47, 0.2);
-  background: rgba(47, 47, 47, 0.9);
-}
-
-.submitButton:active {
-  transform: translateY(0);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 32px rgba(182, 140, 87, 0.4);
 }
 
 .resultsPanel {
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + 12px);
   left: 0;
   right: 0;
-  background: white;
-  border: 1px solid rgba(47, 47, 47, 0.1);
-  border-radius: 12px;
-  box-shadow: 0 12px 32px rgba(47, 47, 47, 0.15);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(182, 140, 87, 0.2);
+  border-radius: 20px;
   z-index: 10;
-  padding: 8px;
-  max-height: 400px;
+  padding: 12px;
+  max-height: 420px;
   overflow-y: auto;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.12);
 }
 
 .resultItem {
@@ -104,17 +109,18 @@
   align-items: center;
   gap: 16px;
   width: 100%;
-  padding: 12px 16px;
-  border-radius: 8px;
+  padding: 14px 18px;
+  border-radius: 14px;
   border: none;
   background: transparent;
   cursor: pointer;
-  transition: background 0.15s ease;
   text-align: left;
+  position: relative;
+  transition: all 0.3s ease;
 }
 
 .resultItem:hover {
-  background: var(--color-sand);
+  background: rgba(182, 140, 87, 0.1);
 }
 
 .resultLabel {

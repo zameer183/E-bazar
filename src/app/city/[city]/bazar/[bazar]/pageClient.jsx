@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
+import Navbar from "@/components/Navbar/Navbar";
 import SearchBar from "@/components/search-bar/SearchBar";
 import BazaarFooter from "@/components/bazaar-footer/BazaarFooter";
 import { getBazaarDefinition, getTopRatedSellers } from "@/data/markets";
@@ -17,7 +17,9 @@ export default function BazaarPageClient({ city, bazaar, fragranceSellers, heroI
   const heroVisual = heroImage || city.detailImage || city.image;
 
   return (
-    <div className={styles.page}>
+    <div className={styles.page} suppressHydrationWarning>
+      <Navbar />
+
       <header className={styles.header}>
         <nav className={styles.breadcrumbs} aria-label="Breadcrumb">
           <Link href="/">Home</Link>
@@ -32,7 +34,7 @@ export default function BazaarPageClient({ city, bazaar, fragranceSellers, heroI
         <SearchBar citySlug={city.slug} lockCity />
 
         <section className={styles.hero}>
-          <div className={styles.heroImage}>
+          <div className={styles.heroImage} suppressHydrationWarning>
             <Image
               src={heroVisual}
               alt={`${city.name} bazaar visuals`}
@@ -42,12 +44,10 @@ export default function BazaarPageClient({ city, bazaar, fragranceSellers, heroI
               priority
             />
           </div>
-          <div className={styles.heroCopy}>
+          <div className={styles.heroCopy} suppressHydrationWarning>
             <h1>{definition?.title ?? bazaar.title}</h1>
             <p>{definition?.description}</p>
-            <Suspense fallback={null}>
-              <FocusNote />
-            </Suspense>
+            <FocusNote />
           </div>
 
         </section>
@@ -124,7 +124,7 @@ export default function BazaarPageClient({ city, bazaar, fragranceSellers, heroI
                 {city.name}.
               </p>
             </header>
-            <div className={styles.subcategoryGrid}>
+            <div className={styles.subcategoryGrid} suppressHydrationWarning>
               {(definition?.subcategories || []).map((sub) => (
                 <Link
                   key={sub.label}

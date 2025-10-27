@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Navbar from "@/components/Navbar/Navbar";
 import styles from "./page.module.css";
 
 const PACKAGES = [
@@ -48,12 +49,7 @@ export default function RegisterPackages() {
 
   return (
     <div className={styles.page}>
-      <header className={styles.header}>
-        <div className={styles.logo}>E-Bazar</div>
-        <Link href="/" className={styles.backLink}>
-          Back to Marketplace
-        </Link>
-      </header>
+      <Navbar />
 
       <main className={styles.main}>
         <section className={styles.hero}>

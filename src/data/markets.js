@@ -339,41 +339,41 @@ export const BAZAAR_ORDER = ["fashion", "tech", "fragrance"];
 export const getBazaarDefinition = (slug) => BAZAAR_DEFINITIONS[slug] ?? null;
 
 export const HERO_SLIDES = [
-  { src: "/images/karachi.jpg", alt: "Mazar-e-Quaid, Karachi skyline" },
+  { src: "/images/mazar-e-quaid.png", alt: "Mazar-e-Quaid, Karachi skyline" },
   { src: "/images/lahore.jpg", alt: "Minar-e-Pakistan, Lahore landmark" },
   { src: "/images/faisalabad-hero.jpg", alt: "Ghanta Ghar, Faisalabad clock tower" },
-  { src: "/images/quetta.jpg", alt: "Miri Fort, Quetta hill view" },
+  { src: "/images/bahawalpur.jpg", alt: "Historic landmark, Quetta view" },
   {
-    src: "https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=1600&q=80",
-    alt: "Traditional Pakistani textiles and fabrics in a bazaar",
+    src: "https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?auto=format&fit=crop&w=1600&q=85",
+    alt: "Elegant fashion boutique with premium clothing display",
   },
   {
-    src: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1600&q=80",
-    alt: "Fashion retail display with modern clothing",
+    src: "https://images.unsplash.com/photo-1558769132-cb1aea1f1f8e?auto=format&fit=crop&w=1600&q=85",
+    alt: "Modern textile and fabric collection showcase",
   },
   {
-    src: "https://images.unsplash.com/photo-1550009158-9ebf69173e03?auto=format&fit=crop&w=1600&q=80",
-    alt: "Electronics and technology gadgets showcase",
+    src: "https://images.unsplash.com/photo-1498049794561-7780e7231661?auto=format&fit=crop&w=1600&q=85",
+    alt: "High-tech workspace with modern gadgets and devices",
   },
   {
-    src: "https://images.unsplash.com/photo-1585386959984-a4155224a1ad?auto=format&fit=crop&w=1600&q=80",
-    alt: "Luxury perfumes and fragrances collection",
+    src: "https://images.unsplash.com/photo-1523293182086-7651a899d37f?auto=format&fit=crop&w=1600&q=85",
+    alt: "Luxury perfume bottles and fragrance collection",
   },
   {
-    src: "https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=1600&q=80",
-    alt: "Traditional marketplace shopping experience",
+    src: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1600&q=85",
+    alt: "Stylish clothing store interior with fashion displays",
   },
   {
-    src: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=1600&q=80",
-    alt: "Smartphone and mobile accessories display",
+    src: "https://images.unsplash.com/photo-1607082349566-187342175e2f?auto=format&fit=crop&w=1600&q=85",
+    alt: "Premium electronics and smart technology showcase",
   },
   {
-    src: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=1600&q=80",
-    alt: "Designer jewelry and accessories boutique",
+    src: "https://images.unsplash.com/photo-1610701596007-11502861dcfa?auto=format&fit=crop&w=1600&q=85",
+    alt: "Designer jewelry and accessories boutique display",
   },
   {
-    src: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1600&q=80",
-    alt: "Footwear and shoe collection in retail store",
+    src: "https://images.unsplash.com/photo-1460353581641-37baddab0fa2?auto=format&fit=crop&w=1600&q=85",
+    alt: "Trendy footwear and shoe collection in modern store",
   },
 ];
 
@@ -708,8 +708,8 @@ export const BASE_CITY_MARKETS = [
   {
     name: "Quetta",
     slug: "quetta",
-    image: "/images/quetta.jpg",
-    detailImage: "/images/quetta.jpg",
+    image: "/images/bahawalpur.jpg",
+    detailImage: "/images/bahawalpur.jpg",
     defaultCategory: "clothes",
     industries: {
       clothes: {
@@ -816,10 +816,8 @@ export const BASE_CITY_MARKETS = [
   {
     name: "Islamabad",
     slug: "islamabad",
-    image:
-      "https://images.unsplash.com/photo-1544986581-efac024faf62?auto=format&fit=crop&w=1600&q=80",
-    detailImage:
-      "https://images.unsplash.com/photo-1544986581-efac024faf62?auto=format&fit=crop&w=1600&q=80",
+    image: "/images/islamabad.jpg",
+    detailImage: "/images/islamabad.jpg",
     defaultCategory: "clothes",
     industries: createStandardIndustries({
       city: "Islamabad",
@@ -853,10 +851,8 @@ export const BASE_CITY_MARKETS = [
   {
     name: "Rawalpindi",
     slug: "rawalpindi",
-    image:
-      "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=1600&q=80",
-    detailImage:
-      "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=1600&q=80",
+    image: "/images/islamabad.jpg",
+    detailImage: "/images/islamabad.jpg",
     defaultCategory: "clothes",
     industries: createStandardIndustries({
       city: "Rawalpindi",
@@ -890,10 +886,8 @@ export const BASE_CITY_MARKETS = [
   {
     name: "Peshawar",
     slug: "peshawar",
-    image:
-      "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1600&q=80",
-    detailImage:
-      "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1600&q=80",
+    image: "/images/peshawar.jpg",
+    detailImage: "/images/peshawar.jpg",
     defaultCategory: "clothes",
     industries: createStandardIndustries({
       city: "Peshawar",
@@ -927,10 +921,8 @@ export const BASE_CITY_MARKETS = [
   {
     name: "Multan",
     slug: "multan",
-    image:
-      "https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=1600&q=80",
-    detailImage:
-      "https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=1600&q=80",
+    image: "/images/multan.jpg",
+    detailImage: "/images/multan.jpg",
     defaultCategory: "clothes",
     industries: createStandardIndustries({
       city: "Multan",
@@ -964,10 +956,8 @@ export const BASE_CITY_MARKETS = [
   {
     name: "Hyderabad",
     slug: "hyderabad",
-    image:
-      "https://images.unsplash.com/photo-1610296669228-602fa827fc1f?auto=format&fit=crop&w=1600&q=80",
-    detailImage:
-      "https://images.unsplash.com/photo-1610296669228-602fa827fc1f?auto=format&fit=crop&w=1600&q=80",
+    image: "/images/mazar-e-quaid.png",
+    detailImage: "/images/mazar-e-quaid.png",
     defaultCategory: "clothes",
     industries: createStandardIndustries({
       city: "Hyderabad",
@@ -1001,10 +991,8 @@ export const BASE_CITY_MARKETS = [
   {
     name: "Sialkot",
     slug: "sialkot",
-    image:
-      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80",
-    detailImage:
-      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80",
+    image: "/images/sialkot.jpg",
+    detailImage: "/images/sialkot.jpg",
     defaultCategory: "clothes",
     industries: createStandardIndustries({
       city: "Sialkot",
@@ -1038,10 +1026,8 @@ export const BASE_CITY_MARKETS = [
   {
     name: "Gujranwala",
     slug: "gujranwala",
-    image:
-      "https://images.unsplash.com/photo-1543165796-5426273eaab3?auto=format&fit=crop&w=1600&q=80",
-    detailImage:
-      "https://images.unsplash.com/photo-1543165796-5426273eaab3?auto=format&fit=crop&w=1600&q=80",
+    image: "/images/gujranwala.webp",
+    detailImage: "/images/gujranwala.webp",
     defaultCategory: "clothes",
     industries: createStandardIndustries({
       city: "Gujranwala",
@@ -1075,10 +1061,8 @@ export const BASE_CITY_MARKETS = [
   {
     name: "Bahawalpur",
     slug: "bahawalpur",
-    image:
-      "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=1600&q=80",
-    detailImage:
-      "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=1600&q=80",
+    image: "/images/bahawalpur.jpg",
+    detailImage: "/images/bahawalpur.jpg",
     defaultCategory: "clothes",
     industries: createStandardIndustries({
       city: "Bahawalpur",
@@ -1112,10 +1096,8 @@ export const BASE_CITY_MARKETS = [
   {
     name: "Sargodha",
     slug: "sargodha",
-    image:
-      "https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=1600&q=80",
-    detailImage:
-      "https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=1600&q=80",
+    image: "/images/multan.jpg",
+    detailImage: "/images/multan.jpg",
     defaultCategory: "clothes",
     industries: createStandardIndustries({
       city: "Sargodha",
@@ -1149,10 +1131,8 @@ export const BASE_CITY_MARKETS = [
   {
     name: "Sukkur",
     slug: "sukkur",
-    image:
-      "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80",
-    detailImage:
-      "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80",
+    image: "/images/mazar-e-quaid.png",
+    detailImage: "/images/mazar-e-quaid.png",
     defaultCategory: "clothes",
     industries: createStandardIndustries({
       city: "Sukkur",
@@ -1238,7 +1218,7 @@ const sortByRatingAndReviews = (a, b) => {
 
 export const getTopRatedSellers = (limit = 12) => {
   return flattenAllSellers()
-    .filter((seller) => (seller.rating || 0) >= 4.2)
+    .filter((seller) => (seller.rating || 0) >= 4.0)
     .sort(sortByRatingAndReviews)
     .slice(0, limit)
     .map((seller) => ({
@@ -1259,6 +1239,27 @@ export const CATEGORY_OPTIONS = [
   { name: "Clothes", slug: "clothes" },
   { name: "Perfumes", slug: "perfumes" },
   { name: "Electronics", slug: "electronics" },
+  { name: "Furniture", slug: "furniture" },
+  { name: "Jewelry", slug: "jewelry" },
+  { name: "Books & Stationery", slug: "books-stationery" },
+  { name: "Home Decor", slug: "home-decor" },
+  { name: "Sports & Fitness", slug: "sports-fitness" },
+  { name: "Toys & Games", slug: "toys-games" },
+  { name: "Automotive", slug: "automotive" },
+  { name: "Mobile Phones", slug: "mobile-phones" },
+  { name: "Computers & Laptops", slug: "computers-laptops" },
+  { name: "Kitchen Appliances", slug: "kitchen-appliances" },
+  { name: "Footwear", slug: "footwear" },
+  { name: "Beauty & Cosmetics", slug: "beauty-cosmetics" },
+  { name: "Bags & Luggage", slug: "bags-luggage" },
+  { name: "Watches", slug: "watches" },
+  { name: "Groceries", slug: "groceries" },
+  { name: "Pet Supplies", slug: "pet-supplies" },
+  { name: "Baby Products", slug: "baby-products" },
+  { name: "Medical Equipment", slug: "medical-equipment" },
+  { name: "Art & Craft", slug: "art-craft" },
+  { name: "Photography", slug: "photography" },
+  { name: "Garden & Outdoor", slug: "garden-outdoor" },
 ];
 
 export const CITY_OPTIONS = BASE_CITY_MARKETS.map((city) => ({

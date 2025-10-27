@@ -53,28 +53,17 @@
 }
 
 .hero {
-  display: grid;
-  gap: clamp(24px, 4vw, 32px);
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: flex;
+  justify-content: center;
   align-items: center;
-}
-
-.heroImage {
-  position: relative;
-  width: 100%;
-  border-radius: 28px;
-  aspect-ratio: 16 / 10;
-  overflow: hidden;
-  box-shadow: 0 20px 40px rgba(47, 47, 47, 0.18);
-}
-
-.heroAsset {
-  object-fit: cover;
+  text-align: center;
+  margin-bottom: 24px;
 }
 
 .heroCopy {
   display: grid;
   gap: 16px;
+  max-width: 800px;
 }
 
 .heroCopy h1 {
@@ -84,17 +73,12 @@
   font-weight: 700;
 }
 
-.heroCopy p {
-  font-size: 16px;
-  line-height: 1.7;
-  color: rgba(47, 47, 47, 0.78);
-}
-
 .subcategoryBar {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin: 8px 0 4px;
+  margin: 24px 0;
+  justify-content: center;
 }
 
 .subcategoryLink,
@@ -211,9 +195,11 @@
   padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
   box-shadow: 0 4px 12px rgba(47, 47, 47, 0.08);
   transition: all 0.2s ease;
+  min-height: 180px;
+  height: 100%;
 }
 
 .sellerCard:hover {
@@ -260,7 +246,7 @@
   letter-spacing: 0.05em;
   padding: 6px 12px;
   border-radius: 999px;
-  background: var(--color-accent);
+  background: linear-gradient(135deg, var(--color-accent) 0%, #a67b4a 100%);
   color: white;
   font-weight: 700;
   box-shadow: 0 2px 8px rgba(182, 140, 87, 0.25);
@@ -271,6 +257,14 @@
   gap: 4px;
   font-size: 13px;
   color: rgba(47, 47, 47, 0.75);
+}
+
+.subcategoryInfo {
+  font-size: 11px;
+  text-transform: capitalize;
+  color: rgba(47, 47, 47, 0.6);
+  font-style: italic;
+  margin-top: 4px;
 }
 
 .sellerRatings {
@@ -318,11 +312,7 @@
 
 @media (max-width: 900px) {
   .hero {
-    grid-template-columns: 1fr;
-  }
-
-  .heroImage {
-    aspect-ratio: 16 / 9;
+    margin-bottom: 20px;
   }
 
   .sellerGrid {

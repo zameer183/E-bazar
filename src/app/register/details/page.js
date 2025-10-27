@@ -3,6 +3,7 @@
 import { Suspense, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import Navbar from "@/components/Navbar/Navbar";
 import {
   CATEGORY_OPTIONS,
   CITY_OPTIONS,
@@ -98,13 +99,15 @@ function RegisterDetailsClient() {
       const shops = stored ? JSON.parse(stored) : [];
       shops.push(newShop);
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(shops));
+      // Set user as logged in
+      window.localStorage.setItem("eBazarLoggedIn", "true");
       setStatus({
         type: "success",
-        message: "Shop registered! Redirecting you back to the marketplace...",
+        message: "Shop registered! Redirecting you to your dashboard...",
       });
 
       setTimeout(() => {
-        router.push("/?registered=1");
+        router.push("/dashboard");
       }, 1200);
     } catch (error) {
       console.error("Unable to save shop registration", error);
@@ -117,12 +120,7 @@ function RegisterDetailsClient() {
 
   return (
     <div className={styles.page}>
-      <header className={styles.header}>
-        <div className={styles.logo}>E-Bazar</div>
-        <Link href="/register" className={styles.backLink}>
-          Choose a different package
-        </Link>
-      </header>
+      <Navbar />
 
       <main className={styles.main}>
         <section className={styles.summary}>

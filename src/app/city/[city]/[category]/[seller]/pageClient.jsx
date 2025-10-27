@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import Navbar from "@/components/Navbar/Navbar";
 import {
   STORAGE_KEY,
   createSellerSlug,
@@ -38,14 +40,9 @@ const matchShop = (shop, citySlug, categorySlug, sellerSlug) => {
 
 export default function SellerPageClient({ city, industry, baseSeller, slugs }) {
   const { city: citySlug, category: categorySlug, seller: sellerSlug } = slugs;
-  const [productFocus, setProductFocus] = useState(null);
+  const searchParams = useSearchParams();
+  const productFocus = searchParams.get("product");
   const [dynamicSeller, setDynamicSeller] = useState(null);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const params = new URLSearchParams(window.location.search);
-    setProductFocus(params.get("product"));
-  }, [citySlug, categorySlug, sellerSlug]);
 
 
   useEffect(() => {
@@ -78,6 +75,19 @@ export default function SellerPageClient({ city, industry, baseSeller, slugs }) 
     dynamicSeller,
   ]);
 
+  // Track visitor count
+  useEffect(() => {
+    if (!seller || typeof window === "undefined") return;
+    try {
+      const visitorKey = `${STORAGE_KEY}_visitors_${seller.id}`;
+      const currentCount = parseInt(window.localStorage.getItem(visitorKey) || "0");
+      const newCount = currentCount + 1;
+      window.localStorage.setItem(visitorKey, newCount.toString());
+    } catch (error) {
+      console.error("Unable to track visitor", error);
+    }
+  }, [seller]);
+
   const focusProduct = useMemo(() => {
     if (!productFocus) return null;
     const products = seller?.products || [];
@@ -100,8 +110,16 @@ export default function SellerPageClient({ city, industry, baseSeller, slugs }) 
 
   const products = seller.products || createProductShowcase(categorySlug, 0);
 
+  const handleChat = (productName) => {
+    const message = `Hi! I'm interested in ${productName}. Can you provide more details about this product and delivery information?`;
+    const whatsappUrl = `https://wa.me/${seller.contact.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
   return (
     <div className={styles.page}>
+      <Navbar />
+
       <header className={styles.header}>
         <nav className={styles.breadcrumbs} aria-label="Breadcrumb">
           <Link href="/">Home</Link>
@@ -203,6 +221,12 @@ export default function SellerPageClient({ city, industry, baseSeller, slugs }) 
                           : "First review pending"}
                       </span>
                     </div>
+                    <button
+                      onClick={() => handleChat(product.name)}
+                      className={styles.chatButton}
+                    >
+                      💬 Chat
+                    </button>
                   </div>
                 </article>
               );

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   BASE_CITY_MARKETS,
   BAZAAR_ORDER,
@@ -27,21 +27,40 @@ const cityOptions = BASE_CITY_MARKETS.map((city) => ({
 const mapCategoryToBazaar = (categorySlug) =>
   CATEGORY_TO_BAZAAR[categorySlug] || null;
 
-export default function SearchBar({ citySlug, lockCity = false }) {
+export default function SearchBar({ citySlug, lockCity = false, enableCityFilter = false, bazaarSlug = null }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const cityFromUrl = searchParams.get("city");
+
   const [query, setQuery] = useState("");
   const [selectedCity, setSelectedCity] = useState(
     citySlug && cityOptions.some((c) => c.value === citySlug)
       ? citySlug
+      : cityFromUrl && cityOptions.some((c) => c.value === cityFromUrl)
+      ? cityFromUrl
       : cityOptions[0]?.value,
   );
   const [showResults, setShowResults] = useState(false);
   const [storedShops, setStoredShops] = useState([]);
 
+  // Initialize selectedCity from URL when enableCityFilter is true
+  useEffect(() => {
+    if (enableCityFilter && cityFromUrl && cityOptions.some((c) => c.value === cityFromUrl)) {
+      setSelectedCity(cityFromUrl);
+    }
+  }, [cityFromUrl, enableCityFilter]);
+
   useEffect(() => {
     if (!citySlug) return;
     setSelectedCity(citySlug);
   }, [citySlug]);
+
+  // Handle city change for bazaar page
+  useEffect(() => {
+    if (enableCityFilter && bazaarSlug && selectedCity) {
+      router.push(`/bazar/${bazaarSlug}?city=${selectedCity}`);
+    }
+  }, [selectedCity, enableCityFilter, bazaarSlug, router]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -211,15 +230,30 @@ export default function SearchBar({ citySlug, lockCity = false }) {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+
+    // Validation: ensure both city and search query are provided
+    const trimmedQuery = query.trim();
+    if (!selectedCity) {
+      alert("Please select a city first");
+      return;
+    }
+
+    if (!trimmedQuery) {
+      alert("Please enter a category, subcategory, seller, or product to search");
+      return;
+    }
+
     if (results.length > 0) {
       handleNavigate(results[0]);
+    } else {
+      alert("No results found. Try a different search term.");
     }
   };
 
   return (
-    <div className={styles.wrapper}>
+    <div className={styles.wrapper} suppressHydrationWarning>
       <form className={styles.form} onSubmit={handleSubmit}>
-        <div className={styles.citySelect}>
+        <div className={styles.citySelect} suppressHydrationWarning>
           <label htmlFor="search-city">City</label>
           <select
             id="search-city"
@@ -235,16 +269,17 @@ export default function SearchBar({ citySlug, lockCity = false }) {
           </select>
         </div>
 
-        <div className={styles.inputGroup}>
+        <div className={styles.inputGroup} suppressHydrationWarning>
           <label htmlFor="search-query">Search the bazaar</label>
           <input
             id="search-query"
             type="search"
-            placeholder="Search sellers, products, or bazaar lanes"
+            placeholder="Enter category, subcategory, seller, or product name..."
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             onFocus={() => setShowResults(true)}
             onBlur={() => setTimeout(() => setShowResults(false), 150)}
+            required
           />
         </div>
 

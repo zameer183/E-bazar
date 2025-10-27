@@ -224,7 +224,7 @@
   letter-spacing: 0.05em;
   padding: 6px 12px;
   border-radius: 999px;
-  background: var(--color-accent);
+  background: linear-gradient(135deg, var(--color-accent) 0%, #a67b4a 100%);
   color: white;
   font-weight: 700;
   box-shadow: 0 2px 8px rgba(182, 140, 87, 0.25);

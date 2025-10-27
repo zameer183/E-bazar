@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Navbar from "@/components/Navbar/Navbar";
 import { getTopRatedSellers } from "@/data/markets";
 import styles from "./page.module.css";
 
@@ -10,6 +11,8 @@ const STAR = "\u2605";
 export default function TopRatedPage() {
   return (
     <div className={styles.page}>
+      <Navbar />
+
       <header className={styles.hero}>
         <h1>Top Rated Sellers Across Pakistan</h1>
         <p>

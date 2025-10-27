@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Navbar from "@/components/Navbar/Navbar";
 import styles from "./page.module.css";
 
 const WHY_POINTS = [
@@ -18,10 +19,12 @@ const FUTURE_POINTS = [
 export default function AboutPage() {
   return (
     <div className={styles.page}>
+      <Navbar />
+
       <header className={styles.hero}>
         <h1>About E-Bazar</h1>
         <p>
-          E-Bazar celebrates Pakistan’s marketplace heritage — from Karachi’s buzzing streets to
+          E-Bazar celebrates Pakistan's marketplace heritage — from Karachi's buzzing streets to
           the artisans of Bahawalpur. We organize that energy into a digital bazaar so buyers can
           explore confident, city-first shopping without losing the culture that makes every stall
           special.
@@ -45,7 +48,7 @@ export default function AboutPage() {
       <section className={styles.section}>
         <h2>Grow Without Extra Overheads</h2>
         <p>
-          Buyers don’t demand a personal website or fancy marketing campaign here. Just bring your
+          Buyers don't demand a personal website or fancy marketing campaign here. Just bring your
           best dealing, honest prices, quality products, and timely delivery. Earn trust, respond
           quickly, and your lane stays busy.
         </p>
@@ -53,25 +56,12 @@ export default function AboutPage() {
 
       <section className={styles.section}>
         <h2>The Road Ahead</h2>
-        <p>We’re continuously widening the bazaar so sellers can sell smarter today and tomorrow.</p>
+        <p>We're continuously widening the bazaar so sellers can sell smarter today and tomorrow.</p>
         <ul className={styles.list}>
           {FUTURE_POINTS.map((point) => (
             <li key={point}>{point}</li>
           ))}
         </ul>
-      </section>
-
-      <section className={styles.cta}>
-        <div>
-          <h3>List Your Stall in Minutes</h3>
-          <p>
-            Submit your details once, choose your industry lane, and let Pakistan discover your
-            products round the clock.
-          </p>
-        </div>
-        <Link href="/register" className={styles.ctaButton}>
-          Register Apni Dukan
-        </Link>
       </section>
     </div>
   );

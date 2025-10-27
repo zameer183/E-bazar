@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import {
   BASE_CITY_MARKETS,
   BAZAAR_ORDER,
@@ -41,16 +42,18 @@ export default async function CityBazaarPage({ params }) {
   const heroImage = getBazaarHeroImage(city.slug, bazaar.slug);
 
   return (
-    <BazaarPageClient
-      city={{
-        name: city.name,
-        slug: city.slug,
-        image: city.image,
-        detailImage: city.detailImage ?? city.image,
-      }}
-      bazaar={bazaar}
-      fragranceSellers={fragranceSellers}
-      heroImage={heroImage}
-    />
+    <Suspense fallback={<div>Loading bazaar...</div>}>
+      <BazaarPageClient
+        city={{
+          name: city.name,
+          slug: city.slug,
+          image: city.image,
+          detailImage: city.detailImage ?? city.image,
+        }}
+        bazaar={bazaar}
+        fragranceSellers={fragranceSellers}
+        heroImage={heroImage}
+      />
+    </Suspense>
   );
 }

@@ -1,8 +1,9 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useState } from "react";
-import Image from "next/image";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
+import Navbar from "@/components/Navbar/Navbar";
 import {
   STORAGE_KEY,
   CATEGORY_TO_BAZAAR,
@@ -11,10 +12,14 @@ import {
   getBazaarSubcategories,
   getTopRatedSellers,
 } from "@/data/markets";
-import BazaarFooter from "@/components/bazaar-footer/BazaarFooter";
 import SearchBar from "@/components/search-bar/SearchBar";
 import { useSearchParams } from "next/navigation";
 import styles from "./page.module.css";
+
+// Dynamic import for footer
+const BazaarFooter = dynamic(() => import("@/components/bazaar-footer/BazaarFooter"), {
+  ssr: false,
+});
 
 const SERVICE_NOTE =
   "We only provide an online bazaar. Sellers handle payments & delivery directly.";
@@ -32,15 +37,7 @@ const matchCategory = (shop, slug, name) => {
   return shopCategorySlug === slug || shopCategoryName === name.toLowerCase();
 };
 
-export default function CategoryPageClient(props) {
-  return (
-    <Suspense fallback={<div className={styles.loading}>Loading bazaar lanes...</div>}>
-      <CategoryPageContent {...props} />
-    </Suspense>
-  );
-}
-
-function CategoryPageContent({ city, industry, categories }) {
+export default function CategoryPageClient({ city, industry, categories }) {
   const [dynamicShops, setDynamicShops] = useState([]);
   const searchParams = useSearchParams();
   const focusParam = searchParams.get("focus");
@@ -55,28 +52,28 @@ function CategoryPageContent({ city, industry, categories }) {
   );
   const totalCategories = categories?.length ?? 0;
 
-  const loadShops = () => {
-    if (typeof window === "undefined") return;
-    try {
-      const stored = window.localStorage.getItem(STORAGE_KEY);
-      if (!stored) {
-        setDynamicShops([]);
-        return;
-      }
-      const parsed = JSON.parse(stored);
-      const filtered = parsed.filter(
-        (shop) =>
-          matchCity(shop, city.slug, city.name) &&
-          matchCategory(shop, industry.slug, industry.name),
-      );
-      setDynamicShops(filtered);
-    } catch (error) {
-      console.error("Unable to read stored shops", error);
-      setDynamicShops([]);
-    }
-  };
-
   useEffect(() => {
+    const loadShops = () => {
+      if (typeof window === "undefined") return;
+      try {
+        const stored = window.localStorage.getItem(STORAGE_KEY);
+        if (!stored) {
+          setDynamicShops([]);
+          return;
+        }
+        const parsed = JSON.parse(stored);
+        const filtered = parsed.filter(
+          (shop) =>
+            matchCity(shop, city.slug, city.name) &&
+            matchCategory(shop, industry.slug, industry.name),
+        );
+        setDynamicShops(filtered);
+      } catch (error) {
+        console.error("Unable to read stored shops", error);
+        setDynamicShops([]);
+      }
+    };
+
     loadShops();
     const handleStorage = (event) => {
       if (event.key === STORAGE_KEY) {
@@ -85,8 +82,7 @@ function CategoryPageContent({ city, industry, categories }) {
     };
     window.addEventListener("storage", handleStorage);
     return () => window.removeEventListener("storage", handleStorage);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [city.slug, industry.slug]);
+  }, [city.slug, city.name, industry.slug, industry.name]);
 
   const sellers = useMemo(() => {
     const base = industry.sellers || [];
@@ -97,6 +93,7 @@ function CategoryPageContent({ city, industry, categories }) {
           ? subcategoryFocuses[index % subcategoryFocuses.length]
           : null;
       return {
+        id: shop.id, // Add unique ID
         name: shop.name,
         slug,
         address: shop.address,
@@ -146,6 +143,8 @@ function CategoryPageContent({ city, industry, categories }) {
 
   return (
     <div className={styles.page}>
+      <Navbar />
+
       <header className={styles.header}>
         <nav className={styles.breadcrumbs} aria-label="Breadcrumb">
           <Link href="/">Home</Link>
@@ -157,70 +156,45 @@ function CategoryPageContent({ city, industry, categories }) {
       </header>
 
       <main className={styles.main}>
-        <SearchBar citySlug={city.slug} lockCity />
         <section className={styles.hero}>
-          <div className={styles.heroImage}>
-            <Image
-              src={city.detailImage ?? city.image}
-              alt={`${city.name} landmark view`}
-              fill
-              className={styles.heroAsset}
-              sizes="(max-width: 768px) 100vw, 50vw"
-              priority
-            />
-          </div>
           <div className={styles.heroCopy}>
             <h1>
               {city.name} {industry.name} Market
             </h1>
-            <p>
-              Discover curated {industry.name.toLowerCase()} sellers from{" "}
-              {city.name}&apos;s bazaar culture. Each stall keeps the spirit of
-              Pakistan&apos;s marketplace alive - organized so shoppers reach the
-              right lane instantly.
-            </p>
-            {subcategories.length > 0 && (
-              <div
-                className={styles.subcategoryBar}
-                role="tablist"
-                aria-label={`${industry.name} subcategories`}
-              >
-                <Link
-                  href={basePath}
-                  className={
-                    hasFocus ? styles.subcategoryLink : styles.subcategoryLinkActive
-                  }
-                >
-                  All lanes
-                </Link>
-                {subcategories.map((subcategory) => (
-                  <Link
-                    key={subcategory.focus}
-                    href={`${basePath}?focus=${subcategory.focus}`}
-                    className={
-                      focusParam === subcategory.focus
-                        ? styles.subcategoryLinkActive
-                        : styles.subcategoryLink
-                    }
-                  >
-                    {subcategory.label}
-                  </Link>
-                ))}
-              </div>
-            )}
-            <p className={styles.sellerCount}>
-              {hasFocus && activeSubcategory
-                ? `Showing ${filteredSellers.length} sellers from the ${activeSubcategory.label} lane.`
-                : `Showing ${filteredSellers.length} sellers across ${Math.max(
-                    subcategories.length,
-                    1,
-                  )} bazaar lanes.`}
-            </p>
-            <p className={styles.marketMeta}>
-              Connected to {totalCategories} major categories in {city.name}.
-            </p>
           </div>
         </section>
+
+        <SearchBar citySlug={city.slug} lockCity />
+
+        {subcategories.length > 0 && (
+          <div
+            className={styles.subcategoryBar}
+            role="tablist"
+            aria-label={`${industry.name} subcategories`}
+          >
+            <Link
+              href={basePath}
+              className={
+                hasFocus ? styles.subcategoryLink : styles.subcategoryLinkActive
+              }
+            >
+              All lanes
+            </Link>
+            {subcategories.map((subcategory) => (
+              <Link
+                key={subcategory.focus}
+                href={`${basePath}?focus=${subcategory.focus}`}
+                className={
+                  focusParam === subcategory.focus
+                    ? styles.subcategoryLinkActive
+                    : styles.subcategoryLink
+                }
+              >
+                {subcategory.label}
+              </Link>
+            ))}
+          </div>
+        )}
 
         <section className={styles.sellerSection}>
           <header className={styles.sectionHeader}>
@@ -241,7 +215,7 @@ function CategoryPageContent({ city, industry, categories }) {
             <div className={styles.sellerGrid}>
               {filteredSellers.map((seller, idx) => (
                 <Link
-                  key={seller.slug ?? `${seller.name}-${idx}`}
+                  key={seller.id || `${seller.slug}-${idx}`}
                   href={`/city/${city.slug}/${industry.slug}/${seller.slug ?? createSellerSlug(city.name, seller.name)}`}
                   className={styles.sellerLink}
                 >
@@ -249,18 +223,18 @@ function CategoryPageContent({ city, industry, categories }) {
                     <div className={styles.sellerHeader}>
                       <h3>{seller.name}</h3>
                       <div className={styles.sellerTags}>
-                        {seller.subcategoryFocus && (
-                          <span className={styles.subcategoryTag}>
-                            {subcategoryLabelMap[seller.subcategoryFocus] ||
-                              seller.subcategoryFocus.replaceAll("-", " ")}
-                          </span>
-                        )}
                         <span className={styles.planTag}>{seller.plan}</span>
                       </div>
                     </div>
                     <div className={styles.sellerMeta}>
                       <span>{seller.address}</span>
                       <span>{seller.contact}</span>
+                      {seller.subcategoryFocus && (
+                        <span className={styles.subcategoryInfo}>
+                          {subcategoryLabelMap[seller.subcategoryFocus] ||
+                            seller.subcategoryFocus.replaceAll("-", " ")}
+                        </span>
+                      )}
                     </div>
                     <div className={styles.sellerRatings}>
                       <span>

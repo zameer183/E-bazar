@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import {
   BASE_CITY_MARKETS,
   getCityBySlug,
@@ -35,19 +36,21 @@ export default async function CityCategoryPage({ params }) {
   const categories = getIndustrySlugs(city);
 
   return (
-    <CategoryPageClient
-      city={{
-        name: city.name,
-        slug: city.slug,
-        image: city.image,
-        detailImage: city.detailImage ?? city.image,
-      }}
-      industry={{
-        name: industry.name,
-        slug: categorySlug,
-        sellers: industry.sellers,
-      }}
-      categories={categories}
-    />
+    <Suspense fallback={<div>Loading category...</div>}>
+      <CategoryPageClient
+        city={{
+          name: city.name,
+          slug: city.slug,
+          image: city.image,
+          detailImage: city.detailImage ?? city.image,
+        }}
+        industry={{
+          name: industry.name,
+          slug: categorySlug,
+          sellers: industry.sellers,
+        }}
+        categories={categories}
+      />
+    </Suspense>
   );
 }

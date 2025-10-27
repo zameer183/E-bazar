@@ -100,7 +100,7 @@
 }
 
 .planBadge {
-  background: var(--color-accent);
+  background: linear-gradient(135deg, var(--color-accent) 0%, #a67b4a 100%);
   color: white;
   padding: 8px 16px;
   border-radius: 999px;
@@ -233,6 +233,29 @@
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: rgba(47, 47, 47, 0.65);
+}
+
+.chatButton {
+  margin-top: 8px;
+  width: 100%;
+  padding: 10px 16px;
+  background: linear-gradient(135deg, var(--color-accent) 0%, #a67b4a 100%);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(182, 140, 87, 0.3);
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+
+.chatButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(182, 140, 87, 0.4);
+  background: linear-gradient(135deg, #a67b4a 0%, #8b6f47 100%);
 }
 
 .ctaBanner {

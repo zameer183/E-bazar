@@ -3,59 +3,55 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import SearchBar from "@/components/search-bar/SearchBar";
-import { BASE_CITY_MARKETS, HERO_SLIDES, getTopRatedSellers } from "@/data/markets";
-import BazaarFooter from "@/components/bazaar-footer/BazaarFooter";
+import dynamic from "next/dynamic";
+import Navbar from "@/components/Navbar/Navbar";
+import { BASE_CITY_MARKETS, HERO_SLIDES, getTopRatedSellers, STORAGE_KEY } from "@/data/markets";
 import styles from "./page.module.css";
+
+// Dynamic imports for better performance
+const SearchBar = dynamic(() => import("@/components/search-bar/SearchBar"), {
+  loading: () => <div className={styles.searchLoading}>Loading search...</div>,
+});
+
+const BazaarFooter = dynamic(() => import("@/components/bazaar-footer/BazaarFooter"), {
+  ssr: false,
+  loading: () => <div className={styles.footerLoading}>Loading...</div>,
+});
 
 const SERVICE_NOTE = "We only provide an online bazaar. Sellers handle payments & delivery directly.";
 const TOP_RATED_SELLERS = getTopRatedSellers(12);
 const STAR = "\u2605";
 
 export default function Home() {
-  const [currentSlide, setCurrentSlide] = useState(0);
+  const [hasShop, setHasShop] = useState(false);
+  const [notification, setNotification] = useState({ show: false, message: "" });
 
   useEffect(() => {
-    const timer = setInterval(
-      () => setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length),
-      5000,
-    );
-    return () => clearInterval(timer);
+    // Check if user has a registered shop
+    if (typeof window !== "undefined") {
+      const stored = window.localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        const shops = JSON.parse(stored);
+        setHasShop(shops.length > 0);
+      }
+    }
   }, []);
 
-  const handlePrev = () => {
-    setCurrentSlide((prev) =>
-      prev === 0 ? HERO_SLIDES.length - 1 : prev - 1,
-    );
-  };
-
-  const handleNext = () => {
-    setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
-  };
-
   return (
-    <div className={styles.page}>
-      <header className={styles.navbar}>
-        <div className={styles.logo}>E-Bazar</div>
-        <div className={styles.tagline}>
-          <span className={styles.taglineTitle}>Industry-wise Digital Bazaar</span>
-          <p className={styles.taglineCopy}>
-            Explore Pakistan&apos;s marketplace culture city by city.
-          </p>
+    <div className={styles.page} suppressHydrationWarning>
+      <Navbar />
+
+      {/* Notification Toast */}
+      {notification.show && (
+        <div className={styles.notification}>
+          <span className={styles.notificationIcon}>✓</span>
+          <span className={styles.notificationMessage}>{notification.message}</span>
         </div>
-        <div className={styles.actionGroup}>
-          <Link href="/about" className={styles.aboutLink}>
-            About Us
-          </Link>
-          <Link href="/top-rated" className={styles.topRatedButton}>
-            Top Rated from all Over Pakistan
-          </Link>
-        </div>
-      </header>
+      )}
 
       <main className={styles.main}>
         <section className={styles.hero}>
-          <div className={styles.heroCopy}>
+          <div className={styles.heroCopy} suppressHydrationWarning>
             <h1>Find Your Marketplace Across Pakistan</h1>
             <p>
               Each city card mirrors the traditional bazaar layout - distinct
@@ -63,72 +59,12 @@ export default function Home() {
               can jump straight to the industry they need.
             </p>
           </div>
-          <div className={styles.heroSlider}>
-            <div className={styles.sliderViewport}>
-              <div
-                className={styles.sliderTrack}
-                style={{
-                  width: `${HERO_SLIDES.length * 100}%`,
-                  transform: `translateX(-${
-                    (100 / HERO_SLIDES.length) * currentSlide
-                  }%)`,
-                }}
-              >
-                {HERO_SLIDES.map((slide, index) => (
-                  <div key={slide.alt} className={styles.slide}>
-                    <Image
-                      src={slide.src}
-                      alt={slide.alt}
-                      fill
-                      className={styles.slideImage}
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 45vw, 520px"
-                      priority={index === 0}
-                    />
-                    <div className={styles.slideOverlay}>
-                      <h3>{slide.alt}</h3>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <button
-                type="button"
-                className={`${styles.sliderButton} ${styles.sliderButtonLeft}`}
-                onClick={handlePrev}
-                aria-label="Show previous landmark"
-              >
-                {"<"}
-              </button>
-              <button
-                type="button"
-                className={`${styles.sliderButton} ${styles.sliderButtonRight}`}
-                onClick={handleNext}
-                aria-label="Show next landmark"
-              >
-                {">"}
-              </button>
-            </div>
-            <div className={styles.sliderDots}>
-              {HERO_SLIDES.map((slide, index) => (
-                <button
-                  key={slide.alt}
-                  type="button"
-                  className={
-                    index === currentSlide
-                      ? styles.sliderDotActive
-                      : styles.sliderDot
-                  }
-                  onClick={() => setCurrentSlide(index)}
-                  aria-label={`Show slide ${index + 1}`}
-                />
-              ))}
-            </div>
-          </div>
         </section>
 
         <SearchBar />
 
         <section className={styles.cityGrid} aria-label="City marketplaces">
-          {BASE_CITY_MARKETS.map((city) => {
+          {BASE_CITY_MARKETS.map((city, index) => {
             const categorySlugs = Object.keys(city.industries || {});
             const primaryCategory =
               (city.defaultCategory && categorySlugs.includes(city.defaultCategory))
@@ -141,14 +77,15 @@ export default function Home() {
                 className={styles.cityButton}
                 aria-label={`Explore ${city.name} marketplace`}
               >
-                <div className={styles.cityButtonImage}>
+                <div className={styles.cityButtonImage} suppressHydrationWarning>
                   <Image
                     src={city.image}
                     alt={`${city.name} landmark`}
                     fill
                     className={styles.buttonImage}
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 30vw, 200px"
-                    priority={city.slug === "karachi"}
+                    loading={index < 4 ? "eager" : "lazy"}
+                    quality={75}
                   />
                 </div>
                 <span className={styles.cityButtonName}>{city.name}</span>
@@ -165,14 +102,14 @@ export default function Home() {
               matter where they order from.
             </p>
           </header>
-          <div className={styles.topRatedGrid}>
+          <div className={styles.topRatedGrid} suppressHydrationWarning>
             {TOP_RATED_SELLERS.map((seller) => (
               <Link
                 key={`${seller.citySlug}-${seller.slug || seller.name}`}
                 href={seller.path}
                 className={styles.topRatedCard}
               >
-                <div className={styles.topRatedCardHeader}>
+                <div className={styles.topRatedCardHeader} suppressHydrationWarning>
                   <h3>{seller.name}</h3>
                   {seller.rating ? (
                     <span className={styles.topRatedRating}>

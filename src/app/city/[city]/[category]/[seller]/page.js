@@ -1,10 +1,13 @@
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import {
   BASE_CITY_MARKETS,
   getCityBySlug,
   getIndustryFromCity,
 } from "@/data/markets";
 import SellerPageClient from "./pageClient";
+
+export const dynamicParams = true;
 
 export function generateStaticParams() {
   const params = [];
@@ -44,16 +47,18 @@ export default async function SellerPage({ params }) {
     industry.sellers?.find((seller) => seller.slug === sellerSlug) ?? null;
 
   return (
-    <SellerPageClient
-      city={{
-        name: city.name,
-        slug: city.slug,
-        image: city.image,
-        detailImage: city.detailImage ?? city.image,
-      }}
-      industry={{ name: industry.name, slug: categorySlug }}
-      baseSeller={baseSeller}
-      slugs={{ city: city.slug, category: categorySlug, seller: sellerSlug }}
-    />
+    <Suspense fallback={<div>Loading seller details...</div>}>
+      <SellerPageClient
+        city={{
+          name: city.name,
+          slug: city.slug,
+          image: city.image,
+          detailImage: city.detailImage ?? city.image,
+        }}
+        industry={{ name: industry.name, slug: categorySlug }}
+        baseSeller={baseSeller}
+        slugs={{ city: city.slug, category: categorySlug, seller: sellerSlug }}
+      />
+    </Suspense>
   );
 }

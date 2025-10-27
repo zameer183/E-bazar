@@ -157,8 +157,8 @@ export default function BazaarFooter({ note, topRatedSellers = [] }) {
 
   return (
     <footer className={styles.footer}>
-      <div className={styles.headerRow}>
-        <div className={styles.titleBlock}>
+      <div className={styles.headerRow} suppressHydrationWarning>
+        <div className={styles.titleBlock} suppressHydrationWarning>
           <h2>Marketplace Directory</h2>
           <p>
             Explore Pakistan&apos;s bazaar taxonomy or search for the category you need.
@@ -176,7 +176,7 @@ export default function BazaarFooter({ note, topRatedSellers = [] }) {
       </div>
 
       {hasTopRated && (
-        <div className={styles.topRatedBlock}>
+        <div className={styles.topRatedBlock} suppressHydrationWarning>
           <span className={styles.topRatedLabel}>Top Rated Sellers</span>
           <Link href="/top-rated" className={styles.topRatedLink}>
             Browse Pakistan-wide champions {"->"}
@@ -189,17 +189,44 @@ export default function BazaarFooter({ note, topRatedSellers = [] }) {
           No bazaar categories match that search. Try another keyword.
         </p>
       ) : (
-        <div className={styles.grid}>
-          {filteredSections.map((section) => (
-            <div key={section.title} className={styles.column}>
-              <h3>{section.title}</h3>
-              <ul>
-                {section.items.map((item) => (
-                  <li key={`${section.title}-${item}`}>{item}</li>
-                ))}
-              </ul>
-            </div>
-          ))}
+        <div className={styles.grid} suppressHydrationWarning>
+          {filteredSections.map((section) => {
+            // Map section titles to bazaar slugs
+            const bazaarSlugMap = {
+              "Fashion Bazaar": "fashion",
+              "Tech Bazaar": "tech",
+              "Home Bazaar": "home",
+              "Grocery Bazaar": "grocery",
+              "Auto Bazaar": "auto",
+              "Construction Bazaar": "construction",
+              "Agro Bazaar": "agro",
+              "Education Bazaar": "education",
+              "Family Bazaar": "family",
+              "Health Bazaar": "health",
+              "Event Bazaar": "event",
+              "Travel Bazaar": "travel",
+              "Business Bazaar": "business",
+              "Islamic Bazaar": "islamic",
+            };
+            const bazaarSlug = bazaarSlugMap[section.title] || "fashion";
+
+            return (
+              <div key={section.title} className={styles.column} suppressHydrationWarning>
+                <Link href={`/bazar/${bazaarSlug}`} className={styles.sectionTitle}>
+                  <h3>{section.title}</h3>
+                </Link>
+                <ul>
+                  {section.items.map((item) => (
+                    <li key={`${section.title}-${item}`}>
+                      <Link href={`/bazar/${bazaarSlug}`} className={styles.itemLink}>
+                        {item}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            );
+          })}
         </div>
       )}
 
