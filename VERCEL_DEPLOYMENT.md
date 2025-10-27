@@ -66,10 +66,30 @@ NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=<your-value>
 NEXT_PUBLIC_ADMIN_UIDS=3EM1qAgpHMZEwic5EEreIhjzN272
 ```
 
+> The repo ships with `vercel.json` that maps environment variables to Vercel [secrets](https://vercel.com/docs/projects/environment-variables#secrets) (e.g. `@firebase_api_key`). You can create those secrets once and reuse them across environments:
+
+```bash
+vercel env add NEXT_PUBLIC_FIREBASE_API_KEY firebase_api_key
+vercel env add NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN firebase_auth_domain
+vercel env add NEXT_PUBLIC_FIREBASE_PROJECT_ID firebase_project_id
+vercel env add NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET firebase_storage_bucket
+vercel env add NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID firebase_messaging_sender_id
+vercel env add NEXT_PUBLIC_FIREBASE_APP_ID firebase_app_id
+vercel env add NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID firebase_measurement_id
+vercel env add NEXT_PUBLIC_ADMIN_UIDS ebazar_admin_uids
+vercel env add AWS_REGION aws_region
+vercel env add AWS_S3_BUCKET aws_s3_bucket
+vercel env add AWS_ACCESS_KEY_ID aws_access_key_id
+vercel env add AWS_SECRET_ACCESS_KEY aws_secret_access_key
+vercel env add AWS_S3_PUBLIC_URL aws_s3_public_url
+vercel env add NEXT_PUBLIC_STORAGE_DRIVER storage_driver
+```
+
 **Important Notes**:
-- Add all variables to: **Production**, **Preview**, and **Development** environments
-- Double-check values match your `.env.local` exactly
-- The admin UID is already configured
+- Secrets only need to be created once; they will map automatically because `vercel.json` references `@secret-name`.
+- Add all variables to **Production**, **Preview**, and **Development** to keep builds consistent.
+- Double-check values match your `.env.local` exactly (no surrounding quotes).
+- The admin UID is already configured in the app; set it to the UID(s) who should access admin routes.
 
 ### Step 4: Deploy
 

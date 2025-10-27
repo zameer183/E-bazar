@@ -5,7 +5,7 @@
   padding: 64px clamp(32px, 5vw, 100px) 56px;
   margin-top: 80px;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(246, 240, 228, 0.6) 100%);
-  border-top: 2px solid rgba(182, 140, 87, 0.2);
+  border-top: 2px solid rgba(242, 125, 66, 0.2);
   position: relative;
   overflow: hidden;
 }
@@ -17,7 +17,7 @@
   right: -15%;
   width: 500px;
   height: 500px;
-  background: radial-gradient(circle, rgba(182, 140, 87, 0.06) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(242, 125, 66, 0.06) 0%, transparent 70%);
   border-radius: 50%;
   pointer-events: none;
 }
@@ -61,7 +61,7 @@
   justify-content: space-between;
   padding: 24px 28px;
   border-radius: 14px;
-  border: 2px solid rgba(182, 140, 87, 0.2);
+  border: 2px solid rgba(242, 125, 66, 0.2);
   background: linear-gradient(135deg, white 0%, var(--color-sand) 100%);
   box-shadow: 0 4px 12px rgba(47, 47, 47, 0.06);
   position: relative;

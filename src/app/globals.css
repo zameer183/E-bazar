@@ -1,9 +1,19 @@
 :root {
-  --color-sand: #f6f0e4;
-  --color-warm-gray: #e6e2db;
-  --color-deep-gray: #2f2f2f;
-  --color-accent: #b68c57;
-  --color-card-shadow: rgba(47, 47, 47, 0.1);
+  --color-sand: #f4f1ea;
+  --color-warm-gray: #dce8ed;
+  --color-deep-gray: #172026;
+  --color-primary: #1b3a4b;
+  --color-primary-soft: #284e60;
+  --color-accent: #ffb155;
+  --color-accent-strong: #f27d42;
+  --color-highlight: #f25f4c;
+  --color-muted: #5b6a72;
+  --color-card-shadow: rgba(27, 58, 75, 0.12);
+}
+
+/* Debug: Add a visible border to all elements to see if CSS is being applied */
+* {
+  /* border: 1px solid red !important; */
 }
 
 html,
@@ -14,7 +24,8 @@ body {
 
 body {
   color: var(--color-deep-gray);
-  background: linear-gradient(135deg, var(--color-sand), var(--color-warm-gray));
+  background: radial-gradient(circle at top right, rgba(31, 79, 96, 0.08), transparent 55%),
+    linear-gradient(135deg, var(--color-sand), var(--color-warm-gray));
   font-family: var(--font-poppins), 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -63,7 +74,7 @@ a {
 /* Dropdown selection styling */
 select {
   color: var(--color-deep-gray) !important;
-  background-color: var(--color-sand) !important;
+  background-color: #ffffff !important;
 }
 
 /* Custom scrollbar for dropdowns - Firefox */
@@ -84,7 +95,7 @@ select::-webkit-scrollbar-track {
 
 select::-webkit-scrollbar-thumb {
   background: var(--color-accent) !important;
-  border-radius: 0 !important;
+  border-radius: 10px !important;
   border: 2px solid var(--color-sand) !important;
 }
 
@@ -95,7 +106,7 @@ select option {
 }
 
 select option:checked {
-  background: var(--color-accent) !important;
+  background: var(--color-primary-soft) !important;
   color: white !important;
 }
 
@@ -109,15 +120,15 @@ select option:checked {
   align-items: center;
   justify-content: center;
   padding: 18px 36px;
-  border-radius: 28px;
-  background: linear-gradient(135deg, var(--color-accent) 0%, #a67b4a 100%);
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-strong) 100%);
   color: white;
   font-size: 16px;
   font-weight: 700;
   border: none;
   letter-spacing: 0.02em;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 8px 32px rgba(182, 140, 87, 0.4);
+  box-shadow: 0 12px 34px rgba(242, 125, 66, 0.35);
 }
 
 @media (max-width: 600px) {

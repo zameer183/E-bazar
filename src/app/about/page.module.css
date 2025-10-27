@@ -28,7 +28,7 @@
   font-size: 28px;
   font-weight: 700;
   letter-spacing: 0.02em;
-  background: linear-gradient(135deg, var(--color-accent) 0%, #8b6f47 100%);
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-strong) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -52,26 +52,26 @@
 }
 
 .navLink:focus-visible {
-  background: rgba(182, 140, 87, 0.1);
+  background: rgba(242, 125, 66, 0.1);
 }
 
 .navButton {
   padding: 11px 22px;
-  background: linear-gradient(135deg, var(--color-accent) 0%, #a67b4a 100%);
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-strong) 100%);
   color: white;
   border-radius: 0;
   font-size: 14px;
   font-weight: 600;
   white-space: nowrap;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(182, 140, 87, 0.3);
+  box-shadow: 0 4px 12px rgba(242, 125, 66, 0.3);
   text-decoration: none;
   display: inline-block;
 }
 
 .logoutButton {
   padding: 11px 22px;
-  background: linear-gradient(135deg, var(--color-deep-gray) 0%, #1a1a1a 100%);
+  background: linear-gradient(135deg, var(--color-deep-gray) 0%, var(--color-primary-soft) 100%);
   color: white;
   border: none;
   border-radius: 0;
@@ -219,7 +219,7 @@
   max-width: 450px;
   width: 100%;
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.25);
-  border: 1px solid rgba(182, 140, 87, 0.2);
+  border: 1px solid rgba(242, 125, 66, 0.2);
 }
 
 .modalContent h2 {
@@ -244,9 +244,9 @@
 
 .cancelButton {
   padding: 12px 28px;
-  background: rgba(182, 140, 87, 0.1);
+  background: rgba(242, 125, 66, 0.1);
   color: var(--color-deep-gray);
-  border: 1px solid rgba(182, 140, 87, 0.25);
+  border: 1px solid rgba(242, 125, 66, 0.25);
   border-radius: 20px;
   font-size: 14px;
   font-weight: 600;
@@ -256,7 +256,7 @@
 
 .confirmButton {
   padding: 12px 28px;
-  background: linear-gradient(135deg, var(--color-accent) 0%, #a67b4a 100%);
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-strong) 100%);
   color: white;
   border: none;
   border-radius: 20px;
@@ -264,5 +264,5 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 16px rgba(182, 140, 87, 0.3);
+  box-shadow: 0 4px 16px rgba(242, 125, 66, 0.3);
 }

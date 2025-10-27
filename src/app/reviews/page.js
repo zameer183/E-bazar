@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import styles from "./page.module.css";
 import ReviewSummary from "@/components/reviews/ReviewSummary";
@@ -47,11 +47,18 @@ const writeStoredReviews = (key, reviews) => {
 };
 
 const useStoredReviewList = (storageKey) => {
-  const [entries, setEntries] = useState(() => readStoredReviews(storageKey));
+  const [entries, setEntries] = useState([]);
 
-  useMemo(() => {
+  // Initialize entries only on the client side
+  useEffect(() => {
+    setEntries(readStoredReviews(storageKey));
+  }, [storageKey]);
+
+  // Set up event listeners only on the client side
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    
     const sync = () => setEntries(readStoredReviews(storageKey));
-    sync();
     const handleStorage = (event) => {
       if (event.key === storageKey || event.key === null) {
         sync();

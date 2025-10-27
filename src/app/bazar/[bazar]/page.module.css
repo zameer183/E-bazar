@@ -81,7 +81,7 @@
 
 .homeLink:focus-visible {
   transform: translateY(-2px);
-  box-shadow: 0 12px 24px rgba(182, 140, 87, 0.3);
+  box-shadow: 0 12px 24px rgba(242, 125, 66, 0.3);
 }
 
 .hero {
@@ -161,7 +161,7 @@
   transform: translateY(-4px);
   box-shadow: 0 12px 28px rgba(47, 47, 47, 0.15);
   border-color: var(--color-accent);
-  background: rgba(182, 140, 87, 0.05);
+  background: rgba(242, 125, 66, 0.05);
 }
 
 .subcategoryCard h3 {
@@ -321,7 +321,7 @@
   padding: 60px 40px;
   background: rgba(255, 255, 255, 0.7);
   border-radius: 20px;
-  border: 2px dashed rgba(182, 140, 87, 0.3);
+  border: 2px dashed rgba(242, 125, 66, 0.3);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -377,7 +377,7 @@
   color: white;
   border-color: var(--color-accent);
   transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(182, 140, 87, 0.3);
+  box-shadow: 0 8px 16px rgba(242, 125, 66, 0.3);
 }
 
 @media (max-width: 768px) {

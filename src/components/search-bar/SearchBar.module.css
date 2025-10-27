@@ -10,12 +10,12 @@
   grid-template-columns: 200px 1fr auto;
   gap: 16px;
   align-items: end;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(182, 140, 87, 0.2);
-  border-radius: 0;
+  border: 1px solid rgba(27, 58, 75, 0.12);
+  border-radius: 20px;
   padding: 32px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 12px 38px rgba(27, 58, 75, 0.15);
   transition: all 0.3s ease;
 }
 
@@ -31,7 +31,7 @@
 .inputGroup label {
   font-size: 12px;
   font-weight: 600;
-  color: rgba(47, 47, 47, 0.65);
+  color: rgba(27, 58, 75, 0.62);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -39,14 +39,16 @@
 .citySelect select,
 .inputGroup input {
   padding: 14px 18px;
-  border-radius: 0;
-  border: 1px solid rgba(182, 140, 87, 0.25);
-  background: rgba(246, 240, 228, 0.5);
+  border-radius: 14px;
+  border: 1px solid rgba(27, 58, 75, 0.16);
+  background: rgba(244, 241, 234, 0.6);
   font-size: 15px;
   color: var(--color-deep-gray);
   font-family: inherit;
   font-weight: 600;
   transition: all 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .citySelect select:focus,
@@ -54,7 +56,7 @@
   outline: none;
   border-color: var(--color-accent);
   background: white;
-  box-shadow: 0 0 0 4px rgba(182, 140, 87, 0.1);
+  box-shadow: 0 0 0 4px rgba(242, 125, 66, 0.18);
 }
 
 .citySelect select:disabled {
@@ -64,9 +66,9 @@
 
 .submitButton {
   padding: 14px 32px;
-  border-radius: 0;
+  border-radius: 999px;
   border: none;
-  background: linear-gradient(135deg, var(--color-accent) 0%, #a67b4a 100%);
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-strong) 100%);
   color: white;
   font-size: 14px;
   font-weight: 700;
@@ -75,7 +77,8 @@
   letter-spacing: 0.08em;
   white-space: nowrap;
   transition: all 0.3s ease;
-  box-shadow: 0 6px 20px rgba(182, 140, 87, 0.3);
+  box-shadow: 0 10px 24px rgba(242, 125, 66, 0.28);
+  height: fit-content;
 }
 
 .resultsPanel {
@@ -83,23 +86,23 @@
   top: calc(100% + 12px);
   left: 0;
   right: 0;
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.96);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(182, 140, 87, 0.2);
-  border-radius: 0;
+  border: 1px solid rgba(27, 58, 75, 0.12);
+  border-radius: 20px;
   z-index: 10;
   padding: 12px;
   max-height: 420px;
   overflow-y: auto;
-  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 16px 48px rgba(27, 58, 75, 0.18);
 }
 
 .resultNotice {
   padding: 12px 16px;
   font-size: 13px;
   font-weight: 600;
-  color: rgba(47, 47, 47, 0.7);
-  border-bottom: 1px solid rgba(182, 140, 87, 0.15);
+  color: rgba(27, 58, 75, 0.7);
+  border-bottom: 1px solid rgba(27, 58, 75, 0.12);
 }
 
 .resultItem {
@@ -109,13 +112,18 @@
   gap: 16px;
   width: 100%;
   padding: 14px 18px;
-  border-radius: 0;
+  border-radius: 14px;
   border: none;
   background: transparent;
   cursor: pointer;
   text-align: left;
   position: relative;
   transition: all 0.3s ease;
+}
+
+.resultItem:hover,
+.resultItem:focus {
+  background: rgba(27, 58, 75, 0.08);
 }
 
 .resultLabel {
@@ -136,7 +144,7 @@
 
 .empty {
   font-size: 13px;
-  color: rgba(47, 47, 47, 0.5);
+  color: rgba(27, 58, 75, 0.5);
   padding: 16px;
   text-align: center;
 }
@@ -145,21 +153,34 @@
   .form {
     grid-template-columns: 1fr;
     padding: 16px;
+    gap: 12px;
   }
 
   .submitButton {
     width: 100%;
   }
+  
+  .citySelect select,
+  .inputGroup input {
+    font-size: 14px;
+    padding: 12px 16px;
+  }
 }
 
 @media (max-width: 480px) {
   .form {
-    gap: 12px;
+    padding: 12px;
+    gap: 10px;
   }
 
   .citySelect select,
   .inputGroup input {
     font-size: 14px;
     padding: 10px 14px;
+  }
+  
+  .submitButton {
+    padding: 12px 24px;
+    font-size: 13px;
   }
 }

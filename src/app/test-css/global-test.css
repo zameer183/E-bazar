@@ -1,0 +1,9 @@
+.test-global-style {
+  color: red;
+  font-size: 24px;
+  font-weight: bold;
+  background-color: yellow;
+  padding: 20px;
+  border: 2px solid blue;
+  text-align: center;
+}

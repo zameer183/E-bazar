@@ -1,0 +1,35 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
+  "buildCommand": "npm run build",
+  "installCommand": "npm install",
+  "outputDirectory": ".next",
+  "functions": {
+    "api/**/*": {
+      "runtime": "nodejs20.x",
+      "maxDuration": 60,
+      "memory": 1024
+    }
+  },
+  "env": {
+    "NEXT_PUBLIC_FIREBASE_API_KEY": "AIzaSyB46vgcBhVf3NeQrz7CQEq9fVD9fByx1Ro",
+    "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN": "e-bazar-e3b68.firebaseapp.com",
+    "NEXT_PUBLIC_FIREBASE_PROJECT_ID": "e-bazar-e3b68",
+    "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET": "e-bazar-e3b68.firebasestorage.app",
+    "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID": "592387625655",
+    "NEXT_PUBLIC_FIREBASE_APP_ID": "1:592387625655:web:ae166dde92f5dbf451f332",
+    "NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID": "",
+    "NEXT_PUBLIC_ADMIN_UIDS": "",
+    "AWS_REGION": "",
+    "AWS_S3_BUCKET": "",
+    "AWS_ACCESS_KEY_ID": "",
+    "AWS_SECRET_ACCESS_KEY": "",
+    "AWS_S3_PUBLIC_URL": "",
+    "NEXT_PUBLIC_STORAGE_DRIVER": ""
+  },
+  "git": {
+    "deploymentEnabled": {
+      "main": true
+    }
+  }
+}

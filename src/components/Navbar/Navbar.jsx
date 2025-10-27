@@ -159,6 +159,10 @@ export default function Navbar() {
           E-Bazar
         </Link>
         <div className={styles.navLinks}>
+
+          <Link href="/" className={styles.navLink}>
+            Home
+          </Link>
           <Link href="/about" className={styles.navLink}>
             About Us
           </Link>
