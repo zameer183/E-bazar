@@ -1,0 +1,128 @@
+.footer {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 32px clamp(16px, 4vw, 48px);
+  margin-top: clamp(32px, 6vw, 64px);
+  background: rgba(255, 255, 255, 0.82);
+  border-radius: 24px;
+  border: 1px solid rgba(47, 47, 47, 0.1);
+  box-shadow: 0 18px 34px rgba(47, 47, 47, 0.12);
+}
+
+.headerRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.titleBlock {
+  max-width: 440px;
+  display: grid;
+  gap: 10px;
+}
+
+.titleBlock h2 {
+  font-size: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  color: var(--color-deep-gray);
+}
+
+.titleBlock p {
+  font-size: 14px;
+  color: rgba(47, 47, 47, 0.75);
+}
+
+.searchField {
+  display: grid;
+  gap: 8px;
+  min-width: min(360px, 100%);
+}
+
+.searchField span {
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(47, 47, 47, 0.6);
+}
+
+.searchField input {
+  padding: 12px 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(47, 47, 47, 0.2);
+  background: rgba(255, 255, 255, 0.92);
+  font-size: 14px;
+  color: var(--color-deep-gray);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.searchField input:focus {
+  outline: none;
+  border-color: var(--color-deep-gray);
+  box-shadow: 0 0 0 4px rgba(47, 47, 47, 0.08);
+}
+
+.emptyState {
+  padding: 20px;
+  border-radius: 18px;
+  background: rgba(230, 226, 219, 0.45);
+  border: 1px solid rgba(47, 47, 47, 0.12);
+  font-size: 13px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgba(47, 47, 47, 0.65);
+  text-align: center;
+}
+
+.grid {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.column {
+  display: grid;
+  gap: 10px;
+}
+
+.column h3 {
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  color: var(--color-deep-gray);
+}
+
+.column ul {
+  list-style: none;
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  color: rgba(47, 47, 47, 0.75);
+}
+
+.note {
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(47, 47, 47, 0.6);
+  text-align: center;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 16px;
+  padding: 12px 16px;
+  border: 1px dashed rgba(47, 47, 47, 0.2);
+}
+
+@media (max-width: 600px) {
+  .headerRow {
+    align-items: stretch;
+  }
+
+  .searchField {
+    min-width: 100%;
+  }
+}

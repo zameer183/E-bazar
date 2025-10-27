@@ -1,10 +1,21 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { STORAGE_KEY } from "@/data/markets";
+import {
+  STORAGE_KEY,
+  createSellerSlug,
+  createProductShowcase,
+} from "@/data/markets";
+import BazaarFooter from "@/components/bazaar-footer/BazaarFooter";
+import SearchBar from "@/components/search-bar/SearchBar";
 import styles from "./page.module.css";
+
+import { useSearchParams } from "next/navigation";
+
+const SERVICE_NOTE =
+  "We only provide an online bazaar - sellers handle payments & delivery directly.";
 
 const matchCity = (shop, slug, name) => {
   const shopCitySlug = shop.citySlug?.toLowerCase?.();
@@ -56,16 +67,27 @@ export default function CategoryPageClient({ city, industry, categories }) {
 
   const sellers = useMemo(() => {
     const base = industry.sellers || [];
-    const dynamic = dynamicShops.map((shop) => ({
-      name: shop.name,
-      address: shop.address,
-      contact: shop.contact,
-      rating: shop.rating ?? 0,
-      reviews: shop.reviews ?? 0,
-      plan: shop.planLabel || shop.plan || "Marketplace Partner",
-    }));
-    return [...base, ...dynamic];
-  }, [industry.sellers, dynamicShops]);
+    const dynamic = dynamicShops.map((shop, index) => {
+      const slug = shop.slug || createSellerSlug(city.name, shop.name);
+      return {
+        name: shop.name,
+        slug,
+        address: shop.address,
+        contact: shop.contact,
+        rating: shop.rating ?? 0,
+        reviews: shop.reviews ?? 0,
+        plan: shop.planLabel || shop.plan || "Marketplace Partner",
+        description:
+          shop.description ||
+          `${shop.name} serves ${industry.name.toLowerCase()} buyers across ${city.name}.`,
+        products:
+          shop.products && shop.products.length > 0
+            ? shop.products
+            : createProductShowcase(industry.slug, index),
+      };
+    });
+    return [...base, ...dynamic].sort((a, b) => (b.rating || 0) - (a.rating || 0));
+  }, [industry.sellers, dynamicShops, city.name, industry.name, industry.slug]);
 
   return (
     <div className={styles.page}>
@@ -83,6 +105,7 @@ export default function CategoryPageClient({ city, industry, categories }) {
       </header>
 
       <main className={styles.main}>
+        <SearchBar citySlug={city.slug} lockCity />
         <section className={styles.hero}>
           <div className={styles.heroImage}>
             <Image
@@ -101,11 +124,18 @@ export default function CategoryPageClient({ city, industry, categories }) {
             <p>
               Discover curated {industry.name.toLowerCase()} sellers from{" "}
               {city.name}&apos;s bazaar culture. Each stall keeps the spirit of
-              Pakistan&apos;s marketplace alive—organized so shoppers reach the
+              Pakistan&apos;s marketplace alive - organized so shoppers reach the
               right lane instantly.
             </p>
+            <p className={styles.serviceNotice}>
+              We only provide an online bazaar. Sellers handle payments &amp;
+              delivery directly.
+            </p>
+            <Suspense fallback={null}>
+              <FocusChip />
+            </Suspense>
             <p className={styles.sellerCount}>
-              {sellers.length}+ specialist stores listed • Updated in real time
+              {sellers.length}+ specialist stores listed - Updated in real time
               with new registrations and reviews.
             </p>
             <div className={styles.categoryLinks}>
@@ -135,25 +165,48 @@ export default function CategoryPageClient({ city, industry, categories }) {
             </p>
           </header>
           <div className={styles.sellerGrid}>
-            {sellers.map((seller) => (
-              <article key={`${seller.name}-${seller.address}`} className={styles.sellerCard}>
-                <div className={styles.sellerHeader}>
-                  <h3>{seller.name}</h3>
-                  <span className={styles.planTag}>{seller.plan}</span>
-                </div>
-                <div className={styles.sellerMeta}>
-                  <span>{seller.address}</span>
-                  <span>{seller.contact}</span>
-                </div>
-                <div className={styles.sellerRatings}>
-                  <span>
-                    {seller.rating ? `${seller.rating.toFixed(1)} ★` : "New Store"}
-                  </span>
-                  <span>
-                    {seller.reviews ? `${seller.reviews} reviews` : "Awaiting reviews"}
-                  </span>
-                </div>
-              </article>
+            {sellers.map((seller, idx) => (
+              <Link
+                key={seller.slug ?? `${seller.name}-${idx}`}
+                href={`/city/${city.slug}/${industry.slug}/${seller.slug ?? createSellerSlug(city.name, seller.name)}`}
+                className={styles.sellerLink}
+              >
+                <article className={styles.sellerCard}>
+                  <div className={styles.sellerHeader}>
+                    <h3>{seller.name}</h3>
+                    <span className={styles.planTag}>{seller.plan}</span>
+                  </div>
+                  <div className={styles.sellerMeta}>
+                    <span>{seller.address}</span>
+                    <span>{seller.contact}</span>
+                  </div>
+                  <div className={styles.sellerRatings}>
+                    <span>
+                      {seller.rating ? `${seller.rating.toFixed(1)} ★` : "New Store"}
+                    </span>
+                    <span>
+                      {seller.reviews
+                        ? `${seller.reviews} reviews`
+                        : "Awaiting reviews"}
+                    </span>
+                  </div>
+                  <div className={styles.productPreview}>
+                    {(seller.products || [])
+                      .slice(0, 2)
+                      .map((product) => (
+                        <div
+                          key={`${seller.name}-${product.name}`}
+                          className={styles.productChip}
+                        >
+                          <span>{product.name}</span>
+                          <span>
+                            {product.rating ? `${product.rating.toFixed(1)} ★` : "New"}
+                          </span>
+                        </div>
+                      ))}
+                  </div>
+                </article>
+              </Link>
             ))}
           </div>
         </section>
@@ -170,7 +223,20 @@ export default function CategoryPageClient({ city, industry, categories }) {
             Register Apni Dukan
           </Link>
         </section>
+
+        <BazaarFooter note={SERVICE_NOTE} />
       </main>
     </div>
+  );
+}
+
+function FocusChip() {
+  const searchParams = useSearchParams();
+  const focus = searchParams.get("focus");
+  if (!focus) return null;
+  return (
+    <p className={styles.focusChip}>
+      Filtering for: {focus.replaceAll("-", " ")}
+    </p>
   );
 }

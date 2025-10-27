@@ -3,12 +3,18 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import SearchBar from "@/components/search-bar/SearchBar";
 import {
   BASE_CITY_MARKETS,
   HERO_SLIDES,
-  getIndustrySlugs,
+  BAZAAR_ORDER,
+  getBazaarDefinition,
 } from "@/data/markets";
+import BazaarFooter from "@/components/bazaar-footer/BazaarFooter";
 import styles from "./page.module.css";
+
+const SERVICE_NOTE =
+  "We only provide an online bazaar – sellers handle payments & delivery directly.";
 
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -116,6 +122,12 @@ export default function Home() {
           </div>
         </section>
 
+        <div className={styles.serviceStrip} role="note">
+          {SERVICE_NOTE}
+        </div>
+
+        <SearchBar />
+
         <section className={styles.cityGrid} aria-label="City marketplaces">
           {BASE_CITY_MARKETS.map((city) => (
             <article key={city.slug} className={styles.cityCard}>
@@ -135,22 +147,27 @@ export default function Home() {
                   Navigate the city&apos;s iconic markets and explore dedicated
                   sectors inspired by Pakistan&apos;s traditional bazaars.
                 </p>
-                <ul className={styles.industryList}>
-                  {getIndustrySlugs(city).map((industry) => (
-                    <li key={`${city.slug}-${industry.slug}`}>
+                <div className={styles.industrySlider} role="list">
+                  {BAZAAR_ORDER.map((bazaarSlug) => {
+                    const bazaar = getBazaarDefinition(bazaarSlug);
+                    return (
                       <Link
-                        href={`/city/${city.slug}/${industry.slug}`}
-                        className={styles.industryButton}
+                        key={`${city.slug}-${bazaarSlug}`}
+                        href={`/city/${city.slug}/bazar/${bazaarSlug}`}
+                        className={styles.industryPill}
+                        role="listitem"
                       >
-                        {industry.name}
+                        {bazaar?.title ?? bazaarSlug}
                       </Link>
-                    </li>
-                  ))}
-                </ul>
+                    );
+                  })}
+                </div>
               </div>
             </article>
           ))}
         </section>
+
+        <BazaarFooter note={SERVICE_NOTE} />
       </main>
     </div>
   );

@@ -1,0 +1,189 @@
+"use client";
+
+import { Suspense, useEffect, useMemo, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import {
+  STORAGE_KEY,
+  createSellerSlug,
+  createProductShowcase,
+} from "@/data/markets";
+import BazaarFooter from "@/components/bazaar-footer/BazaarFooter";
+import SearchBar from "@/components/search-bar/SearchBar";
+import styles from "./page.module.css";
+
+const SERVICE_NOTE =
+  "We only provide an online bazaar – sellers handle payments & delivery directly.";
+
+const matchShop = (shop, citySlug, categorySlug, sellerSlug) => {
+  const cityMatches =
+    shop.citySlug?.toLowerCase?.() === citySlug ||
+    shop.city?.toLowerCase?.() === citySlug;
+  const categoryMatches =
+    shop.categorySlug?.toLowerCase?.() === categorySlug ||
+    shop.category?.toLowerCase?.() === categorySlug;
+  const derivedSlug = (
+    shop.slug || createSellerSlug(shop.city ?? citySlug, shop.name ?? "")
+  ).toLowerCase();
+  return cityMatches && categoryMatches && derivedSlug === sellerSlug;
+};
+
+export default function SellerPageClient({ city, industry, baseSeller, slugs }) {
+  const { city: citySlug, category: categorySlug, seller: sellerSlug } = slugs;
+  const searchParams = useSearchParams();
+  const productFocus = searchParams.get("product");
+
+  const [dynamicSeller, setDynamicSeller] = useState(null);
+
+  useEffect(() => {
+    if (baseSeller || typeof window === "undefined") return;
+    try {
+      const stored = window.localStorage.getItem(STORAGE_KEY);
+      if (!stored) return;
+      const shops = JSON.parse(stored);
+      const match = shops.find((shop) =>
+        matchShop(shop, citySlug, categorySlug, sellerSlug),
+      );
+      if (!match) return;
+      setDynamicSeller({
+        ...match,
+        slug:
+          (match.slug && match.slug.toLowerCase()) ||
+          createSellerSlug(match.city ?? citySlug, match.name ?? ""),
+        products:
+          match.products && match.products.length > 0
+            ? match.products
+            : createProductShowcase(categorySlug, Math.floor(Math.random() * 40)),
+      });
+    } catch (error) {
+      console.error("Unable to load seller details from storage", error);
+    }
+  }, [baseSeller, citySlug, categorySlug, sellerSlug]);
+
+  const seller = useMemo(
+    () =>
+      baseSeller ?? dynamicSeller ?? null,
+    [baseSeller, dynamicSeller],
+  );
+
+  if (!seller) {
+    return (
+      <div className={styles.missingPage}>
+        <p>Seller details not found or no longer available.</p>
+        <Link href={`/city/${citySlug}/${categorySlug}`} className={styles.backLink}>
+          Back to {city.name} bazaar
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.page}>
+      <header className={styles.header}>
+        <nav className={styles.breadcrumbs} aria-label="Breadcrumb">
+          <Link href="/">Home</Link>
+          <span>/</span>
+          <Link href={`/city/${citySlug}/${categorySlug}`}>{city.name}</Link>
+          <span>/</span>
+          <span>{seller.name}</span>
+        </nav>
+        <Link href="/register" className={styles.registerButton}>
+          Register Apni Dukan
+        </Link>
+      </header>
+
+      <main className={styles.main}>
+        <SearchBar citySlug={city.slug} lockCity />
+        <section className={styles.hero}>
+          <div className={styles.heroImage}>
+            <Image
+              src={city.detailImage ?? city.image}
+              alt={`${city.name} landmark`}
+              fill
+              className={styles.heroAsset}
+              sizes="(max-width: 768px) 100vw, 60vw"
+              priority
+            />
+            <div className={styles.heroOverlay}>
+              <h1>{seller.name}</h1>
+              <p>
+                {seller.description ||
+                  `${seller.name} serves ${industry.name.toLowerCase()} buyers across ${city.name}.`}
+              </p>
+              <div className={styles.heroStats}>
+                <span>{seller.rating ? `${seller.rating.toFixed(1)} ★` : "New Store"}</span>
+                <span>
+                  {seller.reviews ? `${seller.reviews} reviews` : "Awaiting reviews"}
+                </span>
+                <span>{industry.name}</span>
+              </div>
+            </div>
+          </div>
+          <aside className={styles.contactCard}>
+            <h2>Contact & Location</h2>
+            <div className={styles.contactDetails}>
+              <span>{seller.address}</span>
+              <span>{seller.contact}</span>
+            </div>
+            <p className={styles.serviceNotice}>{SERVICE_NOTE}</p>
+          </aside>
+        </section>
+
+        <section className={styles.productsSection}>
+          <header className={styles.sectionHeader}>
+            <h2>Product Catalog</h2>
+            <p>
+              Explore the highlighted inventory offered by {seller.name}. Ratings and
+              reviews reflect buyer feedback shared through the marketplace community.
+            </p>
+          </header>
+
+          <div className={styles.productsGrid}>
+            {(seller.products || createProductShowcase(categorySlug, 0)).map((product) => (
+              <article key={`${seller.slug}-${product.name}`} className={styles.productCard}>
+                <div className={styles.productImage}>
+                  <Image
+                    src={product.image}
+                    alt={product.name}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 25vw"
+                  />
+                </div>
+                <div className={styles.productDetails}>
+                  <h3>{product.name}</h3>
+                  <p className={styles.productPrice}>{product.price}</p>
+                  <div className={styles.productRatings}>
+                    <span>
+                      {product.rating ? `${product.rating.toFixed(1)} ★` : "New arrival"}
+                    </span>
+                    <span>
+                      {product.reviews
+                        ? `${product.reviews} reviews`
+                        : "First review pending"}
+                    </span>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className={styles.ctaBanner}>
+          <div>
+            <h3>Showcase your products on E-Bazar</h3>
+            <p>
+              Feature your store and product lineup in the digital bazaar, while you
+              continue to manage payments and deliveries.
+            </p>
+          </div>
+          <Link href="/register" className={styles.ctaButton}>
+            Register Apni Dukan
+          </Link>
+        </section>
+
+        <BazaarFooter note={SERVICE_NOTE} />
+      </main>
+    </div>
+  );
+}

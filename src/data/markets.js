@@ -2,7 +2,92 @@ export const STORAGE_KEY = "eBazarShops";
 
 const plans = ["Featured Store", "Standard Partner", "Premium Partner", "Free Partner"];
 
-const createSellerList = ({ city, mobileCode, names, areas }) =>
+const slugify = (text) =>
+  text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+export const createSellerSlug = (city, name) => slugify(`${city} ${name}`);
+
+const productCatalog = {
+  clothes: [
+    {
+      name: "Handcrafted Ajrak Kurta",
+      image:
+        "https://images.pexels.com/photos/1159670/pexels-photo-1159670.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      price: "Rs. 4,850",
+    },
+    {
+      name: "Embroidered Bridal Lehnga",
+      image:
+        "https://images.pexels.com/photos/307008/pexels-photo-307008.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      price: "Rs. 135,000",
+    },
+    {
+      name: "Signature Lawn Three Piece",
+      image:
+        "https://images.pexels.com/photos/428338/pexels-photo-428338.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      price: "Rs. 6,950",
+    },
+  ],
+  perfumes: [
+    {
+      name: "Oud Royale Attar",
+      image:
+        "https://images.pexels.com/photos/965989/pexels-photo-965989.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      price: "Rs. 8,400",
+    },
+    {
+      name: "Rose Musk Signature Spray",
+      image:
+        "https://images.pexels.com/photos/965994/pexels-photo-965994.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      price: "Rs. 5,950",
+    },
+    {
+      name: "Amber Resin Gift Set",
+      image:
+        "https://images.pexels.com/photos/965992/pexels-photo-965992.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      price: "Rs. 4,200",
+    },
+  ],
+  electronics: [
+    {
+      name: "Smart LED 55\" Display",
+      image:
+        "https://images.pexels.com/photos/5081387/pexels-photo-5081387.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      price: "Rs. 124,999",
+    },
+    {
+      name: "Gaming Laptop Pro 15",
+      image:
+        "https://images.pexels.com/photos/6432105/pexels-photo-6432105.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      price: "Rs. 189,500",
+    },
+    {
+      name: "Wireless ANC Headphones",
+      image:
+        "https://images.pexels.com/photos/3394657/pexels-photo-3394657.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      price: "Rs. 22,900",
+    },
+  ],
+};
+
+const generateProducts = (sellerIndex, categorySlug) => {
+  const catalog = productCatalog[categorySlug] || [];
+  return catalog.map((product, idx) => {
+    const rating = Math.min(5, +(4.2 + ((sellerIndex + idx) % 5) * 0.12).toFixed(1));
+    const reviews = 24 + (sellerIndex + idx) * 9;
+    return {
+      ...product,
+      slug: slugify(`${categorySlug}-${product.name}`),
+      rating,
+      reviews,
+    };
+  });
+};
+
+const createSellerList = ({ city, mobileCode, names, areas, categorySlug }) =>
   names.map((name, index) => {
     const area = areas[index % areas.length];
     const baseNumber = 5000000 + index * 137;
@@ -13,13 +98,78 @@ const createSellerList = ({ city, mobileCode, names, areas }) =>
 
     return {
       name,
+      slug: createSellerSlug(city, name),
       address: `${area}, ${city}`,
       contact,
       rating,
       reviews,
       plan,
+      description: `${name} curates authentic ${categorySlug} selections that echo the heritage of ${city}.`,
+      products: generateProducts(index, categorySlug),
     };
   });
+
+export const createProductShowcase = (categorySlug, seed = 0) =>
+  generateProducts(seed, categorySlug).map((product) => ({ ...product }));
+
+export const BAZAAR_DEFINITIONS = {
+  fashion: {
+    slug: "fashion",
+    title: "Fashion Bazaar",
+    description:
+      "Stroll through stitched couture, fabrics, and accessories inspired by Pakistan's heritage.",
+    subcategories: [
+      { label: "Fashion & Clothing", categorySlug: "clothes", focus: "fashion-clothing" },
+      { label: "Footwear", categorySlug: "clothes", focus: "footwear" },
+      { label: "Jewelry & Accessories", categorySlug: "clothes", focus: "jewelry-accessories" },
+      { label: "Beauty & Cosmetics", categorySlug: "clothes", focus: "beauty-cosmetics" },
+      {
+        label: "Fashion Designers & Boutiques",
+        categorySlug: "clothes",
+        focus: "fashion-designers",
+      },
+      { label: "Textile & Fabric", categorySlug: "clothes", focus: "textile-fabric" },
+      { label: "Tailoring & Stitching", categorySlug: "clothes", focus: "tailoring-stitching" },
+    ],
+  },
+  tech: {
+    slug: "tech",
+    title: "Tech Bazaar",
+    description:
+      "Discover the latest devices, repair hubs, and home tech powering local bazaars.",
+    subcategories: [
+      { label: "Electronics & Gadgets", categorySlug: "electronics", focus: "electronics-gadgets" },
+      {
+        label: "Mobile Phones & Accessories",
+        categorySlug: "electronics",
+        focus: "mobile-accessories",
+      },
+      { label: "Computers & Laptops", categorySlug: "electronics", focus: "computers-laptops" },
+      { label: "Home Appliances", categorySlug: "electronics", focus: "home-appliances" },
+      {
+        label: "Electronic Repair & Maintenance",
+        categorySlug: "electronics",
+        focus: "electronic-repair",
+      },
+    ],
+  },
+  fragrance: {
+    slug: "fragrance",
+    title: "Fragrance Bazaar",
+    description:
+      "Experience signature attars, luxury sprays, and scent artisans rooted in city tradition.",
+    highlights: [
+      { name: "Oud-e-Sindh Blend", origin: "Karachi Coastal Distillers" },
+      { name: "Rose-Itar Lahore", origin: "Anarkali Floral Houses" },
+      { name: "Sandal Classic", origin: "Faisalabad Heritage Labs" },
+      { name: "Amber Wilderness", origin: "Quetta Aroma Guild" },
+    ],
+  },
+};
+
+export const BAZAAR_ORDER = ["fashion", "tech", "fragrance"];
+
+export const getBazaarDefinition = (slug) => BAZAAR_DEFINITIONS[slug] ?? null;
 
 export const HERO_SLIDES = [
   { src: "/images/karachi.jpg", alt: "Mazar-e-Quaid, Karachi skyline" },
@@ -27,28 +177,28 @@ export const HERO_SLIDES = [
   { src: "/images/faisalabad-hero.jpg", alt: "Ghanta Ghar, Faisalabad clock tower" },
   { src: "/images/quetta.jpg", alt: "Miri Fort, Quetta hill view" },
   {
-    src: "https://upload.wikimedia.org/wikipedia/commons/e/e0/Ali_Mujtaba_WLM2017_FAISAL_MOSQUE_019.jpg",
+    src: "https://images.pexels.com/photos/1134176/pexels-photo-1134176.jpeg?auto=compress&cs=tinysrgb&w=1600",
     alt: "Faisal Mosque framed by Margalla Hills in Islamabad",
   },
   {
-    src: "https://upload.wikimedia.org/wikipedia/commons/c/c8/Badshahi_Mosque_front_picture.jpg",
+    src: "https://images.pexels.com/photos/724919/pexels-photo-724919.jpeg?auto=compress&cs=tinysrgb&w=1600",
     alt: "Badshahi Mosque courtyard during golden hour in Lahore",
   },
   {
-    src: "https://upload.wikimedia.org/wikipedia/commons/4/4f/Rakaposhi%2C_Nagar_GB_%28Pakistan%29.jpg",
-    alt: "Hunza Valley and Rakaposhi peaks",
+    src: "https://images.pexels.com/photos/1481457/pexels-photo-1481457.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    alt: "Hunza Valley and Karakoram peaks",
   },
   {
-    src: "https://upload.wikimedia.org/wikipedia/commons/0/00/Derawar_Fort%2C_Bahawalpur_I.jpg",
-    alt: "Derawar Fort standing tall in the Cholistan Desert",
+    src: "https://images.pexels.com/photos/1133383/pexels-photo-1133383.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    alt: "Desert dunes reminiscent of Cholistan near Derawar Fort",
   },
   {
-    src: "https://upload.wikimedia.org/wikipedia/commons/f/f7/Gwadar_city%2C_the_doors_of_Air.jpg",
-    alt: "Gwadar coastline and deep-sea port",
+    src: "https://images.pexels.com/photos/2422256/pexels-photo-2422256.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    alt: "Gwadar-style coastline opening to the Arabian Sea",
   },
   {
-    src: "https://upload.wikimedia.org/wikipedia/commons/3/3a/Thatta_collage.jpg",
-    alt: "Shah Jahan Mosque domes in Thatta",
+    src: "https://images.pexels.com/photos/208733/pexels-photo-208733.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    alt: "Shah Jahan Mosque inspired tile work in interior view",
   },
 ];
 
@@ -65,6 +215,7 @@ export const BASE_CITY_MARKETS = [
         sellers: createSellerList({
           city: "Karachi",
           mobileCode: "21",
+          categorySlug: "clothes",
           names: [
             "Zainab Couture Collective",
             "Clifton Silk House",
@@ -98,6 +249,7 @@ export const BASE_CITY_MARKETS = [
         sellers: createSellerList({
           city: "Karachi",
           mobileCode: "21",
+          categorySlug: "perfumes",
           names: [
             "Tariq Road Fragrance Lane",
             "Saddar Attar Ghar",
@@ -130,6 +282,7 @@ export const BASE_CITY_MARKETS = [
         sellers: createSellerList({
           city: "Karachi",
           mobileCode: "21",
+          categorySlug: "electronics",
           names: [
             "Gadget Hub Karachi",
             "TechSquare Saddar",
@@ -171,6 +324,7 @@ export const BASE_CITY_MARKETS = [
         sellers: createSellerList({
           city: "Lahore",
           mobileCode: "22",
+          categorySlug: "clothes",
           names: [
             "Anarkali Heritage Looms",
             "Liberty Pret Studio",
@@ -204,6 +358,7 @@ export const BASE_CITY_MARKETS = [
         sellers: createSellerList({
           city: "Lahore",
           mobileCode: "22",
+          categorySlug: "perfumes",
           names: [
             "Walled City Attar House",
             "Mall Road Essence Bar",
@@ -236,6 +391,7 @@ export const BASE_CITY_MARKETS = [
         sellers: createSellerList({
           city: "Lahore",
           mobileCode: "22",
+          categorySlug: "electronics",
           names: [
             "Hall Road Digital Centre",
             "TechHub Fortress",
@@ -277,6 +433,7 @@ export const BASE_CITY_MARKETS = [
         sellers: createSellerList({
           city: "Faisalabad",
           mobileCode: "33",
+          categorySlug: "clothes",
           names: [
             "Clock Tower Textile Arcade",
             "Liaqat Road Fabric Mart",
@@ -309,6 +466,7 @@ export const BASE_CITY_MARKETS = [
         sellers: createSellerList({
           city: "Faisalabad",
           mobileCode: "33",
+          categorySlug: "perfumes",
           names: [
             "Jinnah Colony Attar Studio",
             "D Ground Fragrance Lane",
@@ -341,6 +499,7 @@ export const BASE_CITY_MARKETS = [
         sellers: createSellerList({
           city: "Faisalabad",
           mobileCode: "33",
+          categorySlug: "electronics",
           names: [
             "Rail Bazaar Tech Point",
             "Susan Road Gadget Shoppe",
@@ -383,6 +542,7 @@ export const BASE_CITY_MARKETS = [
         sellers: createSellerList({
           city: "Quetta",
           mobileCode: "34",
+          categorySlug: "clothes",
           names: [
             "Liaquat Bazaar Wool Works",
             "Kandhari Shawl House",
@@ -415,6 +575,7 @@ export const BASE_CITY_MARKETS = [
         sellers: createSellerList({
           city: "Quetta",
           mobileCode: "34",
+          categorySlug: "perfumes",
           names: [
             "Hanna Lake Essence Co.",
             "Prince Road Attar Gallery",
@@ -447,6 +608,7 @@ export const BASE_CITY_MARKETS = [
         sellers: createSellerList({
           city: "Quetta",
           mobileCode: "34",
+          categorySlug: "electronics",
           names: [
             "Circular Road Digital Mart",
             "Jinnah Road Tech Lounge",
@@ -490,6 +652,19 @@ export const getIndustrySlugs = (city) =>
     name: city.industries[slug].name,
   }));
 
+
+export const getPerfumeSellersForCity = (citySlug, limit = 6) => {
+  const city = BASE_CITY_MARKETS.find((entry) => entry.slug === citySlug.toLowerCase());
+  if (!city) return [];
+  const perfumes = city.industries?.perfumes?.sellers || [];
+  return perfumes.slice(0, limit);
+};
+
+export const getBazaarSubcategories = (slug) => {
+  const def = getBazaarDefinition(slug);
+  return def?.subcategories || [];
+};
+
 export const CATEGORY_OPTIONS = [
   { name: "Clothes", slug: "clothes" },
   { name: "Perfumes", slug: "perfumes" },
@@ -500,3 +675,71 @@ export const CITY_OPTIONS = BASE_CITY_MARKETS.map((city) => ({
   name: city.name,
   slug: city.slug,
 }));
+export const CATEGORY_TO_BAZAAR = {
+  clothes: "fashion",
+  electronics: "tech",
+  perfumes: "fragrance",
+};
+
+export const BAZAAR_HERO_IMAGES = {
+  fashion: {
+    karachi:
+      "https://images.pexels.com/photos/1374124/pexels-photo-1374124.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    lahore:
+      "https://images.pexels.com/photos/1082502/pexels-photo-1082502.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    faisalabad:
+      "https://images.pexels.com/photos/668423/pexels-photo-668423.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    quetta:
+      "https://images.pexels.com/photos/3115179/pexels-photo-3115179.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    default:
+      "https://images.pexels.com/photos/1854876/pexels-photo-1854876.jpeg?auto=compress&cs=tinysrgb&w=1600",
+  },
+  tech: {
+    karachi:
+      "https://images.pexels.com/photos/267394/pexels-photo-267394.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    lahore:
+      "https://images.pexels.com/photos/1181298/pexels-photo-1181298.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    faisalabad:
+      "https://images.pexels.com/photos/243698/pexels-photo-243698.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    quetta:
+      "https://images.pexels.com/photos/18105/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=1600",
+    default:
+      "https://images.pexels.com/photos/3861969/pexels-photo-3861969.jpeg?auto=compress&cs=tinysrgb&w=1600",
+  },
+  fragrance: {
+    karachi:
+      "https://images.pexels.com/photos/965989/pexels-photo-965989.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    lahore:
+      "https://images.pexels.com/photos/965993/pexels-photo-965993.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    faisalabad:
+      "https://images.pexels.com/photos/965994/pexels-photo-965994.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    quetta:
+      "https://images.pexels.com/photos/965992/pexels-photo-965992.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    default:
+      "https://images.pexels.com/photos/965989/pexels-photo-965989.jpeg?auto=compress&cs=tinysrgb&w=1600",
+  },
+};
+
+export const getBazaarHeroImage = (citySlug, bazaarSlug) => {
+  const images = BAZAAR_HERO_IMAGES[bazaarSlug];
+  if (!images) return null;
+  return images[citySlug] || images.default || null;
+};
+
+export const getCitySellers = (citySlug) => {
+  const city = BASE_CITY_MARKETS.find((entry) => entry.slug === citySlug.toLowerCase());
+  if (!city) return [];
+  const sellers = [];
+  Object.entries(city.industries || {}).forEach(([categorySlug, industry]) => {
+    const bazaarSlug = CATEGORY_TO_BAZAAR[categorySlug];
+    if (!bazaarSlug) return;
+    (industry.sellers || []).forEach((seller) => {
+      sellers.push({
+        ...seller,
+        categorySlug,
+        bazaarSlug,
+      });
+    });
+  });
+  return sellers;
+};

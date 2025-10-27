@@ -7,6 +7,8 @@ import {
   CATEGORY_OPTIONS,
   CITY_OPTIONS,
   STORAGE_KEY,
+  createSellerSlug,
+  createProductShowcase,
 } from "@/data/markets";
 import styles from "./page.module.css";
 
@@ -83,6 +85,9 @@ function RegisterDetailsClient() {
       address: formState.address,
       plan: selectedPackage.id,
       planLabel: selectedPackage.label,
+      slug: createSellerSlug(cityOption?.name ?? formState.citySlug, formState.name),
+      description: `${formState.name} connects with buyers looking for ${categoryOption?.name?.toLowerCase() ?? "marketplace goods"} in ${cityOption?.name ?? formState.citySlug}.`,
+      products: createProductShowcase(formState.categorySlug, Math.floor(Math.random() * 50)),
       rating: 0,
       reviews: 0,
     };
