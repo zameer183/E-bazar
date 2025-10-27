@@ -1,4 +1,4 @@
-import { Poppins, Inter } from "next/font/google";
+import { Poppins } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar/Navbar";
 import StickyRegisterLink from "@/components/StickyRegisterLink";
@@ -7,11 +7,7 @@ const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
-});
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
+  preload: false,
 });
 
 export const metadata = {
@@ -23,10 +19,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${poppins.variable} ${inter.variable}`}
-        suppressHydrationWarning
-      >
+      <body className={poppins.variable} suppressHydrationWarning>
         <Navbar />
         {children}
         <StickyRegisterLink />

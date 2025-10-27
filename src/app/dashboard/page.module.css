@@ -1304,6 +1304,95 @@
   margin-top: 28px;
 }
 
+.imageSelectionControls {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 0 12px;
+}
+
+.selectionToggleButton {
+  padding: 8px 16px;
+  border: 1px solid rgba(47, 47, 47, 0.2);
+  background: white;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-deep-gray);
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.selectionToggleButton:hover:not(:disabled) {
+  background: rgba(182, 140, 87, 0.08);
+  border-color: rgba(182, 140, 87, 0.35);
+}
+
+.selectionToggleButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.imageSelectionList {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.imageSelectionItem {
+  display: grid;
+  grid-template-columns: auto 72px 1fr;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid rgba(47, 47, 47, 0.15);
+  border-radius: 12px;
+  background: rgba(246, 240, 228, 0.5);
+}
+
+.imageSelectionCheckbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.imageSelectionPreview {
+  width: 72px;
+  height: 72px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(47, 47, 47, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.imageSelectionThumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.imageSelectionPlaceholder {
+  font-size: 11px;
+  color: rgba(47, 47, 47, 0.6);
+}
+
+.imageSelectionName {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-deep-gray);
+  word-break: break-word;
+}
+
+.selectionHint {
+  font-size: 12px;
+  color: rgba(197, 48, 48, 0.85);
+  margin: 0 0 16px;
+  text-align: center;
+}
+
 .confirmDeleteButton {
   background: #e53e3e;
   color: white;

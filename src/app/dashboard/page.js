@@ -4,6 +4,13 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import {
+  uploadShopImage,
+  deleteShopImage as deleteShopImageFile,
+  uploadShopVideo,
+  uploadProductImage,
+  deleteFile,
+} from "@/lib/storage";
 import { STORAGE_KEY } from "@/data/markets";
 import styles from "./page.module.css";
 
@@ -328,7 +335,6 @@ export default function SellerDashboard() {
 
       try {
         // Upload to Firebase Storage
-        const { uploadShopImage } = await import("@/lib/storage");
         const { saveShopImage } = await import("@/lib/firestore");
 
         const result = await uploadShopImage(shop.id, file);
@@ -373,8 +379,7 @@ export default function SellerDashboard() {
       if (!image) return;
 
       // Delete from Firebase Storage
-      const { deleteShopImage: deleteStorageImage } = await import("@/lib/storage");
-      await deleteStorageImage(image.imageUrl);
+      await deleteShopImageFile(image.imageUrl);
 
       // Delete metadata from Firestore
       const { deleteShopImage } = await import("@/lib/firestore");
@@ -415,7 +420,6 @@ export default function SellerDashboard() {
 
         try {
           // Upload to Firebase Storage
-          const { uploadShopVideo } = await import("@/lib/storage");
           const { saveShopVideo } = await import("@/lib/firestore");
 
           const result = await uploadShopVideo(shop.id, file);
@@ -463,11 +467,9 @@ export default function SellerDashboard() {
 
       // Delete from Firebase Storage if it's a URL
       if (shopVideo.videoUrl && shopVideo.videoUrl.startsWith('http')) {
-        const { deleteFile } = await import("@/lib/storage");
         await deleteFile(shopVideo.videoUrl);
       } else if (shopVideo.data && shopVideo.data.startsWith('http')) {
         // Backward compatibility
-        const { deleteFile } = await import("@/lib/storage");
         await deleteFile(shopVideo.data);
       }
 
@@ -504,7 +506,6 @@ export default function SellerDashboard() {
 
     try {
       // Upload to Firebase Storage
-      const { uploadProductImage } = await import("@/lib/storage");
       const { saveProductImage } = await import("@/lib/firestore");
 
       const result = await uploadProductImage(shop.id, trimmedName, file);
@@ -808,10 +809,7 @@ export default function SellerDashboard() {
     try {
       const existingImages = [...productImages];
       setIsDeletingAllProductImages(true);
-      const [{ deleteFile }, { deleteProductImage }] = await Promise.all([
-        import("@/lib/storage"),
-        import("@/lib/firestore"),
-      ]);
+      const { deleteProductImage } = await import("@/lib/firestore");
 
       for (const image of existingImages) {
         const fileUrl = image.imageUrl || image.data;
@@ -956,62 +954,35 @@ export default function SellerDashboard() {
     }
   };
 
-  const handleDeleteProductImage = async (imageId) => {
-    try {
-      // Find the image to get its URL
-      const image = productImages.find(img => img.id === imageId);
-      if (!image) return;
-
-      // Delete from Firebase Storage if it's a URL
-      if (image.imageUrl && image.imageUrl.startsWith('http')) {
-        const { deleteFile } = await import("@/lib/storage");
-        await deleteFile(image.imageUrl);
-      } else if (image.data && image.data.startsWith('http')) {
-        // Backward compatibility
-        const { deleteFile } = await import("@/lib/storage");
-        await deleteFile(image.data);
-      }
-
-      // Delete metadata from Firestore
-      const { deleteProductImage } = await import("@/lib/firestore");
-      await deleteProductImage(imageId);
-
-      // Update local state
-      const updatedImages = productImages.filter((img) => img.id !== imageId);
-      setProductImages(updatedImages);
-
-      // Also update localStorage for compatibility
-      window.localStorage.setItem(
-        `${STORAGE_KEY}_product_images_${shop.id}`,
-        JSON.stringify(updatedImages)
-      );
-    } catch (error) {
-      console.error("Error deleting product image:", error);
-      showNotification("Failed to delete product image. Please try again.", "error");
-    }
-  };
-
   const handleDeleteProductImagesByName = async (productName, options = {}) => {
-    const { silent = false } = options;
+    const { silent = false, imageIds = null } = options;
     if (!productName) return true;
 
-    const imagesForProduct = productImages.filter(
+    const selection = Array.isArray(imageIds) && imageIds.length > 0
+      ? new Set(imageIds)
+      : null;
+
+    let imagesForProduct = productImages.filter(
       (img) => img.productName === productName
     );
 
+    if (selection) {
+      imagesForProduct = imagesForProduct.filter((img) => selection.has(img.id));
+    }
+
     if (imagesForProduct.length === 0) {
       if (!silent) {
-        showNotification(`No images to delete for ${productName}.`, "info");
+        const message = selection
+          ? "Select at least one image to delete."
+          : `No images to delete for ${productName}.`;
+        showNotification(message, "info");
       }
-      return true;
+      return selection ? false : true;
     }
 
     try {
       setDeletingProductImages((prev) => ({ ...prev, [productName]: true }));
-      const [{ deleteFile }, { deleteProductImage }] = await Promise.all([
-        import("@/lib/storage"),
-        import("@/lib/firestore"),
-      ]);
+      const { deleteProductImage } = await import("@/lib/firestore");
 
       for (const image of imagesForProduct) {
         const fileUrl = image.imageUrl || image.data;
@@ -1021,8 +992,9 @@ export default function SellerDashboard() {
         await deleteProductImage(image.id);
       }
 
+      const idsToRemove = new Set(imagesForProduct.map((img) => img.id));
       const remainingImages = productImages.filter(
-        (img) => img.productName !== productName
+        (img) => !(img.productName === productName && idsToRemove.has(img.id))
       );
       setProductImages(remainingImages);
       if (typeof window !== "undefined") {
@@ -1200,7 +1172,12 @@ export default function SellerDashboard() {
       showNotification(`No images to delete for ${name}.`, "info");
       return;
     }
-    setProductImageDeleteTarget({ name, count: imagesForProduct.length });
+    setProductImageDeleteTarget({
+      name,
+      count: imagesForProduct.length,
+      images: imagesForProduct,
+      selectedIds: imagesForProduct.map((img) => img.id),
+    });
   };
 
   const cancelProductImagesDelete = () => {
@@ -1217,11 +1194,40 @@ export default function SellerDashboard() {
     if (!productImageDeleteTarget) {
       return;
     }
-    const { name } = productImageDeleteTarget;
-    const success = await handleDeleteProductImagesByName(name);
+    const { name, selectedIds } = productImageDeleteTarget;
+    const success = await handleDeleteProductImagesByName(name, {
+      imageIds: Array.isArray(selectedIds) ? selectedIds : [],
+    });
     if (success) {
       setProductImageDeleteTarget(null);
     }
+  };
+
+  const toggleProductImageForDeletion = (imageId, checked) => {
+    setProductImageDeleteTarget((prev) => {
+      if (!prev) {
+        return prev;
+      }
+      const currentSelection = Array.isArray(prev.selectedIds) ? prev.selectedIds : [];
+      const nextSelection = checked
+        ? currentSelection.includes(imageId)
+          ? currentSelection
+          : [...currentSelection, imageId]
+        : currentSelection.filter((id) => id !== imageId);
+      return { ...prev, selectedIds: nextSelection };
+    });
+  };
+
+  const setAllProductImagesForDeletion = (checked) => {
+    setProductImageDeleteTarget((prev) => {
+      if (!prev) {
+        return prev;
+      }
+      const allIds = Array.isArray(prev.images)
+        ? prev.images.map((img) => img.id)
+        : [];
+      return { ...prev, selectedIds: checked ? allIds : [] };
+    });
   };
 
   const handleDeleteShop = async () => {
@@ -1283,6 +1289,15 @@ export default function SellerDashboard() {
   const productImagesDeleteInProgress = productImageDeleteTarget
     ? !!deletingProductImages[productImageDeleteTarget.name]
     : false;
+  const hasSelectedProductImages = Boolean(
+    productImageDeleteTarget?.selectedIds?.length,
+  );
+  const allImagesSelectedForDeletion = Boolean(
+    productImageDeleteTarget?.images?.length &&
+      productImageDeleteTarget.selectedIds?.length ===
+        productImageDeleteTarget.images.length,
+  );
+  const selectedProductImagesCount = productImageDeleteTarget?.selectedIds?.length ?? 0;
 
   if (loading) {
     return (
@@ -1802,8 +1817,63 @@ export default function SellerDashboard() {
           <div className={styles.modalContent}>
             <h2>Delete Product Images?</h2>
             <p>
-              Remove all {productImageDeleteTarget.count} image(s) for &quot;{productImageDeleteTarget.name}&quot;? This action cannot be undone.
+              Select the image(s) to remove from &quot;{productImageDeleteTarget.name}&quot;. This action cannot be undone.
             </p>
+            {productImageDeleteTarget.images?.length > 1 && (
+              <div className={styles.imageSelectionControls}>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setAllProductImagesForDeletion(!allImagesSelectedForDeletion)
+                  }
+                  className={styles.selectionToggleButton}
+                  disabled={productImagesDeleteInProgress}
+                >
+                  {allImagesSelectedForDeletion ? "Clear Selection" : "Select All"}
+                </button>
+              </div>
+            )}
+            <div className={styles.imageSelectionList}>
+              {productImageDeleteTarget.images?.map((image, index) => {
+                const previewSrc = image.imageUrl || image.data;
+                const isChecked = productImageDeleteTarget.selectedIds?.includes(image.id);
+                return (
+                  <label key={image.id} className={styles.imageSelectionItem}>
+                    <input
+                      type="checkbox"
+                      className={styles.imageSelectionCheckbox}
+                      checked={Boolean(isChecked)}
+                      onChange={(event) =>
+                        toggleProductImageForDeletion(image.id, event.target.checked)
+                      }
+                      disabled={productImagesDeleteInProgress}
+                    />
+                    <div className={styles.imageSelectionPreview}>
+                      {previewSrc ? (
+                        <Image
+                          src={previewSrc}
+                          alt={`${productImageDeleteTarget.name} image ${index + 1}`}
+                          width={72}
+                          height={72}
+                          className={styles.imageSelectionThumbnail}
+                          loading="lazy"
+                          unoptimized
+                          sizes="72px"
+                        />
+                      ) : (
+                        <span className={styles.imageSelectionPlaceholder}>No preview</span>
+                      )}
+                    </div>
+                    <span className={styles.imageSelectionName}>
+                      {image.name || `${productImageDeleteTarget.name} image ${index + 1}`}
+                    </span>
+                  </label>
+                );
+              })}
+            </div>
+            {!hasSelectedProductImages && (
+              <p className={styles.selectionHint}>Select at least one image to delete.</p>
+            )}
             <div className={styles.modalActions}>
               <button
                 onClick={cancelProductImagesDelete}
@@ -1815,9 +1885,13 @@ export default function SellerDashboard() {
               <button
                 onClick={confirmProductImagesDelete}
                 className={styles.confirmDeleteButton}
-                disabled={productImagesDeleteInProgress}
+                disabled={productImagesDeleteInProgress || !hasSelectedProductImages}
               >
-                {productImagesDeleteInProgress ? "Deleting..." : "Yes, Delete Images"}
+                {productImagesDeleteInProgress
+                  ? "Deleting..."
+                  : selectedProductImagesCount === 1
+                  ? "Delete 1 Image"
+                  : "Delete Selected Images"}
               </button>
             </div>
           </div>

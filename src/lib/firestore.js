@@ -4,7 +4,7 @@ import {
   collection,
   doc,
   getDoc,
-  getDocs,
+  getDocsFromServer,
   setDoc,
   addDoc,
   updateDoc,
@@ -296,7 +296,7 @@ export const getShopsByOwner = async (ownerId) => {
       // Note: orderBy removed temporarily - add index in Firebase Console to enable sorting
       // orderBy("createdAt", "desc")
     );
-    const querySnapshot = await getDocs(q);
+    const querySnapshot = await getDocsFromServer(q);
     const shops = [];
     querySnapshot.forEach((doc) => {
       shops.push({ id: doc.id, ...doc.data() });
@@ -322,7 +322,7 @@ export const getShopsByOwner = async (ownerId) => {
 export const getAllShops = async () => {
   try {
     const q = query(collection(db, "shops"));
-    const querySnapshot = await getDocs(q);
+    const querySnapshot = await getDocsFromServer(q);
     const shops = [];
     querySnapshot.forEach((doc) => {
       shops.push({ id: doc.id, ...doc.data() });
@@ -404,7 +404,7 @@ export const getShopImages = async (shopId) => {
       where("shopId", "==", shopId)
       // orderBy("uploadedAt", "desc") - requires index, sorting in memory instead
     );
-    const querySnapshot = await getDocs(q);
+    const querySnapshot = await getDocsFromServer(q);
     const images = [];
     querySnapshot.forEach((doc) => {
       images.push({ id: doc.id, ...doc.data() });
@@ -466,7 +466,7 @@ export const getShopVideo = async (shopId) => {
       where("shopId", "==", shopId),
       limit(1)
     );
-    const querySnapshot = await getDocs(q);
+    const querySnapshot = await getDocsFromServer(q);
     if (!querySnapshot.empty) {
       const doc = querySnapshot.docs[0];
       return { success: true, data: { id: doc.id, ...doc.data() } };
@@ -521,7 +521,7 @@ export const getProductImages = async (shopId) => {
       where("shopId", "==", shopId)
       // orderBy("uploadedAt", "desc") - requires index, sorting in memory instead
     );
-    const querySnapshot = await getDocs(q);
+    const querySnapshot = await getDocsFromServer(q);
     const images = [];
     querySnapshot.forEach((doc) => {
       images.push({ id: doc.id, ...doc.data() });
@@ -631,7 +631,7 @@ export const getProductReviews = async (shopId, productName) => {
       where("productName", "==", productName)
       // orderBy("createdAt", "desc") - requires index, sorting in memory instead
     );
-    const querySnapshot = await getDocs(q);
+    const querySnapshot = await getDocsFromServer(q);
     const reviews = [];
     querySnapshot.forEach((doc) => {
       reviews.push({ id: doc.id, ...doc.data() });
@@ -670,7 +670,7 @@ export const getShopReviews = async (shopId) => {
       collection(db, "productReviews"),
       where("shopId", "==", shopId)
     );
-    const querySnapshot = await getDocs(q);
+    const querySnapshot = await getDocsFromServer(q);
     const reviews = [];
     querySnapshot.forEach((doc) => {
       reviews.push({ id: doc.id, ...doc.data() });
@@ -771,7 +771,7 @@ export const getSellerReviews = async (shopId) => {
 
   try {
     const q = query(collection(db, "sellerReviews"), where("shopId", "==", shopId));
-    const querySnapshot = await getDocs(q);
+    const querySnapshot = await getDocsFromServer(q);
     const reviews = [];
     querySnapshot.forEach((doc) => {
       reviews.push({ id: doc.id, ...doc.data() });
