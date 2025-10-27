@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
 import {
   uploadShopImage,
   deleteShopImage as deleteShopImageFile,
@@ -12,6 +12,7 @@ import {
   deleteFile,
 } from "@/lib/storage";
 import { STORAGE_KEY } from "@/data/markets";
+import { buildImageProps } from "@/lib/images";
 import styles from "./page.module.css";
 
 const PRODUCT_LIMITS = {
@@ -1548,12 +1549,11 @@ export default function SellerDashboard() {
               shopImages.map((image) => (
                 <div key={image.id} className={styles.imageCard}>
                   <Image
-                    src={image.imageUrl || image.data}
+                    {...buildImageProps(image.imageUrl || image.data)}
                     alt={image.name || "Shop image"}
                     fill
                     className={styles.imageCardImage}
                     sizes="(max-width: 768px) 50vw, 240px"
-                    unoptimized
                   />
                   <button
                     onClick={() => handleDeleteImage(image.id)}
@@ -1749,12 +1749,11 @@ export default function SellerDashboard() {
                         productImgs.map((image) => (
                           <div key={image.id} className={styles.productImageCard}>
                             <Image
-                              src={image.imageUrl || image.data}
+                              {...buildImageProps(image.imageUrl || image.data)}
                               alt={image.name || `${productName} preview`}
                               fill
                               className={styles.productImage}
                               sizes="(max-width: 768px) 60vw, 200px"
-                              unoptimized
                             />
                           </div>
                         ))
@@ -1851,13 +1850,12 @@ export default function SellerDashboard() {
                     <div className={styles.imageSelectionPreview}>
                       {previewSrc ? (
                         <Image
-                          src={previewSrc}
+                          {...buildImageProps(previewSrc)}
                           alt={`${productImageDeleteTarget.name} image ${index + 1}`}
                           width={72}
                           height={72}
                           className={styles.imageSelectionThumbnail}
                           loading="lazy"
-                          unoptimized
                           sizes="72px"
                         />
                       ) : (

@@ -1,20 +1,20 @@
 "use client";
 
-import { Suspense, use } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { BASE_CITY_MARKETS, getBazaarDefinition } from "@/data/markets";
+import { getBazaarDefinition } from "@/data/markets";
 import SearchBar from "@/components/search-bar/SearchBar";
 import BazaarFooter from "@/components/bazaar-footer/BazaarFooter";
+import { useCities } from "@/lib/cities";
 import styles from "./page.module.css";
 
 const SERVICE_NOTE = "We only provide an online bazaar. Sellers handle payments & delivery directly.";
 
-function BazaarPageContent({ params }) {
+export default function BazaarPage({ params }) {
   const searchParams = useSearchParams();
   const selectedCity = searchParams.get("city");
-  const resolvedParams = use(params);
-  const bazaarSlug = resolvedParams.bazar;
+  const bazaarSlug = params?.bazar;
+  const cities = useCities();
   const bazaarDef = getBazaarDefinition(bazaarSlug);
 
   if (!bazaarDef) {
@@ -32,8 +32,8 @@ function BazaarPageContent({ params }) {
   }
 
   const filteredCities = selectedCity
-    ? BASE_CITY_MARKETS.filter((city) => city.slug === selectedCity)
-    : BASE_CITY_MARKETS;
+    ? cities.filter((city) => city.slug === selectedCity)
+    : cities;
 
   return (
     <div className={styles.page}>
@@ -97,13 +97,5 @@ function BazaarPageContent({ params }) {
         <BazaarFooter note={SERVICE_NOTE} />
       </main>
     </div>
-  );
-}
-
-export default function BazaarPage({ params }) {
-  return (
-    <Suspense fallback={<div className={styles.loading}>Loading bazaar...</div>}>
-      <BazaarPageContent params={params} />
-    </Suspense>
   );
 }

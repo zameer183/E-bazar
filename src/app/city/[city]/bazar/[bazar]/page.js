@@ -1,59 +1,52 @@
-import { notFound } from "next/navigation";
-import { Suspense } from "react";
-import {
-  BASE_CITY_MARKETS,
-  BAZAAR_ORDER,
-  getBazaarDefinition,
-  getCityBySlug,
-  getBazaarHeroImage,
-  getPerfumeSellersForCity,
-} from "@/data/markets";
+"use client";
+
+import { useMemo } from "react";
+import { useParams } from "next/navigation";
 import BazaarPageClient from "./pageClient";
+import { findCityBySlug, useCities } from "@/lib/cities";
+import { getBazaarDefinition, getBazaarHeroImage } from "@/data/markets";
+import styles from "./page.module.css";
 
-export function generateStaticParams() {
-  const params = [];
-  BASE_CITY_MARKETS.forEach((city) => {
-    BAZAAR_ORDER.forEach((bazaar) => {
-      params.push({ city: city.slug, bazar: bazaar });
-    });
-  });
-  return params;
-}
+const deriveFragranceSellers = (city) => city?.industries?.perfumes?.sellers || [];
 
-export default async function CityBazaarPage({ params }) {
-  const { city: cityParam, bazar: bazarParam } = await params;
-  const citySlug = cityParam.toLowerCase();
-  const bazaarSlug = bazarParam.toLowerCase();
+export default function CityBazaarPage() {
+  const params = useParams();
+  const citySlug = (params?.city || "").toLowerCase();
+  const bazaarSlug = (params?.bazar || "").toLowerCase();
+  const cities = useCities();
 
-  const city = getCityBySlug(citySlug);
-  if (!city) {
-    notFound();
+  const city = useMemo(() => findCityBySlug(cities, citySlug), [cities, citySlug]);
+  const bazaar = useMemo(() => getBazaarDefinition(bazaarSlug), [bazaarSlug]);
+
+  if (!city || !bazaar) {
+    return (
+      <div className={styles.page}>
+        <main className={styles.main}>
+          <section className={styles.hero}>
+            <div className={styles.heroCopy}>
+              <h1>Marketplace Not Available</h1>
+              <p>This bazaar is not available for the selected city.</p>
+            </div>
+          </section>
+        </main>
+      </div>
+    );
   }
 
-  const bazaar = getBazaarDefinition(bazaarSlug);
-  if (!bazaar) {
-    notFound();
-  }
-
-  const fragranceSellers =
-    bazaar.slug === "fragrance"
-      ? getPerfumeSellersForCity(city.slug, 6)
-      : [];
-  const heroImage = getBazaarHeroImage(city.slug, bazaar.slug);
+  const heroImage = getBazaarHeroImage(city.slug, bazaar.slug) || city.detailImage || city.image;
+  const fragranceSellers = bazaar.slug === "fragrance" ? deriveFragranceSellers(city) : [];
 
   return (
-    <Suspense fallback={<div>Loading bazaar...</div>}>
-      <BazaarPageClient
-        city={{
-          name: city.name,
-          slug: city.slug,
-          image: city.image,
-          detailImage: city.detailImage ?? city.image,
-        }}
-        bazaar={bazaar}
-        fragranceSellers={fragranceSellers}
-        heroImage={heroImage}
-      />
-    </Suspense>
+    <BazaarPageClient
+      city={{
+        name: city.name,
+        slug: city.slug,
+        image: city.image,
+        detailImage: city.detailImage ?? city.image,
+      }}
+      bazaar={bazaar}
+      fragranceSellers={fragranceSellers}
+      heroImage={heroImage}
+    />
   );
 }

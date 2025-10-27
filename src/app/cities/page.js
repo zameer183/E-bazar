@@ -1,10 +1,14 @@
-import Image from "next/image";
+"use client";
+
 import Link from "next/link";
 import landingStyles from "../page.module.css";
 import styles from "./page.module.css";
-import { BASE_CITY_MARKETS } from "@/data/markets";
+import { useCities } from "@/lib/cities";
+import Image from "next/image";
+import { buildImageProps } from "@/lib/images";
 
 export default function CitiesDirectory() {
+  const cities = useCities();
   return (
     <main className={styles.page}>
       <header className={styles.header}>
@@ -16,7 +20,7 @@ export default function CitiesDirectory() {
       </header>
 
       <section className={`${landingStyles.cityGrid} ${styles.cityGrid}`} aria-label="All city marketplaces">
-        {BASE_CITY_MARKETS.map((city, index) => {
+        {cities.map((city, index) => {
           const industries = Object.keys(city.industries || {});
           const defaultCategory =
             (city.defaultCategory && industries.includes(city.defaultCategory))
@@ -32,7 +36,7 @@ export default function CitiesDirectory() {
             >
               <div className={landingStyles.cityButtonImage}>
                 <Image
-                  src={city.image}
+                  {...buildImageProps(city.image)}
                   alt={`${city.name} landmark`}
                   fill
                   className={landingStyles.buttonImage}

@@ -7,7 +7,6 @@ import {
   STORAGE_KEY,
   CATEGORY_TO_BAZAAR,
   createSellerSlug,
-  createProductShowcase,
   getBazaarDefinition,
   getBazaarSubcategories,
 } from "@/data/markets";
@@ -122,10 +121,7 @@ export default function CategoryPageClient({ city, industry, categories }) {
         description:
           shop.description ||
           `${shop.name} serves ${industry.name.toLowerCase()} buyers across ${city.name}.`,
-        products:
-          shop.products && shop.products.length > 0
-            ? shop.products
-            : createProductShowcase(industry.slug, index),
+        products: Array.isArray(shop.products) ? shop.products : [],
         subcategoryFocus: shop.subcategoryFocus || shop.focus || fallbackFocus,
       };
     });
@@ -135,7 +131,6 @@ export default function CategoryPageClient({ city, industry, categories }) {
     dynamicShops,
     city.name,
     industry.name,
-    industry.slug,
     subcategoryFocuses,
   ]);
 
@@ -293,8 +288,6 @@ export default function CategoryPageClient({ city, industry, categories }) {
     </div>
   );
 }
-
-
 
 
 

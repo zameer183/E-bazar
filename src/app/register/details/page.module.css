@@ -88,6 +88,11 @@
   font-weight: 600;
 }
 
+.fieldHint {
+  font-size: 13px;
+  color: rgba(47, 47, 47, 0.7);
+}
+
 .fieldGroup input,
 .fieldGroup select,
 .fieldGroup textarea {

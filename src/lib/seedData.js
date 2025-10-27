@@ -13,6 +13,10 @@ export const seedMockShops = async (onProgress) => {
     return { success: false, error: message, message };
   }
   try {
+    if (BASE_CITY_MARKETS.length === 0) {
+      const message = "No base city data is available to seed.";
+      return { success: false, error: message, message };
+    }
     const totalShops = BASE_CITY_MARKETS.reduce((acc, city) => {
       return acc + Object.values(city.industries || {}).reduce((sum, industry) => {
         return sum + (industry.sellers?.length || 0);

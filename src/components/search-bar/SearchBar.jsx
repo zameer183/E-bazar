@@ -3,14 +3,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
-  BASE_CITY_MARKETS,
   BAZAAR_ORDER,
   CATEGORY_TO_BAZAAR,
   STORAGE_KEY,
-  createProductShowcase,
   getBazaarDefinition,
-  getCitySellers,
+  getCitySellersFromCollection,
 } from "@/data/markets";
+import { useCities } from "@/lib/cities";
 import styles from "./SearchBar.module.css";
 
 const slugify = (text) =>
@@ -19,11 +18,6 @@ const slugify = (text) =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
 
-const cityOptions = BASE_CITY_MARKETS.map((city) => ({
-  label: city.name,
-  value: city.slug,
-}));
-
 const mapCategoryToBazaar = (categorySlug) =>
   CATEGORY_TO_BAZAAR[categorySlug] || null;
 
@@ -31,14 +25,18 @@ export default function SearchBar({ citySlug, lockCity = false, enableCityFilter
   const router = useRouter();
   const searchParams = useSearchParams();
   const cityFromUrl = searchParams.get("city");
-
+  const cities = useCities();
+  const cityOptions = useMemo(
+    () =>
+      cities.map((city) => ({
+        label: city.name,
+        value: city.slug,
+      })),
+    [cities],
+  );
   const [query, setQuery] = useState("");
   const [selectedCity, setSelectedCity] = useState(
-    citySlug && cityOptions.some((c) => c.value === citySlug)
-      ? citySlug
-      : cityFromUrl && cityOptions.some((c) => c.value === cityFromUrl)
-      ? cityFromUrl
-      : cityOptions[0]?.value,
+    citySlug ?? cityFromUrl ?? cityOptions[0]?.value ?? ""
   );
   const [showResults, setShowResults] = useState(false);
   const [storedShops, setStoredShops] = useState([]);
@@ -47,15 +45,28 @@ export default function SearchBar({ citySlug, lockCity = false, enableCityFilter
 
   // Initialize selectedCity from URL when enableCityFilter is true
   useEffect(() => {
-    if (enableCityFilter && cityFromUrl && cityOptions.some((c) => c.value === cityFromUrl)) {
+    if (
+      enableCityFilter &&
+      cityFromUrl &&
+      cityOptions.some((c) => c.value === cityFromUrl)
+    ) {
       setSelectedCity(cityFromUrl);
     }
-  }, [cityFromUrl, enableCityFilter]);
+  }, [cityFromUrl, enableCityFilter, cityOptions]);
 
   useEffect(() => {
     if (!citySlug) return;
-    setSelectedCity(citySlug);
-  }, [citySlug]);
+    if (cityOptions.some((option) => option.value === citySlug)) {
+      setSelectedCity(citySlug);
+    }
+  }, [citySlug, cityOptions]);
+
+  useEffect(() => {
+    if (cityOptions.length === 0) return;
+    if (!selectedCity || !cityOptions.some((option) => option.value === selectedCity)) {
+      setSelectedCity(cityOptions[0].value);
+    }
+  }, [cityOptions, selectedCity]);
 
   // Handle city change for bazaar page
   useEffect(() => {
@@ -146,24 +157,22 @@ export default function SearchBar({ citySlug, lockCity = false, enableCityFilter
   );
 
   const baseSellers = useMemo(
-    () => getCitySellers(selectedCity),
-    [selectedCity],
+    () => getCitySellersFromCollection(cities, selectedCity),
+    [cities, selectedCity],
   );
 
-  const dynamicSellers = useMemo(() =>
+const dynamicSellers = useMemo(
+  () =>
     storedShops.map((shop) => {
       const bazaarSlug = mapCategoryToBazaar(shop.categorySlug);
-      const products =
-        shop.products && shop.products.length > 0
-          ? shop.products
-          : createProductShowcase(shop.categorySlug || "clothes", 3);
       return {
         ...shop,
         bazaarSlug,
-        products,
+        products: Array.isArray(shop.products) ? shop.products : [],
       };
     }),
-  [storedShops]);
+  [storedShops],
+);
 
   const sellerEntries = useMemo(() => {
     const combined = [...baseSellers, ...dynamicSellers];

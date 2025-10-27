@@ -1,4 +1,5 @@
 const FALLBACK_IMAGE = "/images/placeholder-image.svg";
+const MEDIA_PROXY_ENDPOINT = "/api/media/public";
 
 const isAbsoluteUrl = (url) => /^https?:\/\//i.test(url);
 
@@ -15,11 +16,16 @@ const parseHostname = (url) => {
   }
 };
 
+const shouldProxyViaBackend = (hostname) => {
+  if (!hostname) return false;
+  if (hostname.endsWith(".s3.amazonaws.com")) return true;
+  return /\.s3[.-][^.]+\.amazonaws\.com$/i.test(hostname);
+};
+
 const shouldBypassOptimizer = (hostname) => {
   if (!hostname) return false;
   if (hostname === "firebasestorage.googleapis.com") return true;
-  if (hostname.endsWith(".s3.amazonaws.com")) return true;
-  return /\.s3[.-][^.]+\.amazonaws\.com$/i.test(hostname);
+  return shouldProxyViaBackend(hostname);
 };
 
 export const buildImageProps = (rawSrc, fallback = FALLBACK_IMAGE) => {
@@ -29,9 +35,13 @@ export const buildImageProps = (rawSrc, fallback = FALLBACK_IMAGE) => {
       : fallback;
 
   const hostname = parseHostname(src);
-  const props = { src };
+  const shouldProxy = isAbsoluteUrl(src) && shouldProxyViaBackend(hostname);
+  const finalSrc = shouldProxy ? `${MEDIA_PROXY_ENDPOINT}?url=${encodeURIComponent(src)}` : src;
+  const props = { src: finalSrc };
 
-  if (isAbsoluteUrl(src) && shouldBypassOptimizer(hostname)) {
+  if (shouldProxy) {
+    props.unoptimized = true;
+  } else if (isAbsoluteUrl(src) && shouldBypassOptimizer(hostname)) {
     props.unoptimized = true;
   }
 

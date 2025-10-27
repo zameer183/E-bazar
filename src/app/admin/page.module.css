@@ -165,6 +165,139 @@
   font-size: 24px;
 }
 
+.sectionIntro {
+  margin-bottom: 24px;
+  color: #555;
+  line-height: 1.6;
+}
+
+.formGrid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  margin-bottom: 24px;
+}
+
+.formField {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.formField span {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #666;
+}
+
+.formField input,
+.formField select {
+  padding: 12px 14px;
+  border: 1px solid #d0d5dd;
+  border-radius: 10px;
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+}
+
+.formField input:focus-visible,
+.formField select:focus-visible {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.12);
+}
+
+.formActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.imagePreview {
+  border: 1px dashed #e4e7ec;
+  padding: 12px;
+  border-radius: 12px;
+  background: #f8fafc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.imagePreview img {
+  max-width: 100%;
+  border-radius: 8px;
+}
+
+.imagePreviewImg {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.primaryButton {
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 12px;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.primaryButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(118, 75, 162, 0.2);
+}
+
+.cityList {
+  border-top: 1px solid #e4e7ec;
+  padding-top: 20px;
+}
+
+.cityList h3 {
+  font-size: 16px;
+  margin-bottom: 16px;
+  color: #333;
+}
+
+.cityList ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.cityListItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border: 1px solid #e4e7ec;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+.citySlug {
+  margin-left: 8px;
+  font-size: 12px;
+  color: #667085;
+}
+
+.deleteCityButton {
+  background: none;
+  border: none;
+  color: #d92d20;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.deleteCityButton:hover {
+  text-decoration: underline;
+}
+
 .statsGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));

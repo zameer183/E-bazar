@@ -1,5 +1,3 @@
-import { createProductShowcase } from "@/data/markets";
-
 const FALLBACK_CATEGORY = "clothes";
 const DEFAULT_PRICE = "Price on request";
 
@@ -12,15 +10,7 @@ const slugify = (text = "") =>
 
 const ensureArray = (value) => (Array.isArray(value) ? value : []);
 
-const pickFallbackProduct = (categorySlug = FALLBACK_CATEGORY, index = 0) => {
-  const safeSlug = categorySlug || FALLBACK_CATEGORY;
-  const candidates = ensureArray(createProductShowcase(safeSlug, index));
-  if (candidates.length > 0) {
-    return candidates[index % candidates.length];
-  }
-  const fallbackCandidates = ensureArray(createProductShowcase(FALLBACK_CATEGORY, index));
-  return fallbackCandidates[index % fallbackCandidates.length] || {};
-};
+const pickFallbackProduct = () => ({});
 
 const normalizeProduct = (rawProduct, categorySlug = FALLBACK_CATEGORY, index = 0) => {
   if (!rawProduct && rawProduct !== 0) {
@@ -29,7 +19,7 @@ const normalizeProduct = (rawProduct, categorySlug = FALLBACK_CATEGORY, index = 
 
   const usingString = typeof rawProduct === "string";
   const baseObject = typeof rawProduct === "object" && rawProduct !== null ? rawProduct : {};
-  const fallback = pickFallbackProduct(categorySlug, index);
+  const fallback = pickFallbackProduct();
 
   const nameSource =
     usingString

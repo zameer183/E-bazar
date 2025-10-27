@@ -1,11 +1,13 @@
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
 import dynamic from "next/dynamic";
 import ReviewSummary from "@/components/reviews/ReviewSummary";
-import { BASE_CITY_MARKETS, getTopRatedSellers } from "@/data/markets";
+import { getTopRatedSellers } from "@/data/markets";
+import { useCities } from "@/lib/cities";
 import styles from "./page.module.css";
+import Image from "next/image";
+import Link from "next/link";
+import { buildImageProps } from "@/lib/images";
 
 // Dynamic imports for better performance
 const SearchBar = dynamic(() => import("@/components/search-bar/SearchBar"), {
@@ -21,6 +23,7 @@ const SERVICE_NOTE = "We only provide an online bazaar. Sellers handle payments 
 const TOP_RATED_SELLERS = getTopRatedSellers(12);
 
 export default function Home() {
+  const cities = useCities();
   return (
     <div className={styles.page} suppressHydrationWarning>
       <main className={styles.main}>
@@ -38,7 +41,7 @@ export default function Home() {
         <SearchBar />
 
         <section className={styles.cityGrid} aria-label="City marketplaces">
-          {BASE_CITY_MARKETS.map((city, index) => {
+          {cities.map((city, index) => {
             const categorySlugs = Object.keys(city.industries || {});
             const primaryCategory =
               (city.defaultCategory && categorySlugs.includes(city.defaultCategory))
@@ -53,7 +56,7 @@ export default function Home() {
               >
                 <div className={styles.cityButtonImage} suppressHydrationWarning>
                   <Image
-                    src={city.image}
+                    {...buildImageProps(city.image)}
                     alt={`${city.name} landmark`}
                     fill
                     className={styles.buttonImage}
@@ -89,28 +92,35 @@ export default function Home() {
             </p>
           </header>
           <div className={styles.topRatedGrid} suppressHydrationWarning>
-            {TOP_RATED_SELLERS.map((seller) => (
-              <Link
-                key={`${seller.citySlug}-${seller.slug || seller.name}`}
-                href={seller.path}
-                className={styles.topRatedCard}
-              >
-                <div className={styles.topRatedCardHeader} suppressHydrationWarning>
-                  <h3>{seller.name}</h3>
-                </div>
-                <p className={styles.topRatedMeta}>
-                  {seller.categoryName} - {seller.cityName}
-                </p>
-                <ReviewSummary
-                  rating={seller.rating ?? 0}
-                  count={seller.reviews ?? 0}
-                  readHref={`${seller.path}#reviews`}
-                  readLabel="Read reviews"
-                  writeHref={`/reviews?seller=${encodeURIComponent(seller.slug || seller.name)}`}
-                  writeLabel="Write a review"
-                />
-              </Link>
-            ))}
+            {TOP_RATED_SELLERS.length === 0 ? (
+              <p className={styles.topRatedEmpty}>
+                Listings will appear here once verified sellers start collecting real reviews.
+                Add your shop to begin building trust with buyers.
+              </p>
+            ) : (
+              TOP_RATED_SELLERS.map((seller) => (
+                <Link
+                  key={`${seller.citySlug}-${seller.slug || seller.name}`}
+                  href={seller.path}
+                  className={styles.topRatedCard}
+                >
+                  <div className={styles.topRatedCardHeader} suppressHydrationWarning>
+                    <h3>{seller.name}</h3>
+                  </div>
+                  <p className={styles.topRatedMeta}>
+                    {seller.categoryName} - {seller.cityName}
+                  </p>
+                  <ReviewSummary
+                    rating={seller.rating ?? 0}
+                    count={seller.reviews ?? 0}
+                    readHref={`${seller.path}#reviews`}
+                    readLabel="Read reviews"
+                    writeHref={`/reviews?seller=${encodeURIComponent(seller.slug || seller.name)}`}
+                    writeLabel="Write a review"
+                  />
+                </Link>
+              ))
+            )}
           </div>
           <Link href="/top-rated" className={styles.topRatedCta}>
             <span className={styles.topRatedCtaCircle} aria-hidden="true">

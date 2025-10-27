@@ -1,13 +1,13 @@
 "use client";
 
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   CATEGORY_OPTIONS,
-  CITY_OPTIONS,
   STORAGE_KEY,
   createSellerSlug,
 } from "@/data/markets";
+import { useCities } from "@/lib/cities";
 import styles from "./page.module.css";
 
 const PACKAGES = [
@@ -32,6 +32,16 @@ function RegisterDetailsClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const planId = searchParams.get("plan") || "free";
+  const cities = useCities();
+  const cityOptions = useMemo(
+    () =>
+      cities.map((city) => ({
+        name: city.name,
+        slug: city.slug,
+      })),
+    [cities],
+  );
+  const hasCities = cityOptions.length > 0;
 
   const selectedPackage = useMemo(
     () => PACKAGES.find((pkg) => pkg.id === planId) || PACKAGES[0],
@@ -40,7 +50,7 @@ function RegisterDetailsClient() {
 
   const [formState, setFormState] = useState({
     name: "",
-    citySlug: CITY_OPTIONS[0]?.slug || "",
+    citySlug: "",
     categorySlug: CATEGORY_OPTIONS[0]?.slug || "",
     contact: "",
     address: "",
@@ -48,6 +58,12 @@ function RegisterDetailsClient() {
   });
 
   const [status, setStatus] = useState({ type: "idle", message: "" });
+
+  useEffect(() => {
+    if (hasCities && !formState.citySlug) {
+      setFormState((prev) => ({ ...prev, citySlug: cityOptions[0].slug }));
+    }
+  }, [hasCities, cityOptions, formState.citySlug]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -66,8 +82,24 @@ function RegisterDetailsClient() {
       return;
     }
 
+    if (!formState.citySlug) {
+      setStatus({
+        type: "error",
+        message: "Select a city to continue. Add one from the admin panel if needed.",
+      });
+      return;
+    }
+
     const cityOption =
-      CITY_OPTIONS.find((city) => city.slug === formState.citySlug) || null;
+      cityOptions.find((city) => city.slug === formState.citySlug) || null;
+    if (!cityOption) {
+      setStatus({
+        type: "error",
+        message: "The selected city is no longer available. Please choose another city.",
+      });
+      return;
+    }
+
     const categoryOption =
       CATEGORY_OPTIONS.find(
         (category) => category.slug === formState.categorySlug
@@ -178,13 +210,23 @@ function RegisterDetailsClient() {
                 autoComplete="address-level2"
                 value={formState.citySlug}
                 onChange={handleChange}
+                disabled={!hasCities}
               >
-                {CITY_OPTIONS.map((city) => (
-                  <option key={city.slug} value={city.slug}>
-                    {city.name}
-                  </option>
-                ))}
+                {hasCities ? (
+                  cityOptions.map((city) => (
+                    <option key={city.slug} value={city.slug}>
+                      {city.name}
+                    </option>
+                  ))
+                ) : (
+                  <option value="">Add a city in the admin panel first</option>
+                )}
               </select>
+              {!hasCities && (
+                <p className={styles.fieldHint}>
+                  No cities available yet. Please add a city from the admin panel before continuing.
+                </p>
+              )}
             </div>
 
             <div className={styles.fieldGroup}>

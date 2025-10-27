@@ -56,150 +56,185 @@
   color: rgba(47, 47, 47, 0.75);
 }
 
-.tabBar {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  padding: 20px 0;
+.layout {
+  display: grid;
+  grid-template-columns: minmax(320px, 1.2fr) minmax(320px, 1.8fr);
+  gap: 32px;
+  align-items: start;
 }
 
-.tab,
-.tabActive {
-  padding: 12px 24px;
-  border-radius: 999px;
-  border: 2px solid rgba(47, 47, 47, 0.2);
+.formsColumn {
+  display: grid;
+  gap: 32px;
+}
+
+.listColumn {
+  display: grid;
+  gap: 32px;
+}
+
+.formSection,
+.reviewSection {
   background: white;
-  font-size: 14px;
+  border-radius: 20px;
+  box-shadow: 0 12px 32px rgba(47, 47, 47, 0.12);
+  border: 1px solid rgba(47, 47, 47, 0.08);
+  padding: 28px;
+}
+
+.formHeader,
+.sectionHeader {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.formHeader h2,
+.sectionHeader h2 {
+  font-size: 20px;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-weight: 600;
   color: var(--color-deep-gray);
-  cursor: pointer;
-  transition: all 0.3s ease;
 }
 
-.tab:focus-visible {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(47, 47, 47, 0.12);
+.formHeader p,
+.sectionHeader p {
+  font-size: 14px;
+  color: rgba(47, 47, 47, 0.68);
+  line-height: 1.6;
+}
+
+.reviewForm {
+  display: grid;
+  gap: 18px;
+}
+
+.formField {
+  display: grid;
+  gap: 8px;
+}
+
+.formField span {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(47, 47, 47, 0.6);
+  font-weight: 600;
+}
+
+.formField input,
+.formField textarea,
+.formField select {
+  padding: 12px 14px;
+  border: 1px solid rgba(47, 47, 47, 0.18);
+  border-radius: 12px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--color-deep-gray);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.formField input:focus-visible,
+.formField textarea:focus-visible,
+.formField select:focus-visible {
+  outline: none;
   border-color: var(--color-accent);
+  box-shadow: 0 0 0 4px rgba(182, 140, 87, 0.16);
 }
 
-.tabActive {
-  background: var(--color-accent);
+.formField textarea {
+  resize: vertical;
+  min-height: 140px;
+}
+
+.formError {
+  color: #c53030;
+  font-size: 13px;
+}
+
+.formSuccess {
+  color: #047857;
+  font-size: 13px;
+}
+
+.submitButton {
+  padding: 14px 24px;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(135deg, var(--color-accent), #a67b4a);
   color: white;
-  border-color: var(--color-accent);
-  box-shadow: 0 8px 20px rgba(182, 140, 87, 0.3);
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.masonryGrid {
-  columns: 3;
-  column-gap: 24px;
-  padding: 20px 0;
+.submitButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.submitButton:not(:disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(182, 140, 87, 0.25);
+}
+
+.reviewGrid {
+  display: grid;
+  gap: 18px;
 }
 
 .reviewCard {
-  break-inside: avoid;
-  margin-bottom: 24px;
-  background: white;
+  border: 1px solid rgba(47, 47, 47, 0.08);
   border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 4px 20px rgba(47, 47, 47, 0.08);
-  border: 1px solid rgba(47, 47, 47, 0.06);
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.reviewCard::before {
-  content: '"';
-  position: absolute;
-  top: 10px;
-  left: 15px;
-  font-size: 80px;
-  color: rgba(182, 140, 87, 0.08);
-  font-family: Georgia, serif;
-  line-height: 1;
-  pointer-events: none;
+  padding: 22px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 10px 24px rgba(47, 47, 47, 0.08);
 }
 
 .reviewHeader {
   display: flex;
-  gap: 14px;
-  align-items: center;
-  margin-bottom: 16px;
-  position: relative;
-  z-index: 1;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 12px;
 }
 
-.reviewAvatar {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--color-accent), rgba(221, 206, 173, 0.8));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
-  font-weight: 700;
-  color: white;
-  flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(182, 140, 87, 0.2);
-}
-
-.reviewInfo {
-  flex: 1;
-}
-
-.reviewInfo h3 {
+.reviewHeader h3 {
   font-size: 16px;
   font-weight: 700;
   color: var(--color-deep-gray);
-  margin-bottom: 4px;
 }
 
-.business {
+.reviewMeta {
   font-size: 13px;
-  color: var(--color-accent);
-  font-weight: 600;
-  margin: 0 0 2px 0;
-}
-
-.location {
-  font-size: 12px;
-  color: rgba(47, 47, 47, 0.6);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  color: rgba(47, 47, 47, 0.7);
   margin: 0;
 }
 
 .reviewRating {
-  font-size: 18px;
-  color: #FFB800;
-  margin-bottom: 12px;
-  letter-spacing: 2px;
-}
-
-.reviewText {
-  font-size: 15px;
-  line-height: 1.7;
-  color: rgba(47, 47, 47, 0.8);
-  margin: 0 0 16px 0;
-  position: relative;
-  z-index: 1;
-}
-
-.reviewBadge {
-  display: inline-block;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 6px 12px;
-  border-radius: 999px;
-  background: rgba(182, 140, 87, 0.1);
+  font-size: 14px;
+  font-weight: 700;
   color: var(--color-accent);
-  font-weight: 600;
-  border: 1px solid rgba(182, 140, 87, 0.2);
+}
+
+.reviewBody {
+  font-size: 14px;
+  line-height: 1.7;
+  color: rgba(47, 47, 47, 0.82);
+  margin: 0;
+}
+
+.emptyState {
+  border: 1px dashed rgba(47, 47, 47, 0.2);
+  padding: 20px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  color: rgba(47, 47, 47, 0.7);
+  text-align: center;
 }
 
 .cta {
@@ -268,12 +303,6 @@
   border: 2px solid var(--color-sand);
 }
 
-@media (max-width: 1200px) {
-  .masonryGrid {
-    columns: 2;
-  }
-}
-
 @media (max-width: 768px) {
   .page {
     padding: 24px 16px 60px;
@@ -292,24 +321,8 @@
     font-size: 15px;
   }
 
-  .tabBar {
-    gap: 8px;
-  }
-
-  .tab,
-  .tabActive {
-    padding: 10px 16px;
-    font-size: 12px;
-  }
-
-  .masonryGrid {
-    columns: 1;
-    column-gap: 0;
-  }
-
-  .reviewCard {
-    margin-bottom: 20px;
-    padding: 20px;
+  .layout {
+    grid-template-columns: 1fr;
   }
 
   .cta {
@@ -337,25 +350,8 @@
 }
 
 @media (max-width: 480px) {
-  .reviewCard::before {
-    font-size: 60px;
-  }
-
-  .reviewAvatar {
-    width: 40px;
-    height: 40px;
-    font-size: 18px;
-  }
-
-  .reviewInfo h3 {
-    font-size: 14px;
-  }
-
-  .business {
-    font-size: 12px;
-  }
-
-  .reviewText {
-    font-size: 14px;
+  .formSection,
+  .reviewSection {
+    padding: 20px;
   }
 }

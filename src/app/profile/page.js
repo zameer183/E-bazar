@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import styles from "./page.module.css";
+import Image from "next/image";
+import { buildImageProps } from "@/lib/images";
 
 const PROFILE_FIELD_IDS = {
   name: "profile-full-name",
@@ -348,12 +349,11 @@ export default function ProfilePage() {
               <div className={styles.profilePlaceholder}>
                 {userProfile.image ? (
                   <Image
-                    src={userProfile.image}
+                    {...buildImageProps(userProfile.image)}
                     alt="Profile"
                     fill
                     className={styles.profilePicture}
                     sizes="150px"
-                    unoptimized
                   />
                 ) : (
                   <span>

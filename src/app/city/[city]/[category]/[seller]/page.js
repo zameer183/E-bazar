@@ -1,64 +1,63 @@
-import { notFound } from "next/navigation";
-import { Suspense } from "react";
-import {
-  BASE_CITY_MARKETS,
-  getCityBySlug,
-  getIndustryFromCity,
-} from "@/data/markets";
+"use client";
+
+import { useMemo } from "react";
+import { useParams } from "next/navigation";
 import SellerPageClient from "./pageClient";
+import { findCityBySlug, useCities } from "@/lib/cities";
+import styles from "./page.module.css";
 
-export const dynamicParams = true;
+const findIndustry = (city, categorySlug) => city?.industries?.[categorySlug] || null;
 
-export function generateStaticParams() {
-  const params = [];
-  BASE_CITY_MARKETS.forEach((city) => {
-    Object.entries(city.industries).forEach(([categorySlug, industry]) => {
-      industry.sellers.forEach((seller) => {
-        params.push({
-          city: city.slug,
-          category: categorySlug,
-          seller: seller.slug,
-        });
-      });
-    });
-  });
-  return params;
-}
+const findBaseSeller = (industry, sellerSlug) => {
+  if (!industry || !Array.isArray(industry.sellers)) return null;
+  return (
+    industry.sellers.find((seller) => {
+      const normalized = seller.slug || "";
+      return normalized.toLowerCase() === sellerSlug;
+    }) || null
+  );
+};
 
-export default async function SellerPage({ params }) {
-  const { city: cityParam, category: categoryParam, seller: sellerParam } =
-    await params;
+export default function SellerPage() {
+  const params = useParams();
+  const citySlug = (params?.city || "").toLowerCase();
+  const categorySlug = (params?.category || "").toLowerCase();
+  const sellerSlug = (params?.seller || "").toLowerCase();
+  const cities = useCities();
 
-  const citySlug = cityParam.toLowerCase();
-  const categorySlug = categoryParam.toLowerCase();
-  const sellerSlug = sellerParam.toLowerCase();
+  const city = useMemo(() => findCityBySlug(cities, citySlug), [cities, citySlug]);
+  const industry = useMemo(() => findIndustry(city, categorySlug), [city, categorySlug]);
+  const baseSeller = useMemo(() => findBaseSeller(industry, sellerSlug), [industry, sellerSlug]);
 
-  const city = getCityBySlug(citySlug);
-  if (!city) {
-    notFound();
+  if (!city || !industry) {
+    return (
+      <div className={styles.page}>
+        <main className={styles.main}>
+          <section className={styles.hero}>
+            <div className={styles.heroCopy}>
+              <h1>Seller Not Found</h1>
+              <p>The seller you looked for does not exist in this marketplace yet.</p>
+            </div>
+          </section>
+        </main>
+      </div>
+    );
   }
-
-  const industry = getIndustryFromCity(city, categorySlug);
-  if (!industry) {
-    notFound();
-  }
-
-  const baseSeller =
-    industry.sellers?.find((seller) => seller.slug === sellerSlug) ?? null;
 
   return (
-    <Suspense fallback={<div>Loading seller details...</div>}>
-      <SellerPageClient
-        city={{
-          name: city.name,
-          slug: city.slug,
-          image: city.image,
-          detailImage: city.detailImage ?? city.image,
-        }}
-        industry={{ name: industry.name, slug: categorySlug }}
-        baseSeller={baseSeller}
-        slugs={{ city: city.slug, category: categorySlug, seller: sellerSlug }}
-      />
-    </Suspense>
+    <SellerPageClient
+      city={{
+        name: city.name,
+        slug: city.slug,
+        image: city.image,
+        detailImage: city.detailImage ?? city.image,
+      }}
+      industry={{
+        name: industry.name,
+        slug: categorySlug,
+      }}
+      baseSeller={baseSeller}
+      slugs={{ city: citySlug, category: categorySlug, seller: sellerSlug }}
+    />
   );
 }

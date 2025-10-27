@@ -1,56 +1,64 @@
-import { notFound } from "next/navigation";
-import { Suspense } from "react";
-import {
-  BASE_CITY_MARKETS,
-  getCityBySlug,
-  getIndustryFromCity,
-  getIndustrySlugs,
-} from "@/data/markets";
+"use client";
+
+import { useMemo } from "react";
+import { useParams } from "next/navigation";
 import CategoryPageClient from "./pageClient";
+import { useCities, findCityBySlug } from "@/lib/cities";
+import styles from "./page.module.css";
 
-export function generateStaticParams() {
-  return BASE_CITY_MARKETS.flatMap((city) =>
-    Object.keys(city.industries).map((industrySlug) => ({
-      city: city.slug,
-      category: industrySlug,
-    })),
-  );
-}
+const buildCategories = (city) =>
+  Object.keys(city.industries || {}).map((slug) => ({
+    slug,
+    name: city.industries[slug].name,
+  }));
 
-export default async function CityCategoryPage({ params }) {
-  const { city: cityParam, category: categoryParam } = await params;
+export default function CityCategoryPage() {
+  const params = useParams();
+  const citySlug = (params?.city || "").toLowerCase();
+  const categorySlug = (params?.category || "").toLowerCase();
+  const cities = useCities();
 
-  const citySlug = cityParam.toLowerCase();
-  const categorySlug = categoryParam.toLowerCase();
+  const city = useMemo(() => findCityBySlug(cities, citySlug), [cities, citySlug]);
 
-  const city = getCityBySlug(citySlug);
+  const categories = useMemo(() => (city ? buildCategories(city) : []), [city]);
+  const industry = useMemo(() => city?.industries?.[categorySlug] || null, [city, categorySlug]);
+
   if (!city) {
-    notFound();
+    return (
+      <div className={styles.page}>
+        <main className={styles.main}>
+          <section className={styles.hero}>
+            <div className={styles.heroCopy}>
+              <h1>City Not Found</h1>
+              <p>The marketplace you were looking for is not registered yet.</p>
+            </div>
+          </section>
+        </main>
+      </div>
+    );
   }
 
-  const industry = getIndustryFromCity(city, categorySlug);
-  if (!industry) {
-    notFound();
-  }
-
-  const categories = getIndustrySlugs(city);
+  const targetIndustry =
+    industry || {
+      name: categorySlug || "",
+      slug: categorySlug,
+      sellers: [],
+    };
 
   return (
-    <Suspense fallback={<div>Loading category...</div>}>
-      <CategoryPageClient
-        city={{
-          name: city.name,
-          slug: city.slug,
-          image: city.image,
-          detailImage: city.detailImage ?? city.image,
-        }}
-        industry={{
-          name: industry.name,
-          slug: categorySlug,
-          sellers: industry.sellers,
-        }}
-        categories={categories}
-      />
-    </Suspense>
+    <CategoryPageClient
+      city={{
+        name: city.name,
+        slug: city.slug,
+        image: city.image,
+        detailImage: city.detailImage ?? city.image,
+      }}
+      industry={{
+        name: targetIndustry.name,
+        slug: categorySlug,
+        sellers: targetIndustry.sellers || [],
+      }}
+      categories={categories}
+    />
   );
 }

@@ -4,11 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import {
-  STORAGE_KEY,
-  createSellerSlug,
-  createProductShowcase,
-} from "@/data/markets";
+import { STORAGE_KEY, createSellerSlug } from "@/data/markets";
 import { deriveCategorySlug, normalizeProducts } from "@/lib/products";
 import { buildImageProps } from "@/lib/images";
 import BazaarFooter from "@/components/bazaar-footer/BazaarFooter";
@@ -19,144 +15,6 @@ import styles from "./page.module.css";
 const SERVICE_NOTE =
   "We only provide an online bazaar. Sellers handle payments & delivery directly.";
 const SELLER_REVIEW_KEY = "__seller__";
-
-const FALLBACK_REVIEWERS = [
-  "Ayesha R.",
-  "Hamza K.",
-  "Mehwish S.",
-  "Talha N.",
-  "Sadia Q.",
-  "Bilal H.",
-  "Hira T.",
-  "Usman F.",
-  "Sundus P.",
-];
-
-const FALLBACK_COMMENTS = [
-  "Impressed with the quality and packaging.",
-  "Great service, delivery arrived on time!",
-  "Highly recommended-exactly as described.",
-  "Friendly seller and quick responses.",
-  "Fantastic experience, will purchase again.",
-  "Good value for money and authentic items.",
-  "Loved the attention to detail in every product.",
-  "Customer support was very helpful throughout.",
-];
-
-const FALLBACK_PRODUCT_COMMENTS = [
-  "Exactly what I needed. Works perfectly!",
-  "Quality exceeded expectations for the price.",
-  "Item arrived well-packed and ready to use.",
-  "Solid build quality-feels premium in hand.",
-  "Color and finish are exactly as shown in photos.",
-  "Very happy with the purchase. Recommended!",
-  "Reliable performance during daily use so far.",
-  "Makes a great gift-beautiful presentation.",
-  "The attention to detail really stands out.",
-  "Smooth transaction and excellent communication.",
-];
-
-const buildFallbackTimestamp = (ms) => ({
-  toMillis: () => ms,
-  toDate: () => new Date(ms),
-});
-
-const generateFallbackSellerReviews = (sellerInfo) => {
-  const seedSource =
-    sellerInfo?.id || sellerInfo?.slug || sellerInfo?.name || "seller";
-  let hash = 0;
-  for (let i = 0; i < seedSource.length; i += 1) {
-    hash = (hash << 5) - hash + seedSource.charCodeAt(i);
-    hash |= 0;
-  }
-  const seed = Math.abs(hash);
-  const reviewCount = 3 + (seed % 3);
-  const baseRating = Number(
-    (
-      (Number.isFinite(sellerInfo?.rating) ? sellerInfo.rating : 4.2) +
-      ((seed % 10) - 5) * 0.05
-    ).toFixed(1)
-  );
-
-  const reviews = [];
-  for (let i = 0; i < reviewCount; i += 1) {
-    const reviewer =
-      FALLBACK_REVIEWERS[(seed + i) % FALLBACK_REVIEWERS.length];
-    const comment =
-      FALLBACK_COMMENTS[(seed + i * 3) % FALLBACK_COMMENTS.length];
-    const rating = Math.min(
-      5,
-      Math.max(4, Number((baseRating + (i % 3) * 0.1).toFixed(1)))
-    );
-    const createdMs = Date.now() - (seed % 5 + i) * 86_400_000;
-
-    reviews.push({
-      id: `fallback-${seed}-${i}`,
-      name: reviewer,
-      comment,
-      rating,
-      createdAt: buildFallbackTimestamp(createdMs),
-      isFallback: true,
-    });
-  }
-
-  return reviews;
-};
-
-const generateFallbackProductReviews = (
-  sellerInfo,
-  product,
-  seedOffset = 0
-) => {
-  const productName =
-    typeof product === "string" ? product : product?.name || "product";
-  const seedSource = `${sellerInfo?.id || sellerInfo?.slug || sellerInfo?.name || "seller"}::${productName || "product"}`;
-
-  let hash = 0;
-  for (let i = 0; i < seedSource.length; i += 1) {
-    hash = (hash << 5) - hash + seedSource.charCodeAt(i);
-    hash |= 0;
-  }
-  const seed = Math.abs(hash) + seedOffset;
-  const reviewCount = 2 + (seed % 3);
-  const baseRating = Math.min(
-    5,
-    Math.max(
-      3.5,
-      Number(
-        (
-          (Number.isFinite(product?.rating) ? product.rating : 4.3) +
-          ((seed % 7) - 3) * 0.08
-        ).toFixed(1)
-      )
-    )
-  );
-
-  const reviews = [];
-  for (let i = 0; i < reviewCount; i += 1) {
-    const reviewer =
-      FALLBACK_REVIEWERS[(seed + i * 2) % FALLBACK_REVIEWERS.length];
-    const comment =
-      FALLBACK_PRODUCT_COMMENTS[(seed + i * 5) % FALLBACK_PRODUCT_COMMENTS.length];
-    const rating = Math.min(
-      5,
-      Math.max(3, Number((baseRating + ((i % 2) - 0.5) * 0.2).toFixed(1)))
-    );
-    const createdMs = Date.now() - (seed % 9 + i) * 72_000_000;
-
-    reviews.push({
-      id: `fallback-product-${seed}-${i}`,
-      name: reviewer,
-      comment,
-      rating,
-      productName,
-      createdAt: buildFallbackTimestamp(createdMs),
-      isFallback: true,
-    });
-  }
-
-  return reviews;
-};
 
 const toSlug = (text) =>
   text
@@ -223,8 +81,10 @@ export default function SellerPageClient({ city, industry, baseSeller, slugs }) 
   }, []);
 
   const loadProductReviews = useCallback(async (shopId, products) => {
-    if (!products || products.length === 0) return;
-    const fallbackSellerInfo = dynamicSeller ?? baseSeller ?? { id: shopId };
+    if (!products || products.length === 0) {
+      setProductReviews({});
+      return;
+    }
     try {
       const { getProductReviews } = await import("@/lib/firestore");
       const reviewsData = {};
@@ -232,46 +92,42 @@ export default function SellerPageClient({ city, industry, baseSeller, slugs }) 
       for (const product of products) {
         const productName = typeof product === 'string' ? product : product.name;
         const result = await getProductReviews(shopId, productName);
-        if (result.success) {
-          if (result.fallback && (result.reason === "permission-denied" || result.reason === "firebase-unavailable")) {
+        if (result.success && Array.isArray(result.data)) {
+          reviewsData[productName] = result.data;
+          if (
+            result.fallback &&
+            (result.reason === "permission-denied" || result.reason === "firebase-unavailable")
+          ) {
             permissionsBlocked = true;
           }
-          const payload = Array.isArray(result.data) && result.data.length > 0
-            ? result.data
-            : generateFallbackProductReviews(fallbackSellerInfo, product);
-          reviewsData[productName] = payload;
         } else {
-          reviewsData[productName] = generateFallbackProductReviews(
-            fallbackSellerInfo,
-            product
-          );
+          reviewsData[productName] = [];
+          if (result?.reason === "permission-denied" || result?.code === "permission-denied") {
+            permissionsBlocked = true;
+          }
         }
       }
       setProductReviews(reviewsData);
       if (permissionsBlocked && !permissionWarningRef.current.product) {
         permissionWarningRef.current.product = true;
         showToast(
-          "Live product reviews require updated Firestore permissions. Showing marketplace samples instead.",
+          "Live product reviews are unavailable. Update Firestore permissions to enable them.",
           "warning",
           4000,
         );
       }
     } catch (error) {
-      console.warn("Falling back to sample product reviews.", error);
+      console.warn("Unable to load product reviews.", error);
       const fallbackReviews = {};
       for (const product of products) {
         const productName = typeof product === 'string' ? product : product.name;
-        fallbackReviews[productName] = generateFallbackProductReviews(
-          fallbackSellerInfo,
-          product,
-          7
-        );
+        fallbackReviews[productName] = [];
       }
       setProductReviews(fallbackReviews);
     }
-  }, [baseSeller, dynamicSeller, showToast]);
+  }, [showToast]);
 
-  const loadSellerReviews = useCallback(async (shopId, fallbackSellerInfo = null) => {
+  const loadSellerReviews = useCallback(async (shopId) => {
     if (!shopId) {
       setSellerReviews([]);
       return;
@@ -279,34 +135,40 @@ export default function SellerPageClient({ city, industry, baseSeller, slugs }) 
     try {
       const { getSellerReviews } = await import("@/lib/firestore");
       const result = await getSellerReviews(shopId);
-      if (result.success && !result.fallback) {
+      if (result.success && Array.isArray(result.data)) {
         setSellerReviews(result.data);
+        if (
+          result.fallback &&
+          (result.reason === "permission-denied" || result.reason === "firebase-unavailable") &&
+          !permissionWarningRef.current.seller
+        ) {
+          permissionWarningRef.current.seller = true;
+          showToast(
+            "Seller reviews are restricted. Update Firestore permissions to publish them.",
+            "warning",
+            4000,
+          );
+        }
         return;
       }
 
-      const fallbackReviews = result.success && result.data?.length
-        ? result.data
-        : generateFallbackSellerReviews(fallbackSellerInfo || seller || { id: shopId });
-      setSellerReviews(fallbackReviews);
+      setSellerReviews(Array.isArray(result.data) ? result.data : []);
 
       const permissionsBlocked =
-        result.reason === "permission-denied" || result.code === "permission-denied";
-      if (
-        permissionsBlocked &&
-        !permissionWarningRef.current.seller &&
-        process.env.NODE_ENV === "development"
-      ) {
+        result?.reason === "permission-denied" || result?.code === "permission-denied";
+      if (permissionsBlocked && !permissionWarningRef.current.seller) {
         permissionWarningRef.current.seller = true;
-        console.warn(
-          "Seller reviews fell back to local samples due to Firestore permissions.",
+        showToast(
+          "Seller reviews are restricted. Update Firestore permissions to publish them.",
+          "warning",
+          4000,
         );
       }
     } catch (error) {
-      console.warn("Falling back to sample seller reviews.", error);
-      const fallbackReviews = generateFallbackSellerReviews(fallbackSellerInfo || seller || { id: shopId });
-      setSellerReviews(fallbackReviews);
+      console.warn("Unable to load seller reviews.", error);
+      setSellerReviews([]);
     }
-  }, [seller]);
+  }, [showToast]);
 
   useEffect(() => {
     const loadShopData = async () => {
@@ -392,11 +254,7 @@ export default function SellerPageClient({ city, industry, baseSeller, slugs }) 
             // Firestore fetch failed, fall back to localStorage data
             const fallbackCategorySlug = deriveCategorySlug(match, categorySlug);
             const hasStoredProducts = Array.isArray(match.products) && match.products.length > 0;
-            const fallbackProducts = hasStoredProducts
-              ? match.products
-              : match.ownerId
-              ? []
-              : createProductShowcase(fallbackCategorySlug, Math.floor(Math.random() * 40));
+            const fallbackProducts = hasStoredProducts ? match.products : [];
             const normalizedFallback = normalizeProducts(fallbackProducts, fallbackCategorySlug);
             setDynamicSeller({
               ...match,
@@ -416,11 +274,7 @@ export default function SellerPageClient({ city, industry, baseSeller, slugs }) 
           // No valid shopId or old data format, use localStorage data as fallback
           const fallbackCategorySlug = deriveCategorySlug(match, categorySlug);
           const hasStoredProducts = Array.isArray(match.products) && match.products.length > 0;
-          const fallbackProducts = hasStoredProducts
-            ? match.products
-            : match.ownerId
-            ? []
-            : createProductShowcase(fallbackCategorySlug, Math.floor(Math.random() * 40));
+          const fallbackProducts = hasStoredProducts ? match.products : [];
           const normalizedFallback = normalizeProducts(fallbackProducts, fallbackCategorySlug);
           setDynamicSeller({
             ...match,

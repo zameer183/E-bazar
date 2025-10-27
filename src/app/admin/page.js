@@ -1,10 +1,19 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { seedMockShops, clearMockShops, getDataStats } from "@/lib/seedData";
 import { checkIsAdmin } from "@/lib/adminAuth";
 import { onAuthChange } from "@/lib/auth";
+import {
+  buildCityPayload,
+  deleteCityBySlug,
+  upsertCity,
+  useStoredCities,
+} from "@/lib/cities";
+import { useAdminSettings } from "@/lib/adminSettings";
+import { uploadCityImage } from "@/lib/storage";
 import styles from "./page.module.css";
 
 export default function AdminPanel() {
@@ -16,6 +25,13 @@ export default function AdminPanel() {
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [userUid, setUserUid] = useState("");
+  const storedCities = useStoredCities();
+  useAdminSettings(); // triggers hook to keep settings in sync if needed
+  const [cityForm, setCityForm] = useState({
+    name: "",
+    imageFile: null,
+    imagePreview: "",
+  });
 
   useEffect(() => {
     // Listen to auth state changes
@@ -59,6 +75,93 @@ export default function AdminPanel() {
     setTimeout(() => {
       setNotification({ show: false, message: "", type: "success" });
     }, 4000);
+  };
+
+  const handleCityInputChange = (event) => {
+    const { value } = event.target;
+    setCityForm((prev) => ({
+      ...prev,
+      name: value,
+    }));
+  };
+
+  const handleCityImageChange = (event) => {
+    const file = event.target.files && event.target.files[0] ? event.target.files[0] : null;
+    setCityForm((prev) => {
+      if (prev.imagePreview) {
+        URL.revokeObjectURL(prev.imagePreview);
+      }
+      return {
+        ...prev,
+        imageFile: file,
+        imagePreview: file ? URL.createObjectURL(file) : "",
+      };
+    });
+  };
+
+  useEffect(() => {
+    return () => {
+      if (cityForm.imagePreview) {
+        URL.revokeObjectURL(cityForm.imagePreview);
+      }
+    };
+  }, [cityForm.imagePreview]);
+
+  const handleAddCity = async (event) => {
+    event.preventDefault();
+    if (cityForm.name.trim().length === 0) {
+      showNotification("City name is required", "error");
+      return;
+    }
+
+    if (!cityForm.imageFile) {
+      showNotification("Please select an image for the city", "error");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const derivedSlug = cityForm.name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+
+      const uploadResult = await uploadCityImage(derivedSlug, cityForm.imageFile);
+
+      if (!uploadResult.success || !uploadResult.url) {
+        showNotification(uploadResult.error || "Failed to upload city image", "error");
+        setIsLoading(false);
+        return;
+      }
+
+      const payload = buildCityPayload({
+        name: cityForm.name,
+        slug: derivedSlug,
+        image: uploadResult.url,
+        detailImage: uploadResult.url,
+      });
+      upsertCity(payload);
+      showNotification(`${payload.name} added successfully`, "success");
+      if (cityForm.imagePreview) {
+        URL.revokeObjectURL(cityForm.imagePreview);
+      }
+      setCityForm({ name: "", imageFile: null, imagePreview: "" });
+    } catch (error) {
+      console.error("Unable to add city", error);
+      showNotification(error.message || "Failed to add city", "error");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDeleteCity = (slug) => {
+    if (!slug) return;
+    if (!confirm("Remove this city from the directory?")) {
+      return;
+    }
+    deleteCityBySlug(slug);
+    showNotification("City removed", "success");
   };
 
   const handleSeedData = async () => {
@@ -228,6 +331,78 @@ export default function AdminPanel() {
         <div className={styles.header}>
           <h1>Admin Panel</h1>
           <p>Manage Firebase data and seed mock shops</p>
+        </div>
+
+        {/* City Management Section */}
+        <div className={styles.section}>
+          <h2>Add City</h2>
+          <p className={styles.sectionIntro}>
+            Register a new city to appear across the marketplace. Newly added cities start with
+            empty industries so sellers can populate them manually.
+          </p>
+          <form className={styles.formGrid} onSubmit={handleAddCity}>
+            <label className={styles.formField}>
+              <span>City Name</span>
+              <input
+                type="text"
+                name="name"
+                value={cityForm.name}
+                onChange={handleCityInputChange}
+                placeholder="e.g. Multan"
+                required
+              />
+            </label>
+            <label className={styles.formField}>
+              <span>Add Image</span>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleCityImageChange}
+              />
+            </label>
+            {cityForm.imagePreview && (
+              <div className={styles.imagePreview}>
+                <Image
+                  src={cityForm.imagePreview}
+                  alt="City preview"
+                  width={320}
+                  height={200}
+                  className={styles.imagePreviewImg}
+                  unoptimized
+                />
+              </div>
+            )}
+            <div className={styles.formActions}>
+              <button type="submit" className={styles.primaryButton}>
+                Add City
+              </button>
+            </div>
+          </form>
+
+          {storedCities.length > 0 && (
+            <div className={styles.cityList}>
+              <h3>Custom Cities</h3>
+              <ul>
+                {storedCities.map((city) => (
+                  <li key={city.slug} className={styles.cityListItem}>
+                    <div>
+                      <strong>{city.name}</strong>
+                      <span className={styles.citySlug}>
+                        {'/'}{city.slug}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteCity(city.slug)}
+                      className={styles.deleteCityButton}
+                    >
+                      Remove
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
 
         {/* Statistics Section */}

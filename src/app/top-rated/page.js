@@ -33,23 +33,29 @@ export default function TopRatedPage() {
       </section>
 
       <section className={styles.grid} aria-label="Top rated sellers list">
-        {FEATURED_SELLERS.map((seller) => (
-          <Link key={`${seller.citySlug}-${seller.slug}`} href={seller.path} className={styles.card}>
-            <div className={styles.cardHeader}>
-              <h3>{seller.name}</h3>
-              <span className={styles.rating}>
-                {seller.rating ? `${seller.rating.toFixed(1)} ${STAR}` : "New"}
-              </span>
-            </div>
-            <p className={styles.meta}>
-              {seller.categoryName} - {seller.cityName}
-            </p>
-            <p className={styles.reviews}>
-              {seller.reviews ? `${seller.reviews} verified reviews` : "Awaiting first reviews"}
-            </p>
-            {seller.plan && <span className={styles.plan}>{seller.plan}</span>}
-          </Link>
-        ))}
+        {FEATURED_SELLERS.length === 0 ? (
+          <p className={styles.emptyState}>
+            No sellers have been highlighted yet. Once real reviews arrive, verified favourites will appear here automatically.
+          </p>
+        ) : (
+          FEATURED_SELLERS.map((seller) => (
+            <Link key={`${seller.citySlug}-${seller.slug}`} href={seller.path} className={styles.card}>
+              <div className={styles.cardHeader}>
+                <h3>{seller.name}</h3>
+                <span className={styles.rating}>
+                  {seller.rating ? `${seller.rating.toFixed(1)} ${STAR}` : "New"}
+                </span>
+              </div>
+              <p className={styles.meta}>
+                {seller.categoryName} - {seller.cityName}
+              </p>
+              <p className={styles.reviews}>
+                {seller.reviews ? `${seller.reviews} verified reviews` : "Awaiting first reviews"}
+              </p>
+              {seller.plan && <span className={styles.plan}>{seller.plan}</span>}
+            </Link>
+          ))
+        )}
       </section>
     </div>
   );

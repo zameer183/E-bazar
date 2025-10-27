@@ -378,6 +378,21 @@ export const uploadProductImage = async (shopId, productName, file) => {
   }
 };
 
+export const uploadCityImage = async (citySlug, file) => {
+  try {
+    const response = await uploadWithPreferredDriver({
+      path: `cities/${sanitizePathSegment(citySlug)}`,
+      file,
+      fileName: "city-image",
+    });
+
+    return { success: true, url: response.url, key: response.key };
+  } catch (error) {
+    console.error("Error uploading city image:", error);
+    return { success: false, error: error.message };
+  }
+};
+
 /**
  * Delete file from storage
  * @param {string} fileUrl - Full URL of the file to delete
