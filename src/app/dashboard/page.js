@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { STORAGE_KEY } from "@/data/markets";
 import styles from "./page.module.css";
 
@@ -40,7 +41,6 @@ export default function SellerDashboard() {
     description: "",
   });
   const [shopImages, setShopImages] = useState([]);
-  const [imagePreview, setImagePreview] = useState(null);
   const [selectedShopId, setSelectedShopId] = useState(null);
   const [shopVideo, setShopVideo] = useState(null);
   const [videoError, setVideoError] = useState("");
@@ -55,8 +55,33 @@ export default function SellerDashboard() {
   const [productModalError, setProductModalError] = useState("");
   const [isDeletingAllProductImages, setIsDeletingAllProductImages] = useState(false);
   const [deletingProductImages, setDeletingProductImages] = useState({});
+  const [deletingProducts, setDeletingProducts] = useState({});
+  const [productDeleteTarget, setProductDeleteTarget] = useState(null);
+  const [productImageDeleteTarget, setProductImageDeleteTarget] = useState(null);
+  const [activeProductActions, setActiveProductActions] = useState(null);
   const notificationTimeoutRef = useRef(null);
   const firstProductImageInputRef = useRef(null);
+  const syncShopInLocalStorage = useCallback(
+    (entry) => {
+      if (typeof window === "undefined" || !entry?.id) {
+        return;
+      }
+      try {
+        const stored = window.localStorage.getItem(STORAGE_KEY);
+        const shops = stored ? JSON.parse(stored) : [];
+        const index = shops.findIndex((item) => item.id === entry.id);
+        if (index === -1) {
+          shops.push(entry);
+        } else {
+          shops[index] = { ...shops[index], ...entry };
+        }
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(shops));
+      } catch (error) {
+        console.warn("Unable to sync shop metadata locally", error);
+      }
+    },
+    []
+  );
 
   const getProductName = (product) => {
     if (typeof product === "string") return product;
@@ -79,19 +104,7 @@ export default function SellerDashboard() {
       ? `${allProductNames.length} products (Unlimited)`
       : `${allProductNames.length}/${productLimit} products`;
 
-  useEffect(() => {
-    loadShopData();
-  }, []);
-
-  useEffect(() => {
-    return () => {
-      if (notificationTimeoutRef.current) {
-        clearTimeout(notificationTimeoutRef.current);
-      }
-    };
-  }, []);
-
-  const showNotification = (message, type = "info", options = {}) => {
+  const showNotification = useCallback((message, type = "info", options = {}) => {
     if (notificationTimeoutRef.current) {
       clearTimeout(notificationTimeoutRef.current);
     }
@@ -107,19 +120,45 @@ export default function SellerDashboard() {
       setNotification({ show: false, message: "", type: "info", layout: "toast" });
       notificationTimeoutRef.current = null;
     }, 4000);
-  };
+  }, []);
 
-  const loadShopData = async (shopId = null) => {
+  const loadShopData = useCallback(async (shopId = null) => {
     try {
       if (typeof window === "undefined") return;
 
       // Get current user from Firebase
-      const { getCurrentUser } = await import("@/lib/auth");
-      const currentUser = getCurrentUser();
+      const { getCurrentUser, onAuthChange } = await import("@/lib/auth");
+      let currentUser = getCurrentUser();
+
+      if (!currentUser && typeof onAuthChange === "function") {
+        currentUser = await new Promise((resolve) => {
+          let resolved = false;
+          let unsubscribe = () => {};
+          const timeoutId = window.setTimeout(() => {
+            if (resolved) return;
+            resolved = true;
+            unsubscribe();
+            resolve(null);
+          }, 3000);
+          unsubscribe = onAuthChange((user) => {
+            if (resolved) return;
+            resolved = true;
+            window.clearTimeout(timeoutId);
+            unsubscribe();
+            resolve(user);
+          });
+        });
+      }
 
       if (!currentUser) {
+        setLoading(false);
         router.push("/login");
         return;
+      }
+
+      if (currentUser?.uid) {
+        window.localStorage.setItem("eBazarLoggedIn", "true");
+        window.localStorage.setItem("eBazarCurrentUser", currentUser.uid);
       }
 
       // Fetch shops from Firestore
@@ -226,13 +265,13 @@ export default function SellerDashboard() {
     } catch (error) {
       console.error("Error loading shop data:", error);
       showNotification(
-        "We couldn’t reach Firebase services. Please verify your network connection and that *.googleapis.com is accessible.",
+        "We couldn't reach Firebase services. Please verify your network connection and that *.googleapis.com is accessible.",
         "error",
         { layout: "modal" }
       );
       setLoading(false);
     }
-  };
+  }, [router, showNotification]);
 
   const handleShopSwitch = (shopId) => {
     setIsEditing(false);
@@ -379,10 +418,7 @@ export default function SellerDashboard() {
           const { uploadShopVideo } = await import("@/lib/storage");
           const { saveShopVideo } = await import("@/lib/firestore");
 
-          const result = await uploadShopVideo(shop.id, file, (progress) => {
-            // Optional: Add progress indicator here
-            console.log(`Upload progress: ${progress}%`);
-          });
+          const result = await uploadShopVideo(shop.id, file);
 
           if (!result.success) {
             setVideoError("Failed to upload video. Please try again.");
@@ -600,6 +636,23 @@ export default function SellerDashboard() {
       const result = await updateShop(shop.id, { products: updatedProducts });
 
       if (!result.success) {
+        if (result.code === "permission-denied") {
+          setShop((prev) => (prev ? { ...prev, products: updatedProducts } : prev));
+          setAllShops((prev) =>
+            prev.map((s) => (s.id === shop.id ? { ...s, products: updatedProducts } : s))
+          );
+          setProductPrices((prev) => ({
+            ...prev,
+            [productName]: priceTrimmed || prev[productName] || "",
+          }));
+          syncShopInLocalStorage({ ...shop, products: updatedProducts });
+          showNotification(
+            "Products were saved locally. Update your Firestore permissions to sync them to the cloud.",
+            "warning",
+            { layout: "modal" }
+          );
+          return true;
+        }
         showNotification("Failed to update products. Please try again.", "error");
         return false;
       }
@@ -612,8 +665,29 @@ export default function SellerDashboard() {
         ...prev,
         [productName]: priceTrimmed || prev[productName] || "",
       }));
+      syncShopInLocalStorage({ ...shop, products: updatedProducts });
       return true;
     } catch (error) {
+      if (
+        error?.code === "permission-denied" ||
+        error?.message?.toLowerCase?.().includes("missing or insufficient permissions")
+      ) {
+        setShop((prev) => (prev ? { ...prev, products: updatedProducts } : prev));
+        setAllShops((prev) =>
+          prev.map((s) => (s.id === shop.id ? { ...s, products: updatedProducts } : s))
+        );
+        setProductPrices((prev) => ({
+          ...prev,
+          [productName]: priceTrimmed || prev[productName] || "",
+        }));
+        syncShopInLocalStorage({ ...shop, products: updatedProducts });
+        showNotification(
+          "Products were saved locally. Update your Firestore permissions to sync them to the cloud.",
+          "warning",
+          { layout: "modal" }
+        );
+        return true;
+      }
       console.error("Error updating products:", error);
       showNotification("Failed to update products. Please try again.", "error");
       return false;
@@ -627,7 +701,7 @@ export default function SellerDashboard() {
     setProductModalError("");
   };
 
-  const handleProductModalConfirm = () => {
+  const handleProductModalConfirm = async () => {
     const trimmedName = productNameDraft.trim();
     const trimmedPrice = productPriceDraft.trim();
 
@@ -647,13 +721,25 @@ export default function SellerDashboard() {
       return;
     }
 
+    if (!normalizedExisting || trimmedPrice) {
+      const ensured = await ensureProductEntry(trimmedName, trimmedPrice);
+      if (!ensured) {
+        setProductModalError("We couldn't save that product yet. Please try again.");
+        return;
+      }
+    }
+
     setPendingProductName(trimmedName);
     setPendingProductPrice(trimmedPrice);
     setShowProductModal(false);
     setProductModalError("");
     setProductNameDraft("");
     setProductPriceDraft("");
-    firstProductImageInputRef.current?.click();
+    if (firstProductImageInputRef.current) {
+      firstProductImageInputRef.current.click();
+    } else {
+      showNotification("Product saved. You can add images whenever you're ready.", "success");
+    }
   };
 
   const handleFirstProductImageSelection = async (event) => {
@@ -905,25 +991,19 @@ export default function SellerDashboard() {
     }
   };
 
-  const handleDeleteProductImagesByName = async (productName) => {
-    if (!productName) return;
+  const handleDeleteProductImagesByName = async (productName, options = {}) => {
+    const { silent = false } = options;
+    if (!productName) return true;
 
     const imagesForProduct = productImages.filter(
       (img) => img.productName === productName
     );
 
     if (imagesForProduct.length === 0) {
-      showNotification(`No images to delete for ${productName}.`, "info");
-      return;
-    }
-
-    if (typeof window !== "undefined") {
-      const confirmDelete = window.confirm(
-        `Remove all ${imagesForProduct.length} image(s) for ${productName}?`
-      );
-      if (!confirmDelete) {
-        return;
+      if (!silent) {
+        showNotification(`No images to delete for ${productName}.`, "info");
       }
+      return true;
     }
 
     try {
@@ -952,10 +1032,16 @@ export default function SellerDashboard() {
         );
       }
 
-      showNotification(`Deleted ${imagesForProduct.length} image(s) for ${productName}.`, "success");
+      if (!silent) {
+        showNotification(`Deleted ${imagesForProduct.length} image(s) for ${productName}.`, "success");
+      }
+      return true;
     } catch (error) {
       console.error("Error deleting product images:", error);
-      showNotification("Failed to delete product images. Please try again.", "error");
+      if (!silent) {
+        showNotification("Failed to delete product images. Please try again.", "error");
+      }
+      return false;
     } finally {
       setDeletingProductImages((prev) => {
         if (!(productName in prev)) {
@@ -965,6 +1051,176 @@ export default function SellerDashboard() {
         delete updated[productName];
         return updated;
       });
+    }
+  };
+
+  const handleDeleteProduct = async (productName) => {
+    const name = (productName || "").trim();
+    if (!name || !shop?.id) {
+      return;
+    }
+
+    setDeletingProducts((prev) => ({ ...prev, [name]: true }));
+
+    try {
+      await handleDeleteProductImagesByName(name, { silent: true });
+
+      const currentProducts = Array.isArray(shop.products) ? shop.products : [];
+      const updatedProducts = currentProducts.filter((product) => {
+        if (!product) {
+          return false;
+        }
+        if (typeof product === "string") {
+          return product !== name;
+        }
+        const currentName = product.name || "";
+        return currentName !== name;
+      });
+
+      const { updateShop } = await import("@/lib/firestore");
+      const result = await updateShop(shop.id, { products: updatedProducts });
+
+      if (!result.success) {
+        if (result.code === "permission-denied") {
+          setShop((prev) => (prev ? { ...prev, products: updatedProducts } : prev));
+          setAllShops((prev) =>
+            prev.map((s) => (s.id === shop.id ? { ...s, products: updatedProducts } : s))
+          );
+          setProductPrices((prev) => {
+            const updated = { ...prev };
+            delete updated[name];
+            return updated;
+          });
+          syncShopInLocalStorage({ ...shop, products: updatedProducts });
+          showNotification(
+            "Product deleted locally. Update your Firestore permissions to sync with the cloud.",
+            "warning",
+            { layout: "modal" }
+          );
+          return;
+        }
+
+        showNotification("Failed to delete product. Please try again.", "error");
+        return;
+      }
+
+      setShop((prev) => (prev ? { ...prev, products: updatedProducts } : prev));
+      setAllShops((prev) =>
+        prev.map((s) => (s.id === shop.id ? { ...s, products: updatedProducts } : s))
+      );
+      setProductPrices((prev) => {
+        const updated = { ...prev };
+        delete updated[name];
+        return updated;
+      });
+      syncShopInLocalStorage({ ...shop, products: updatedProducts });
+      showNotification(`Deleted product "${name}" successfully.`, "success");
+    } catch (error) {
+      if (
+        error?.code === "permission-denied" ||
+        error?.message?.toLowerCase?.().includes("missing or insufficient permissions")
+      ) {
+        const currentProducts = Array.isArray(shop.products) ? shop.products : [];
+        const updatedProductsLocal = currentProducts.filter((product) => {
+          if (!product) {
+            return false;
+          }
+          if (typeof product === "string") {
+            return product !== name;
+          }
+          const currentName = product.name || "";
+          return currentName !== name;
+        });
+
+        setShop((prev) => (prev ? { ...prev, products: updatedProductsLocal } : prev));
+        setAllShops((prev) =>
+          prev.map((s) => (s.id === shop.id ? { ...s, products: updatedProductsLocal } : s))
+        );
+        setProductPrices((prev) => {
+          const updated = { ...prev };
+          delete updated[name];
+          return updated;
+        });
+        syncShopInLocalStorage({ ...shop, products: updatedProductsLocal });
+        showNotification(
+          "Product deleted locally. Update your Firestore permissions to sync with the cloud.",
+          "warning",
+          { layout: "modal" }
+        );
+        return;
+      }
+
+      console.error("Error deleting product:", error);
+      showNotification("Failed to delete product. Please try again.", "error");
+    } finally {
+      setDeletingProducts((prev) => {
+        if (!(name in prev)) {
+          return prev;
+        }
+        const updated = { ...prev };
+        delete updated[name];
+        return updated;
+      });
+    }
+  };
+
+  const handleProductDeleteRequest = (productName) => {
+    const name = (productName || "").trim();
+    if (!name) {
+      return;
+    }
+    setProductDeleteTarget(name);
+  };
+
+  const cancelProductDelete = () => {
+    if (productDeleteTarget && deletingProducts[productDeleteTarget]) {
+      return;
+    }
+    setProductDeleteTarget(null);
+  };
+
+  const confirmProductDelete = async () => {
+    if (!productDeleteTarget) {
+      return;
+    }
+    try {
+      await handleDeleteProduct(productDeleteTarget);
+    } finally {
+      setProductDeleteTarget(null);
+    }
+  };
+
+  const handleProductImagesDeleteRequest = (productName) => {
+    const name = (productName || "").trim();
+    if (!name) {
+      return;
+    }
+    const imagesForProduct = productImages.filter((img) => img.productName === name);
+    if (imagesForProduct.length === 0) {
+      showNotification(`No images to delete for ${name}.`, "info");
+      return;
+    }
+    setProductImageDeleteTarget({ name, count: imagesForProduct.length });
+  };
+
+  const cancelProductImagesDelete = () => {
+    if (
+      productImageDeleteTarget &&
+      deletingProductImages[productImageDeleteTarget.name]
+    ) {
+      return;
+    }
+    setProductImageDeleteTarget(null);
+  };
+
+  const confirmProductImagesDelete = async () => {
+    if (!productImageDeleteTarget) {
+      return;
+    }
+    const { name } = productImageDeleteTarget;
+    const success = await handleDeleteProductImagesByName(name);
+    if (success) {
+      setProductImageDeleteTarget(null);
     }
   };
 
@@ -991,6 +1247,18 @@ export default function SellerDashboard() {
     }
   };
 
+  useEffect(() => {
+    loadShopData();
+  }, [loadShopData]);
+
+  useEffect(() => {
+    return () => {
+      if (notificationTimeoutRef.current) {
+        clearTimeout(notificationTimeoutRef.current);
+      }
+    };
+  }, []);
+
   const handleLogout = () => {
     if (typeof window !== "undefined") {
       window.localStorage.removeItem("eBazarLoggedIn");
@@ -1003,21 +1271,18 @@ export default function SellerDashboard() {
     }
   };
 
-  const incrementVisitorCount = () => {
-    // This would normally be tracked from the shop page view
-    // For demo purposes, we'll store it in localStorage
-    const visitorKey = `${STORAGE_KEY}_visitors_${shop.id}`;
-    const currentCount = parseInt(window.localStorage.getItem(visitorKey) || "0");
-    const newCount = currentCount + 1;
-    window.localStorage.setItem(visitorKey, newCount.toString());
-    return newCount;
-  };
-
   const getVisitorCount = () => {
     if (!shop) return 0;
     const visitorKey = `${STORAGE_KEY}_visitors_${shop.id}`;
     return parseInt(window.localStorage.getItem(visitorKey) || "0");
   };
+
+  const productDeleteInProgress = productDeleteTarget
+    ? !!deletingProducts[productDeleteTarget]
+    : false;
+  const productImagesDeleteInProgress = productImageDeleteTarget
+    ? !!deletingProductImages[productImageDeleteTarget.name]
+    : false;
 
   if (loading) {
     return (
@@ -1054,12 +1319,12 @@ export default function SellerDashboard() {
         >
           <span className={styles.notificationIcon}>
             {notification.type === "success"
-              ? "✓"
+              ? "Success"
               : notification.type === "error"
-              ? "⚠"
+              ? "Error"
               : notification.type === "warning"
-              ? "⚠"
-              : "ℹ"}
+              ? "Warning"
+              : "Info"}
           </span>
           <span className={styles.notificationMessage}>{notification.message}</span>
         </div>
@@ -1081,12 +1346,9 @@ export default function SellerDashboard() {
                 onClick={() => handleShopSwitch(s.id)}
                 className={`${styles.shopItem} ${s.id === selectedShopId ? styles.shopItemActive : ""}`}
               >
-                <div className={styles.shopItemIcon}>
-                  {s.category === "Clothes" ? "👔" : s.category === "Perfumes" ? "🌸" : "📱"}
-                </div>
                 <div className={styles.shopItemInfo}>
                   <h3>{s.name}</h3>
-                  <p>{s.city} • {s.category}</p>
+                  <p>{s.city} - {s.category}</p>
                 </div>
               </button>
             ))}
@@ -1101,7 +1363,7 @@ export default function SellerDashboard() {
               href={`/city/${shop.citySlug}/${shop.categorySlug}/${shop.slug}`}
               className={styles.viewShopButton}
             >
-              🛍️ View Your Shop
+              View Shop
             </Link>
           </div>
         )}
@@ -1109,28 +1371,24 @@ export default function SellerDashboard() {
         {/* Stats Overview */}
         <div className={styles.statsGrid}>
           <div className={styles.statCard}>
-            <div className={styles.statIcon}>👁️</div>
             <div className={styles.statInfo}>
               <h3>Total Visitors</h3>
               <p className={styles.statNumber}>{getVisitorCount()}</p>
             </div>
           </div>
           <div className={styles.statCard}>
-            <div className={styles.statIcon}>⭐</div>
             <div className={styles.statInfo}>
               <h3>Rating</h3>
               <p className={styles.statNumber}>{shop.rating || "0.0"}</p>
             </div>
           </div>
           <div className={styles.statCard}>
-            <div className={styles.statIcon}>💬</div>
             <div className={styles.statInfo}>
               <h3>Reviews</h3>
               <p className={styles.statNumber}>{shop.reviews || 0}</p>
             </div>
           </div>
           <div className={styles.statCard}>
-            <div className={styles.statIcon}>📦</div>
             <div className={styles.statInfo}>
               <h3>Products</h3>
               <p className={styles.statNumber}>{shop.products?.length || 0}</p>
@@ -1144,7 +1402,7 @@ export default function SellerDashboard() {
             <h2>Shop Information</h2>
             {!isEditing ? (
               <button onClick={handleEdit} className={styles.editButton}>
-                ✏️ Edit
+                Edit
               </button>
             ) : (
               <div className={styles.editActions}>
@@ -1159,75 +1417,95 @@ export default function SellerDashboard() {
           </div>
           <div className={styles.shopInfo}>
             <div className={styles.infoRow}>
-              <label htmlFor="shop-name-input">Shop Name:</label>
               {isEditing ? (
-                <input
-                  id="shop-name-input"
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  className={styles.input}
-                />
+                <>
+                  <label htmlFor="shop-name-input">Shop Name:</label>
+                  <input
+                    id="shop-name-input"
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    className={styles.input}
+                  />
+                </>
               ) : (
-                <span>{shop.name}</span>
+                <>
+                  <span className={styles.infoLabel}>Shop Name:</span>
+                  <span>{shop.name}</span>
+                </>
               )}
             </div>
             <div className={styles.infoRow}>
-              <label>City:</label>
+              <span className={styles.infoLabel}>City:</span>
               <span>{shop.city}</span>
             </div>
             <div className={styles.infoRow}>
-              <label>Category:</label>
+              <span className={styles.infoLabel}>Category:</span>
               <span>{shop.category}</span>
             </div>
             <div className={styles.infoRow}>
-              <label htmlFor="shop-contact-input">Contact:</label>
               {isEditing ? (
-                <input
-                  id="shop-contact-input"
-                  type="tel"
-                  name="contact"
-                  value={formData.contact}
-                  onChange={handleChange}
-                  className={styles.input}
-                />
+                <>
+                  <label htmlFor="shop-contact-input">Contact:</label>
+                  <input
+                    id="shop-contact-input"
+                    type="tel"
+                    name="contact"
+                    value={formData.contact}
+                    onChange={handleChange}
+                    className={styles.input}
+                  />
+                </>
               ) : (
-                <span>{shop.contact}</span>
+                <>
+                  <span className={styles.infoLabel}>Contact:</span>
+                  <span>{shop.contact}</span>
+                </>
               )}
             </div>
             <div className={styles.infoRow}>
-              <label htmlFor="shop-address-input">Address:</label>
               {isEditing ? (
-                <textarea
-                  id="shop-address-input"
-                  name="address"
-                  value={formData.address}
-                  onChange={handleChange}
-                  className={styles.textarea}
-                  rows={3}
-                />
+                <>
+                  <label htmlFor="shop-address-input">Address:</label>
+                  <textarea
+                    id="shop-address-input"
+                    name="address"
+                    value={formData.address}
+                    onChange={handleChange}
+                    className={styles.textarea}
+                    rows={3}
+                  />
+                </>
               ) : (
-                <span>{shop.address}</span>
+                <>
+                  <span className={styles.infoLabel}>Address:</span>
+                  <span>{shop.address}</span>
+                </>
               )}
             </div>
             <div className={styles.infoRow}>
-              <label htmlFor="shop-description-input">Description:</label>
               {isEditing ? (
-                <textarea
-                  id="shop-description-input"
-                  name="description"
-                  value={formData.description}
-                  onChange={handleChange}
-                  className={styles.textarea}
-                  rows={4}
-                />
+                <>
+                  <label htmlFor="shop-description-input">Description:</label>
+                  <textarea
+                    id="shop-description-input"
+                    name="description"
+                    value={formData.description}
+                    onChange={handleChange}
+                    className={styles.textarea}
+                    rows={4}
+                  />
+                </>
               ) : (
-                <span>{shop.description}</span>
+                <>
+                  <span className={styles.infoLabel}>Description:</span>
+                  <span>{shop.description}</span>
+                </>
               )}
             </div>
             <div className={styles.infoRow}>
-              <label>Plan:</label>
+              <span className={styles.infoLabel}>Plan:</span>
               <span className={styles.planBadge}>{shop.planLabel}</span>
             </div>
           </div>
@@ -1238,7 +1516,7 @@ export default function SellerDashboard() {
           <div className={styles.sectionHeader}>
             <h2>Shop Images</h2>
             <label className={styles.uploadButton}>
-              📷 Upload Image
+              Upload Image
               <input
                 type="file"
                 accept="image/*"
@@ -1254,12 +1532,21 @@ export default function SellerDashboard() {
             ) : (
               shopImages.map((image) => (
                 <div key={image.id} className={styles.imageCard}>
-                  <img src={image.imageUrl || image.data} alt={image.name} />
+                  <Image
+                    src={image.imageUrl || image.data}
+                    alt={image.name || "Shop image"}
+                    fill
+                    className={styles.imageCardImage}
+                    sizes="(max-width: 768px) 50vw, 240px"
+                    unoptimized
+                  />
                   <button
                     onClick={() => handleDeleteImage(image.id)}
-                    className={styles.deleteImageButton}
+                    className={styles.imageCardDeleteButton}
+                    type="button"
+                    aria-label={`Delete ${image.name || "shop image"}`}
                   >
-                    ✕
+                    <span className={styles.deleteImageLabel}>Delete</span>
                   </button>
                 </div>
               ))
@@ -1273,7 +1560,7 @@ export default function SellerDashboard() {
             <h2>Shop Video (Max 10 seconds)</h2>
             {!shopVideo && (
               <label className={styles.uploadButton}>
-                🎥 Upload Video
+                Upload Video
                 <input
                   type="file"
                   accept="video/*"
@@ -1303,7 +1590,7 @@ export default function SellerDashboard() {
                   onClick={handleDeleteVideo}
                   className={styles.deleteVideoButton}
                 >
-                  🗑️ Delete Video
+                  Delete Video
                 </button>
               </div>
             ) : (
@@ -1329,12 +1616,12 @@ export default function SellerDashboard() {
               onClick={handleTriggerFirstProductImageUpload}
               disabled={productLimitReached}
             >
-              ➕ Add Product
+              Add Product
             </button>
           </div>
           {productLimitReached && (
             <p className={styles.productLimitWarning}>
-              You've reached the product limit for your {shop.planLabel || shop.plan} plan.
+              You&apos;ve reached the product limit for your {shop.planLabel || shop.plan} plan.
               Upgrade to unlock additional product slots.
             </p>
           )}
@@ -1354,33 +1641,70 @@ export default function SellerDashboard() {
                     <div className={styles.productHeader}>
                       <h3>{productName}</h3>
                       <div className={styles.productHeaderActions}>
-                        {productImgs.length < 2 && (
-                          <label className={styles.uploadButtonSmall}>
-                            📷 Add Image
-                            <input
-                              type="file"
-                              accept="image/*"
-                              name="productImage"
-                              onChange={async (e) => {
-                                const file = e.target.files[0];
-                                if (!file) return;
-                                await handleProductImageUpload(file, productName);
-                                e.target.value = "";
-                              }}
-                              style={{ display: "none" }}
-                            />
-                          </label>
-                        )}
-                        {productImgs.length > 0 && (
+                        <div className={styles.productActionsDropdown}>
                           <button
                             type="button"
-                            className={styles.deleteImageButton}
-                            onClick={() => handleDeleteProductImagesByName(productName)}
-                            disabled={!!deletingProductImages[productName]}
+                            className={styles.productActionsToggle}
+                            onClick={() =>
+                              setActiveProductActions((current) =>
+                                current === productName ? null : productName
+                              )
+                            }
+                            aria-haspopup="menu"
+                            aria-expanded={activeProductActions === productName}
                           >
-                            {deletingProductImages[productName] ? "Deleting..." : "🗑️ Delete Images"}
+                            Actions
+                            <span className={styles.productActionsCaret} aria-hidden="true" />
                           </button>
-                        )}
+                          {activeProductActions === productName && (
+                            <div className={styles.productActionsMenu} role="menu">
+                              {productImgs.length < 2 && (
+                                <label className={styles.productActionsMenuItem} role="menuitem">
+                                  Add Image
+                                  <input
+                                    type="file"
+                                    accept="image/*"
+                                    name="productImage"
+                                    onChange={async (e) => {
+                                      const file = e.target.files[0];
+                                      if (!file) return;
+                                      await handleProductImageUpload(file, productName);
+                                      e.target.value = "";
+                                      setActiveProductActions(null);
+                                    }}
+                                    style={{ display: "none" }}
+                                  />
+                                </label>
+                              )}
+                              <button
+                                type="button"
+                                className={`${styles.productActionsMenuItem} ${styles.productActionsDelete}`}
+                                onClick={() => {
+                                  setActiveProductActions(null);
+                                  handleProductDeleteRequest(productName);
+                                }}
+                                disabled={!!deletingProducts[productName] || !!deletingProductImages[productName]}
+                                role="menuitem"
+                              >
+                                {deletingProducts[productName] ? "Deleting..." : "Delete Product"}
+                              </button>
+                              {productImgs.length > 0 && (
+                                <button
+                                  type="button"
+                                  className={`${styles.productActionsMenuItem} ${styles.productActionsDelete}`}
+                                  onClick={() => {
+                                    setActiveProductActions(null);
+                                    handleProductImagesDeleteRequest(productName);
+                                  }}
+                                  disabled={!!deletingProductImages[productName] || !!deletingProducts[productName]}
+                                  role="menuitem"
+                                >
+                                  {deletingProductImages[productName] ? "Deleting..." : "Delete Images"}
+                                </button>
+                              )}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                     <div className={styles.productPriceControls}>
@@ -1400,7 +1724,7 @@ export default function SellerDashboard() {
                         onClick={() => handleSaveProductPrice(productName)}
                         disabled={!!savingProductPrices[productName]}
                       >
-                        {savingProductPrices[productName] ? "Saving..." : "💾 Save Price"}
+                        {savingProductPrices[productName] ? "Saving..." : "Save Price"}
                       </button>
                     </div>
                     <div className={styles.productImageGrid}>
@@ -1409,13 +1733,14 @@ export default function SellerDashboard() {
                       ) : (
                         productImgs.map((image) => (
                           <div key={image.id} className={styles.productImageCard}>
-                            <img src={image.imageUrl || image.data} alt={image.name} />
-                            <button
-                              onClick={() => handleDeleteProductImage(image.id)}
-                              className={styles.deleteImageButton}
-                            >
-                              🗑️ Delete
-                            </button>
+                            <Image
+                              src={image.imageUrl || image.data}
+                              alt={image.name || `${productName} preview`}
+                              fill
+                              className={styles.productImage}
+                              sizes="(max-width: 768px) 60vw, 200px"
+                              unoptimized
+                            />
                           </div>
                         ))
                       )}
@@ -1433,7 +1758,7 @@ export default function SellerDashboard() {
                     onClick={handleTriggerFirstProductImageUpload}
                     disabled={productLimitReached}
                   >
-                    ➕ Add Product
+                    Add Product
                   </button>
                   <button
                     type="button"
@@ -1441,7 +1766,7 @@ export default function SellerDashboard() {
                     onClick={handleDeleteAllProductImages}
                     disabled={isDeletingAllProductImages}
                   >
-                    {isDeletingAllProductImages ? "Deleting..." : "🗑️ Delete Images"}
+                    {isDeletingAllProductImages ? "Deleting..." : "Delete Images"}
                   </button>
                 </div>
                 <input
@@ -1465,12 +1790,66 @@ export default function SellerDashboard() {
               onClick={() => setShowDeleteModal(true)}
               className={styles.deleteButton}
             >
-              🗑️ Delete Shop
+              Delete Shop
             </button>
           </div>
         </div>
       </main>
       </div>
+
+      {productImageDeleteTarget && (
+        <div className={styles.modal}>
+          <div className={styles.modalContent}>
+            <h2>Delete Product Images?</h2>
+            <p>
+              Remove all {productImageDeleteTarget.count} image(s) for &quot;{productImageDeleteTarget.name}&quot;? This action cannot be undone.
+            </p>
+            <div className={styles.modalActions}>
+              <button
+                onClick={cancelProductImagesDelete}
+                className={styles.cancelButton}
+                disabled={productImagesDeleteInProgress}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmProductImagesDelete}
+                className={styles.confirmDeleteButton}
+                disabled={productImagesDeleteInProgress}
+              >
+                {productImagesDeleteInProgress ? "Deleting..." : "Yes, Delete Images"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {productDeleteTarget && (
+        <div className={styles.modal}>
+          <div className={styles.modalContent}>
+            <h2>Delete Product?</h2>
+            <p>
+              Delete product &quot;{productDeleteTarget}&quot; and all associated images? This action cannot be undone.
+            </p>
+            <div className={styles.modalActions}>
+              <button
+                onClick={cancelProductDelete}
+                className={styles.cancelButton}
+                disabled={productDeleteInProgress}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmProductDelete}
+                className={styles.confirmDeleteButton}
+                disabled={productDeleteInProgress}
+              >
+                {productDeleteInProgress ? "Deleting..." : "Yes, Delete Product"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Product Upload Modal */}
       {showProductModal && (
@@ -1526,7 +1905,7 @@ export default function SellerDashboard() {
           <div className={styles.modalContent}>
             <h2>Delete Shop?</h2>
             <p>
-              Are you sure you want to delete "{shop.name}"? This action cannot be undone.
+              Are you sure you want to delete &quot;{shop.name}&quot;? This action cannot be undone.
               All your shop data, images, and statistics will be permanently removed.
             </p>
             <div className={styles.modalActions}>

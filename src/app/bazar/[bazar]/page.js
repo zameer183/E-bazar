@@ -2,7 +2,7 @@
 
 import { Suspense, use } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { BASE_CITY_MARKETS, getBazaarDefinition } from "@/data/markets";
 import SearchBar from "@/components/search-bar/SearchBar";
 import BazaarFooter from "@/components/bazaar-footer/BazaarFooter";
@@ -11,7 +11,6 @@ import styles from "./page.module.css";
 const SERVICE_NOTE = "We only provide an online bazaar. Sellers handle payments & delivery directly.";
 
 function BazaarPageContent({ params }) {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const selectedCity = searchParams.get("city");
   const resolvedParams = use(params);
@@ -23,7 +22,7 @@ function BazaarPageContent({ params }) {
       <div className={styles.page}>
         <div className={styles.error}>
           <h1>Bazaar Not Found</h1>
-          <p>The bazaar you're looking for doesn't exist.</p>
+          <p>The bazaar you&apos;re looking for doesn&apos;t exist.</p>
           <Link href="/" className={styles.homeLink}>
             Return to Home
           </Link>
@@ -71,7 +70,9 @@ function BazaarPageContent({ params }) {
           <section className={styles.subcategoriesSection}>
             <h2>Browse by Subcategory</h2>
             <p className={styles.subcategoryHint}>
-              Choose your subcategory to explore sellers. {!selectedCity && "Karachi will be shown by default - use the search bar to select a different city."}
+              Choose your subcategory to explore sellers.{" "}
+              {!selectedCity &&
+                "Karachi will be shown by default - use the search bar to select a different city."}
             </p>
             <div className={styles.subcategoryGrid}>
               {bazaarDef.subcategories.map((sub) => {
@@ -85,7 +86,7 @@ function BazaarPageContent({ params }) {
                   >
                     <h3>{sub.label}</h3>
                     <p>Explore specialized sellers in this lane</p>
-                    <span className={styles.subcategoryArrow}>Browse →</span>
+                    <span className={styles.subcategoryArrow}>Browse {"->"}</span>
                   </Link>
                 );
               })}

@@ -43,7 +43,7 @@
   text-decoration: none;
 }
 
-.navLink:hover {
+.navLink:focus-visible {
   background: rgba(182, 140, 87, 0.1);
 }
 
@@ -178,28 +178,6 @@
   top: var(--hamburger-vertical-gap);
 }
 
-.hamburger:hover .hamburgerInner {
-  transform: translate(calc(-1 * var(--hamburger-hide-distance)), -50%);
-  opacity: 0;
-}
-
-.hamburger:hover .hamburgerInner::before,
-.hamburger:hover .hamburgerInner::after {
-  transform: translate(calc(var(--hamburger-hide-distance) * 2), 0);
-  opacity: 0;
-}
-
-.hamburger:hover .hamburgerHidden {
-  opacity: 1;
-  transform: translate(0, -50%);
-}
-
-.hamburger:hover .hamburgerHidden::before,
-.hamburger:hover .hamburgerHidden::after {
-  opacity: 1;
-  transform: translate(0, 0);
-}
-
 .hamburgerActive .hamburgerHidden {
   opacity: 1;
   transform: translate(0, -50%) rotate(45deg);
@@ -332,7 +310,6 @@
   margin-top: 2px;
 }
 
-.profileDropdownItem:hover,
 .profileDropdownItem:focus-visible {
   background: linear-gradient(135deg, rgba(255, 248, 238, 1) 0%, rgba(246, 236, 222, 1) 100%);
   color: var(--color-accent);
@@ -341,7 +318,6 @@
   transform: translateY(-1px);
 }
 
-.profileDropdownItem:hover small,
 .profileDropdownItem:focus-visible small {
   color: rgba(182, 140, 87, 0.9);
 }
@@ -360,14 +336,12 @@
   color: rgba(176, 42, 55, 0.7);
 }
 
-.profileDropdownDanger:hover,
 .profileDropdownDanger:focus-visible {
   background: linear-gradient(135deg, rgba(255, 230, 230, 1) 0%, rgba(255, 214, 214, 1) 100%);
   color: #b02a37;
   box-shadow: 0 10px 24px rgba(176, 42, 55, 0.18);
 }
 
-.profileDropdownDanger:hover small,
 .profileDropdownDanger:focus-visible small {
   color: rgba(176, 42, 55, 0.85);
 }
@@ -397,7 +371,7 @@
   margin: 20px 0;
 }
 
-.currentProfile img {
+.currentProfileImage {
   width: 120px;
   height: 120px;
   border-radius: 50%;

@@ -53,14 +53,6 @@
   position: relative;
 }
 
-.half span::before {
-  content: "★";
-  position: absolute;
-  width: 50%;
-  overflow: hidden;
-  color: rgba(242, 201, 76, 0.4);
-}
-
 .half span {
   position: relative;
   color: rgba(242, 201, 76, 0.7);

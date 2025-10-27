@@ -18,7 +18,8 @@ const parseHostname = (url) => {
 const shouldBypassOptimizer = (hostname) => {
   if (!hostname) return false;
   if (hostname === "firebasestorage.googleapis.com") return true;
-  return hostname.endsWith(".s3.amazonaws.com");
+  if (hostname.endsWith(".s3.amazonaws.com")) return true;
+  return /\.s3[.-][^.]+\.amazonaws\.com$/i.test(hostname);
 };
 
 export const buildImageProps = (rawSrc, fallback = FALLBACK_IMAGE) => {

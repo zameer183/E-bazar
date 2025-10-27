@@ -25,7 +25,7 @@ class ErrorBoundary extends React.Component {
     };
   }
 
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError() {
     // Update state so the next render will show the fallback UI
     return { hasError: true };
   }
@@ -63,10 +63,10 @@ class ErrorBoundary extends React.Component {
       return (
         <div className={styles.errorContainer}>
           <div className={styles.errorCard}>
-            <div className={styles.errorIcon}>⚠️</div>
+            <div className={styles.errorIcon}>!</div>
             <h1 className={styles.errorTitle}>Oops! Something went wrong</h1>
             <p className={styles.errorMessage}>
-              We're sorry for the inconvenience. An unexpected error occurred.
+              We&apos;re sorry for the inconvenience. An unexpected error occurred.
             </p>
 
             {process.env.NODE_ENV === 'development' && this.state.error && (

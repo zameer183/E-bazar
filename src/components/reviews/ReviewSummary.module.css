@@ -50,7 +50,6 @@
   transition: background 0.2s ease, color 0.2s ease;
 }
 
-.reviewLink:hover,
 .reviewLink:focus-visible {
   background: rgba(182, 140, 87, 0.15);
   color: var(--color-deep-gray);

@@ -121,3 +121,16 @@ export const deleteObjectByKey = async (key) => {
   );
 };
 
+export const getObjectAcl = () => {
+  const configured = process.env.AWS_S3_OBJECT_ACL;
+  if (!configured || configured.trim().length === 0) {
+    return {};
+  }
+
+  const acl = configured.trim();
+  if (acl.toLowerCase() === "none") {
+    return {};
+  }
+
+  return { ACL: acl };
+};

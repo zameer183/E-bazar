@@ -182,10 +182,6 @@
   transition: transform 0.2s;
 }
 
-.statCard:hover {
-  transform: translateY(-4px);
-}
-
 .statIcon {
   font-size: 36px;
 }
@@ -269,11 +265,6 @@
   border-radius: 12px;
   text-align: center;
   transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.actionCard:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
 .dangerCard {

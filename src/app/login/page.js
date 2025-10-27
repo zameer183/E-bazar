@@ -69,29 +69,31 @@ export default function Login() {
             <div className={styles.fieldGroup} suppressHydrationWarning>
               <label htmlFor="email">Email Address</label>
               <input
-              id="email"
-              name="email"
-              type="email"
-              autoComplete="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="your@email.com"
-              required
-            />
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="your@email.com"
+                required
+                suppressHydrationWarning
+              />
             </div>
 
             <div className={styles.fieldGroup} suppressHydrationWarning>
               <label htmlFor="password">Password</label>
               <input
-              id="password"
-              name="password"
-              type="password"
-              autoComplete="current-password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Enter your password"
-              required
-            />
+                id="password"
+                name="password"
+                type="password"
+                autoComplete="current-password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Enter your password"
+                required
+                suppressHydrationWarning
+              />
             </div>
 
             {status.type !== "idle" && (
@@ -106,14 +108,18 @@ export default function Login() {
               </div>
             )}
 
-            <button type="submit" className={styles.submitButton}>
+            <button
+              type="submit"
+              className={styles.submitButton}
+              suppressHydrationWarning
+            >
               Log In
             </button>
           </form>
 
           <div className={styles.footer} suppressHydrationWarning>
             <p>
-              Don't have an account?{" "}
+              Don&apos;t have an account?{" "}
               <Link href="/signup" className={styles.footerLink}>
                 Sign up here
               </Link>

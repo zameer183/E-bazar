@@ -57,7 +57,7 @@ const StarRating = ({
           tabIndex={isInteractive ? 0 : -1}
           aria-hidden={isInteractive ? undefined : "true"}
         >
-          <span aria-hidden="true">★</span>
+          <span aria-hidden="true">*</span>
         </button>
       ))}
     </div>

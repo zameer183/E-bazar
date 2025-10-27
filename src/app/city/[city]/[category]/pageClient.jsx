@@ -10,7 +10,6 @@ import {
   createProductShowcase,
   getBazaarDefinition,
   getBazaarSubcategories,
-  getTopRatedSellers,
 } from "@/data/markets";
 import SearchBar from "@/components/search-bar/SearchBar";
 import { useSearchParams } from "next/navigation";
@@ -23,7 +22,6 @@ const BazaarFooter = dynamic(() => import("@/components/bazaar-footer/BazaarFoot
 
 const SERVICE_NOTE =
   "We only provide an online bazaar. Sellers handle payments & delivery directly.";
-const GLOBAL_TOP_RATED = getTopRatedSellers(8);
 
 const matchCity = (shop, slug, name) => {
   const shopCitySlug = shop.citySlug?.toLowerCase?.();
@@ -275,7 +273,7 @@ export default function CategoryPageClient({ city, industry, categories }) {
                     </div>
                     <div className={styles.sellerRatings}>
                       <span>
-                        {seller.rating ? `${seller.rating.toFixed(1)} ★` : "New Store"}
+                        {seller.rating ? `${seller.rating.toFixed(1)} / 5` : "New Store"}
                       </span>
                       <span>
                         {seller.reviews

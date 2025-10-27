@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import ReviewSummary from "@/components/reviews/ReviewSummary";
-import { BASE_CITY_MARKETS, HERO_SLIDES, getTopRatedSellers, STORAGE_KEY } from "@/data/markets";
+import { BASE_CITY_MARKETS, getTopRatedSellers } from "@/data/markets";
 import styles from "./page.module.css";
 
 // Dynamic imports for better performance
@@ -20,33 +19,10 @@ const BazaarFooter = dynamic(() => import("@/components/bazaar-footer/BazaarFoot
 
 const SERVICE_NOTE = "We only provide an online bazaar. Sellers handle payments & delivery directly.";
 const TOP_RATED_SELLERS = getTopRatedSellers(12);
-const STAR = "\u2605";
 
 export default function Home() {
-  const [hasShop, setHasShop] = useState(false);
-  const [notification, setNotification] = useState({ show: false, message: "" });
-
-  useEffect(() => {
-    // Check if user has a registered shop
-    if (typeof window !== "undefined") {
-      const stored = window.localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const shops = JSON.parse(stored);
-        setHasShop(shops.length > 0);
-      }
-    }
-  }, []);
-
   return (
     <div className={styles.page} suppressHydrationWarning>
-      {/* Notification Toast */}
-      {notification.show && (
-        <div className={styles.notification}>
-          <span className={styles.notificationIcon}>✓</span>
-          <span className={styles.notificationMessage}>{notification.message}</span>
-        </div>
-      )}
-
       <main className={styles.main}>
         <section className={styles.hero}>
           <div className={styles.heroCopy} suppressHydrationWarning>

@@ -61,23 +61,6 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-const createUnavailableService = (serviceName) =>
-  new Proxy(
-    {},
-    {
-      get() {
-        throw new Error(
-          `Firebase ${serviceName} is unavailable because required environment variables are missing.`,
-        );
-      },
-      apply() {
-        throw new Error(
-          `Firebase ${serviceName} is unavailable because required environment variables are missing.`,
-        );
-      },
-    },
-  );
-
 // Initialize Firebase (avoid multiple initializations)
 const app =
   hasCompleteFirebaseConfig && getApps().length === 0
@@ -87,9 +70,10 @@ const app =
     : null;
 
 // Initialize Firebase services
-export const auth = app ? getAuth(app) : createUnavailableService("Auth");
-export const db = app ? getFirestore(app) : createUnavailableService("Firestore");
-export const storage = app ? getStorage(app) : createUnavailableService("Storage");
+export const auth = app ? getAuth(app) : null;
+export const db = app ? getFirestore(app) : null;
+export const storage = app ? getStorage(app) : null;
+export const isFirebaseConfigured = hasCompleteFirebaseConfig;
 
 // Initialize Analytics (only in browser environment)
 export const analytics =

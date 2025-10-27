@@ -1,6 +1,6 @@
 "use client";
 
-import { storage as firebaseStorage } from "@/lib/firebase";
+import { storage as firebaseStorage, isFirebaseConfigured } from "@/lib/firebase";
 import {
   ref as firebaseRef,
   uploadBytes,
@@ -18,6 +18,10 @@ const STORAGE_DRIVER = (() => {
   const hasAwsEnv =
     process.env.NEXT_PUBLIC_AWS_S3_BUCKET &&
     process.env.NEXT_PUBLIC_AWS_REGION;
+
+  if (!isFirebaseConfigured || !firebaseStorage) {
+    return hasAwsEnv ? "aws" : "api";
+  }
 
   return hasAwsEnv ? "aws" : "firebase";
 })();
@@ -58,7 +62,8 @@ const ensureFileLike = (file, fallbackName = "upload") => {
 
 const sanitizePathSegment = (value) => value.replace(/[^a-zA-Z0-9/_-]/g, "_");
 
-const shouldUseFirebaseUploads = () => STORAGE_DRIVER === "firebase";
+const shouldUseFirebaseUploads = () =>
+  STORAGE_DRIVER === "firebase" && isFirebaseConfigured && firebaseStorage;
 
 const generateFirebaseObjectPath = (path, fileName = "upload") => {
   const normalizedPath = path
@@ -151,6 +156,9 @@ const uploadViaApi = async ({ path, file, fileName, onProgress }) => {
 };
 
 const uploadViaFirebaseStorage = async ({ path, file, fileName, onProgress }) => {
+  if (!isFirebaseConfigured || !firebaseStorage) {
+    throw new Error("Firebase Storage is unavailable. Please configure Firebase or switch storage driver.");
+  }
   const uploadFile = ensureFileLike(file, fileName || "upload");
   const sanitizedName =
     sanitizePathSegment(fileName || uploadFile.name || "upload") || "upload";
@@ -228,6 +236,9 @@ const extractFirebaseObjectPath = (urlOrKey) => {
 };
 
 const deleteViaFirebaseStorage = async ({ key, url }) => {
+  if (!isFirebaseConfigured || !firebaseStorage) {
+    throw new Error("Firebase Storage is unavailable. Please configure Firebase or switch storage driver.");
+  }
   const objectPath = extractFirebaseObjectPath(key || url);
   if (!objectPath) {
     throw new Error("Unable to determine Firebase Storage object path.");

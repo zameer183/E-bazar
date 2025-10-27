@@ -1,13 +1,17 @@
 "use client";
 
 import { BASE_CITY_MARKETS } from "@/data/markets";
-import { db } from "./firebase";
+import { db, isFirebaseConfigured } from "./firebase";
 import { collection, addDoc, serverTimestamp, writeBatch, doc, getDocs, deleteDoc } from "firebase/firestore";
 
 /**
  * Seed mock shop data to Firebase Firestore
  */
 export const seedMockShops = async (onProgress) => {
+  if (!isFirebaseConfigured || !db) {
+    const message = "Firestore is unavailable. Configure Firebase before seeding data.";
+    return { success: false, error: message, message };
+  }
   try {
     const totalShops = BASE_CITY_MARKETS.reduce((acc, city) => {
       return acc + Object.values(city.industries || {}).reduce((sum, industry) => {
@@ -16,7 +20,9 @@ export const seedMockShops = async (onProgress) => {
     }, 0);
 
     let processedShops = 0;
-    onProgress && onProgress({ status: "Starting seed process...", progress: 0 });
+    if (onProgress) {
+      onProgress({ status: "Starting seed process...", progress: 0 });
+    }
 
     // Create a fake admin user ID for mock data
     const MOCK_ADMIN_ID = "mock-admin-user";
@@ -56,12 +62,14 @@ export const seedMockShops = async (onProgress) => {
 
           processedShops++;
           const progress = Math.round((processedShops / totalShops) * 100);
-          onProgress && onProgress({
-            status: `Added ${seller.name} in ${city.name}`,
-            progress,
-            current: processedShops,
-            total: totalShops
-          });
+          if (onProgress) {
+            onProgress({
+              status: `Added ${seller.name} in ${city.name}`,
+              progress,
+              current: processedShops,
+              total: totalShops,
+            });
+          }
         }
       }
     }
@@ -85,8 +93,14 @@ export const seedMockShops = async (onProgress) => {
  * Clear all mock shop data from Firestore
  */
 export const clearMockShops = async (onProgress) => {
+  if (!isFirebaseConfigured || !db) {
+    const message = "Firestore is unavailable. Configure Firebase before clearing data.";
+    return { success: false, error: message, message };
+  }
   try {
-    onProgress && onProgress({ status: "Fetching all shops...", progress: 0 });
+    if (onProgress) {
+      onProgress({ status: "Fetching all shops...", progress: 0 });
+    }
 
     // Get all shops
     const shopsSnapshot = await getDocs(collection(db, "shops"));
@@ -103,28 +117,30 @@ export const clearMockShops = async (onProgress) => {
     let deleted = 0;
 
     // Delete in batches
-    const batch = writeBatch(db);
+    let batch = writeBatch(db);
     let batchCount = 0;
 
     for (const shopDoc of shopsSnapshot.docs) {
       batch.delete(doc(db, "shops", shopDoc.id));
-      batchCount++;
-      deleted++;
+      batchCount += 1;
+      deleted += 1;
 
       // Firestore batch limit is 500 operations
       if (batchCount === 500) {
         await batch.commit();
-        const newBatch = writeBatch(db);
+        batch = writeBatch(db);
         batchCount = 0;
       }
 
       const progress = Math.round((deleted / total) * 100);
-      onProgress && onProgress({
-        status: `Deleting shop ${deleted}/${total}...`,
-        progress,
-        current: deleted,
-        total
-      });
+      if (onProgress) {
+        onProgress({
+          status: `Deleting shop ${deleted}/${total}...`,
+          progress,
+          current: deleted,
+          total,
+        });
+      }
     }
 
     // Commit remaining operations
@@ -133,7 +149,9 @@ export const clearMockShops = async (onProgress) => {
     }
 
     // Also clear shop images
-    onProgress && onProgress({ status: "Clearing shop images...", progress: 95 });
+    if (onProgress) {
+      onProgress({ status: "Clearing shop images...", progress: 95 });
+    }
     const imagesSnapshot = await getDocs(collection(db, "shopImages"));
     for (const imageDoc of imagesSnapshot.docs) {
       await deleteDoc(doc(db, "shopImages", imageDoc.id));
@@ -170,6 +188,12 @@ export const clearMockShops = async (onProgress) => {
  * Get statistics about current data
  */
 export const getDataStats = async () => {
+  if (!isFirebaseConfigured || !db) {
+    return {
+      success: false,
+      error: "Firestore is unavailable. Configure Firebase before fetching stats.",
+    };
+  }
   try {
     const shopsSnapshot = await getDocs(collection(db, "shops"));
     const imagesSnapshot = await getDocs(collection(db, "shopImages"));

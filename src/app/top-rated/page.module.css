@@ -80,11 +80,6 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 22px 38px rgba(47, 47, 47, 0.16);
-}
-
 .cardHeader {
   display: flex;
   justify-content: space-between;

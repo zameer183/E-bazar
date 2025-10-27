@@ -86,7 +86,7 @@ export default function AdminPanel() {
   };
 
   const handleClearData = async () => {
-    if (!confirm("⚠️ WARNING: This will DELETE ALL shops from Firebase! This cannot be undone. Are you absolutely sure?")) {
+    if (!confirm("Warning WARNING: This will DELETE ALL shops from Firebase! This cannot be undone. Are you absolutely sure?")) {
       return;
     }
 
@@ -141,7 +141,7 @@ export default function AdminPanel() {
     setIsLoading(false);
 
     if (seedResult.success) {
-      showNotification(`✅ Successfully reloaded! ${seedResult.count} shops added.`, "success");
+      showNotification(`Done Successfully reloaded! ${seedResult.count} shops added.`, "success");
       loadStats();
     } else {
       showNotification(seedResult.message, "error");
@@ -167,7 +167,7 @@ export default function AdminPanel() {
     return (
       <div className={styles.loginContainer}>
         <div className={styles.loginBox}>
-          <h1>🔒 Admin Access Required</h1>
+          <h1>Locked Admin Access Required</h1>
           <p style={{ marginBottom: '20px' }}>
             You need administrator privileges to access this page.
           </p>
@@ -218,7 +218,7 @@ export default function AdminPanel() {
       {notification.show && (
         <div className={`${styles.notification} ${styles[notification.type]}`}>
           <span className={styles.notificationIcon}>
-            {notification.type === "success" ? "✓" : "⚠"}
+            {notification.type === "success" ? "Success" : notification.type === "error" ? "Error" : notification.type === "warning" ? "Warning" : "Info"}
           </span>
           <span className={styles.notificationMessage}>{notification.message}</span>
         </div>
@@ -226,38 +226,38 @@ export default function AdminPanel() {
 
       <main className={styles.main}>
         <div className={styles.header}>
-          <h1>🛠️ Admin Panel</h1>
+          <h1>Admin Panel</h1>
           <p>Manage Firebase data and seed mock shops</p>
         </div>
 
         {/* Statistics Section */}
         <div className={styles.section}>
-          <h2>📊 Current Database Statistics</h2>
+          <h2>Current Database Statistics</h2>
           {stats ? (
             <div className={styles.statsGrid}>
               <div className={styles.statCard}>
-                <div className={styles.statIcon}>🏪</div>
+                <div className={styles.statIcon}>Shops</div>
                 <div className={styles.statInfo}>
                   <h3>Total Shops</h3>
                   <p className={styles.statNumber}>{stats.shops}</p>
                 </div>
               </div>
               <div className={styles.statCard}>
-                <div className={styles.statIcon}>📸</div>
+                <div className={styles.statIcon}>Photos</div>
                 <div className={styles.statInfo}>
                   <h3>Shop Images</h3>
                   <p className={styles.statNumber}>{stats.shopImages}</p>
                 </div>
               </div>
               <div className={styles.statCard}>
-                <div className={styles.statIcon}>🎥</div>
+                <div className={styles.statIcon}>Videos</div>
                 <div className={styles.statInfo}>
                   <h3>Shop Videos</h3>
                   <p className={styles.statNumber}>{stats.shopVideos}</p>
                 </div>
               </div>
               <div className={styles.statCard}>
-                <div className={styles.statIcon}>🖼️</div>
+                <div className={styles.statIcon}>Graphics</div>
                 <div className={styles.statInfo}>
                   <h3>Product Images</h3>
                   <p className={styles.statNumber}>{stats.productImages}</p>
@@ -268,7 +268,7 @@ export default function AdminPanel() {
             <p className={styles.loading}>Loading statistics...</p>
           )}
           <button onClick={loadStats} className={styles.refreshButton} disabled={isLoading}>
-            🔄 Refresh Stats
+            Refresh Stats
           </button>
         </div>
 
@@ -291,10 +291,10 @@ export default function AdminPanel() {
 
         {/* Actions Section */}
         <div className={styles.section}>
-          <h2>⚡ Quick Actions</h2>
+          <h2>Quick Actions</h2>
           <div className={styles.actionsGrid}>
             <div className={styles.actionCard}>
-              <div className={styles.actionIcon}>🔄</div>
+              <div className={styles.actionIcon}>Refresh</div>
               <h3>Reload Mock Data</h3>
               <p>Clear all existing data and reload fresh mock shops from /src/data/markets.js</p>
               <button
@@ -302,12 +302,12 @@ export default function AdminPanel() {
                 className={styles.actionButton}
                 disabled={isLoading}
               >
-                🔄 Reload All Data
+                Reload All Data
               </button>
             </div>
 
             <div className={styles.actionCard}>
-              <div className={styles.actionIcon}>➕</div>
+              <div className={styles.actionIcon}>Add</div>
               <h3>Seed Mock Data</h3>
               <p>Add mock shops to Firebase (keeps existing data)</p>
               <button
@@ -315,20 +315,20 @@ export default function AdminPanel() {
                 className={styles.actionButton}
                 disabled={isLoading}
               >
-                ➕ Seed Data
+                Seed Data
               </button>
             </div>
 
             <div className={`${styles.actionCard} ${styles.dangerCard}`}>
-              <div className={styles.actionIcon}>🗑️</div>
+              <div className={styles.actionIcon}>Delete</div>
               <h3>Clear All Data</h3>
-              <p>⚠️ Permanently delete ALL shops from Firebase</p>
+              <p>Warning: Permanently delete ALL shops from Firebase</p>
               <button
                 onClick={handleClearData}
                 className={`${styles.actionButton} ${styles.dangerButton}`}
                 disabled={isLoading}
               >
-                🗑️ Clear Database
+                Clear Database
               </button>
             </div>
           </div>
@@ -336,7 +336,7 @@ export default function AdminPanel() {
 
         {/* Info Section */}
         <div className={styles.infoSection}>
-          <h3>ℹ️ Information</h3>
+          <h3>Information</h3>
           <ul>
             <li><strong>Reload All Data:</strong> Best option to get a fresh database. Deletes everything and reloads ~800+ mock shops.</li>
             <li><strong>Seed Data:</strong> Adds mock shops without deleting existing data. Use when you want to add more shops.</li>

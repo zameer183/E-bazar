@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { onAuthChange } from "@/lib/auth";
@@ -19,6 +20,7 @@ export default function Navbar() {
   const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
   const [showAccountDeleteModal, setShowAccountDeleteModal] = useState(false);
   const profileActionsRef = useRef(null);
+  const profileToggleRef = useRef(null);
 
   useEffect(() => {
     // Listen to Firebase Auth state changes
@@ -143,6 +145,13 @@ export default function Navbar() {
     };
   }, [isHamburgerActive]);
 
+  const closeProfileMenu = () => {
+    setIsHamburgerActive(false);
+    if (profileToggleRef.current) {
+      profileToggleRef.current.focus();
+    }
+  };
+
   return (
     <>
       <nav className={styles.navbar}>
@@ -176,6 +185,7 @@ export default function Navbar() {
                   aria-pressed={isHamburgerActive}
                   aria-expanded={isHamburgerActive}
                   aria-controls="profile-actions-menu"
+                  ref={profileToggleRef}
                 >
                   <span className={styles.hamburgerContainer}>
                     <span className={styles.hamburgerInner} />
@@ -186,9 +196,8 @@ export default function Navbar() {
                   <button
                     type="button"
                     className={styles.profileDropdownOverlay}
-                    onClick={() => setIsHamburgerActive(false)}
+                    onClick={closeProfileMenu}
                     aria-label="Close account menu"
-                    aria-hidden="true"
                     tabIndex={-1}
                   />
                 )}
@@ -197,6 +206,7 @@ export default function Navbar() {
                   className={`${styles.profileDropdown} ${isHamburgerActive ? styles.profileDropdownOpen : ""}`}
                   role="menu"
                   aria-hidden={!isHamburgerActive}
+                  hidden={!isHamburgerActive}
                 >
                   <div className={styles.profileDropdownContent}>
                     <div className={styles.profileDropdownHeader}>
@@ -212,9 +222,9 @@ export default function Navbar() {
                           className={styles.profileDropdownItem}
                           role="menuitem"
                           tabIndex={isHamburgerActive ? 0 : -1}
-                          onClick={() => setIsHamburgerActive(false)}
+                          onClick={closeProfileMenu}
                         >
-                          <span className={styles.profileDropdownIcon}>⚙️</span>
+                          <span className={styles.profileDropdownIcon}>S</span>
                           <span>
                             Profile Settings
                             <small>Update details, avatar, and password.</small>
@@ -228,11 +238,11 @@ export default function Navbar() {
                           role="menuitem"
                           tabIndex={isHamburgerActive ? 0 : -1}
                           onClick={() => {
-                            setIsHamburgerActive(false);
+                            closeProfileMenu();
                             setShowLogoutModal(true);
                           }}
                         >
-                          <span className={styles.profileDropdownIcon}>⏻</span>
+                          <span className={styles.profileDropdownIcon}>O</span>
                           <span>
                             Logout
                             <small>Sign out from this device.</small>
@@ -268,7 +278,14 @@ export default function Navbar() {
             <p>Upload a profile picture to personalize your account.</p>
             {userProfile && (
               <div className={styles.currentProfile}>
-                <img src={userProfile.image} alt="Current Profile" />
+                <Image
+                  src={userProfile.image}
+                  alt="Current Profile"
+                  width={120}
+                  height={120}
+                  className={styles.currentProfileImage}
+                  unoptimized
+                />
               </div>
             )}
             <label className={styles.uploadLabel}>
@@ -281,7 +298,7 @@ export default function Navbar() {
                 style={{ display: "none" }}
               />
               <span className={styles.uploadButtonModal}>
-                📷 {userProfile ? "Upload New Picture" : "Upload Picture"}
+                {userProfile ? "Upload New Picture" : "Upload Picture"}
               </span>
             </label>
             <div className={styles.modalActions}>

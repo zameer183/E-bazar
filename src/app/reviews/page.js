@@ -200,7 +200,7 @@ export default function ReviewsPage() {
     : [...SELLER_REVIEWS, ...BUYER_REVIEWS].sort(() => Math.random() - 0.5);
 
   const renderStars = (rating) => {
-    return "★".repeat(rating) + "☆".repeat(5 - rating);
+    return "*".repeat(rating) + ".".repeat(5 - rating);
   };
 
   return (

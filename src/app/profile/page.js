@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import styles from "./page.module.css";
 
@@ -19,7 +20,6 @@ const PROFILE_FIELD_IDS = {
 
 export default function ProfilePage() {
   const router = useRouter();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
   const [userProfile, setUserProfile] = useState({
     name: "",
@@ -64,8 +64,6 @@ export default function ProfilePage() {
             router.push("/login");
             return;
           }
-
-          setIsLoggedIn(true);
 
           // Load user profile from Firestore
           const { getUserProfile } = await import("@/lib/firestore");
@@ -322,7 +320,13 @@ export default function ProfilePage() {
       {notification.show && (
         <div className={`${styles.notification} ${styles[notification.type]}`}>
           <span className={styles.notificationIcon}>
-            {notification.type === "success" ? "✓" : "⚠"}
+            {notification.type === "success"
+              ? "Success"
+              : notification.type === "error"
+              ? "Error"
+              : notification.type === "warning"
+              ? "Warning"
+              : "Info"}
           </span>
           <span className={styles.notificationMessage}>{notification.message}</span>
         </div>
@@ -341,17 +345,26 @@ export default function ProfilePage() {
           </div>
           <div className={styles.profilePictureContainer}>
             <div className={styles.profilePictureWrapper}>
-              {userProfile.image ? (
-                <img src={userProfile.image} alt="Profile" className={styles.profilePicture} />
-              ) : (
-                <div className={styles.profilePlaceholder}>
-                  <span>👤</span>
-                </div>
-              )}
+              <div className={styles.profilePlaceholder}>
+                {userProfile.image ? (
+                  <Image
+                    src={userProfile.image}
+                    alt="Profile"
+                    fill
+                    className={styles.profilePicture}
+                    sizes="150px"
+                    unoptimized
+                  />
+                ) : (
+                  <span>
+                    {(userProfile.name || formData.email || "User").slice(0, 1).toUpperCase()}
+                  </span>
+                )}
+              </div>
             </div>
             <div className={styles.profilePictureActions}>
               <label className={styles.uploadButton}>
-                📷 {userProfile.image ? "Change Picture" : "Upload Picture"}
+                {userProfile.image ? "Change Picture" : "Upload Picture"}
                 <input
                   type="file"
                   accept="image/*"
@@ -363,7 +376,7 @@ export default function ProfilePage() {
               </label>
               {userProfile.image && (
                 <button onClick={handleDeleteProfilePicture} className={styles.deleteButton}>
-                  🗑️ Remove Picture
+                  Remove Picture
                 </button>
               )}
             </div>
@@ -376,7 +389,7 @@ export default function ProfilePage() {
             <h2>Profile Information</h2>
             {!isEditingProfile ? (
               <button onClick={() => setIsEditingProfile(true)} className={styles.editButton}>
-                ✏️ Edit
+                Edit
               </button>
             ) : (
               <div className={styles.editActions}>
@@ -399,71 +412,91 @@ export default function ProfilePage() {
           </div>
           <div className={styles.profileInfo}>
             <div className={styles.infoRow}>
-              <label htmlFor={PROFILE_FIELD_IDS.name}>Full Name</label>
               {isEditingProfile ? (
-                <input
-                  id={PROFILE_FIELD_IDS.name}
-                  type="text"
-                  name="name"
-                  autoComplete="name"
-                  value={formData.name}
-                  onChange={handleProfileChange}
-                  className={styles.input}
-                  placeholder="Enter your full name"
-                />
+                <>
+                  <label htmlFor={PROFILE_FIELD_IDS.name}>Full Name</label>
+                  <input
+                    id={PROFILE_FIELD_IDS.name}
+                    type="text"
+                    name="name"
+                    autoComplete="name"
+                    value={formData.name}
+                    onChange={handleProfileChange}
+                    className={styles.input}
+                    placeholder="Enter your full name"
+                  />
+                </>
               ) : (
-                <span>{formData.name || "Not set"}</span>
+                <>
+                  <span className={styles.infoLabel}>Full Name</span>
+                  <span>{formData.name || "Not set"}</span>
+                </>
               )}
             </div>
             <div className={styles.infoRow}>
-              <label htmlFor={PROFILE_FIELD_IDS.email}>Email Address</label>
               {isEditingProfile ? (
-                <input
-                  id={PROFILE_FIELD_IDS.email}
-                  type="email"
-                  name="email"
-                  autoComplete="email"
-                  value={formData.email}
-                  onChange={handleProfileChange}
-                  className={styles.input}
-                  placeholder="Enter your email"
-                />
+                <>
+                  <label htmlFor={PROFILE_FIELD_IDS.email}>Email Address</label>
+                  <input
+                    id={PROFILE_FIELD_IDS.email}
+                    type="email"
+                    name="email"
+                    autoComplete="email"
+                    value={formData.email}
+                    onChange={handleProfileChange}
+                    className={styles.input}
+                    placeholder="Enter your email"
+                  />
+                </>
               ) : (
-                <span>{formData.email || "Not set"}</span>
+                <>
+                  <span className={styles.infoLabel}>Email Address</span>
+                  <span>{formData.email || "Not set"}</span>
+                </>
               )}
             </div>
             <div className={styles.infoRow}>
-              <label htmlFor={PROFILE_FIELD_IDS.phone}>Phone Number</label>
               {isEditingProfile ? (
-                <input
-                  id={PROFILE_FIELD_IDS.phone}
-                  type="tel"
-                  name="phone"
-                  autoComplete="tel"
-                  value={formData.phone}
-                  onChange={handleProfileChange}
-                  className={styles.input}
-                  placeholder="Enter your phone number"
-                />
+                <>
+                  <label htmlFor={PROFILE_FIELD_IDS.phone}>Phone Number</label>
+                  <input
+                    id={PROFILE_FIELD_IDS.phone}
+                    type="tel"
+                    name="phone"
+                    autoComplete="tel"
+                    value={formData.phone}
+                    onChange={handleProfileChange}
+                    className={styles.input}
+                    placeholder="Enter your phone number"
+                  />
+                </>
               ) : (
-                <span>{formData.phone || "Not set"}</span>
+                <>
+                  <span className={styles.infoLabel}>Phone Number</span>
+                  <span>{formData.phone || "Not set"}</span>
+                </>
               )}
             </div>
             <div className={styles.infoRow}>
-              <label htmlFor={PROFILE_FIELD_IDS.bio}>Bio</label>
               {isEditingProfile ? (
-                <textarea
-                  id={PROFILE_FIELD_IDS.bio}
-                  name="bio"
-                  autoComplete="off"
-                  value={formData.bio}
-                  onChange={handleProfileChange}
-                  className={styles.textarea}
-                  placeholder="Tell us about yourself"
-                  rows={4}
-                />
+                <>
+                  <label htmlFor={PROFILE_FIELD_IDS.bio}>Bio</label>
+                  <textarea
+                    id={PROFILE_FIELD_IDS.bio}
+                    name="bio"
+                    autoComplete="off"
+                    value={formData.bio}
+                    onChange={handleProfileChange}
+                    className={styles.textarea}
+                    placeholder="Tell us about yourself"
+                    rows={4}
+                  />
+                </>
               ) : (
-                <span>{formData.bio || "Not set"}</span>
+                <>
+                  <span className={styles.infoLabel}>Bio</span>
+                  <span>{formData.bio || "Not set"}</span>
+                </>
               )}
             </div>
           </div>
@@ -475,7 +508,7 @@ export default function ProfilePage() {
             <h2>Change Password</h2>
             {!isChangingPassword && (
               <button onClick={() => setIsChangingPassword(true)} className={styles.editButton}>
-                🔒 Change Password
+                Change Password
               </button>
             )}
           </div>
@@ -537,7 +570,7 @@ export default function ProfilePage() {
               </div>
             </div>
           ) : (
-            <p className={styles.helpText}>Click "Change Password" to update your password</p>
+            <p className={styles.helpText}>Click &quot;Change Password&quot; to update your password</p>
           )}
         </div>
 
@@ -627,7 +660,7 @@ export default function ProfilePage() {
               onClick={() => setShowDeleteAccountModal(true)}
               className={styles.deleteAccountButton}
             >
-              🗑️ Delete Account
+              Delete Account
             </button>
           </div>
         </div>

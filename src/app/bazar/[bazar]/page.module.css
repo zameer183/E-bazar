@@ -29,7 +29,7 @@
   transition: border-color 0.2s ease;
 }
 
-.breadcrumbs a:hover {
+.breadcrumbs a:focus-visible {
   border-color: rgba(47, 47, 47, 0.4);
 }
 
@@ -79,7 +79,7 @@
   transition: all 0.3s ease;
 }
 
-.homeLink:hover {
+.homeLink:focus-visible {
   transform: translateY(-2px);
   box-shadow: 0 12px 24px rgba(182, 140, 87, 0.3);
 }
@@ -157,7 +157,7 @@
   cursor: pointer;
 }
 
-.subcategoryCard:hover {
+.subcategoryCard:focus-visible {
   transform: translateY(-4px);
   box-shadow: 0 12px 28px rgba(47, 47, 47, 0.15);
   border-color: var(--color-accent);
@@ -189,7 +189,7 @@
   transition: transform 0.2s ease;
 }
 
-.subcategoryCard:hover .subcategoryArrow {
+.subcategoryCard:focus-visible .subcategoryArrow {
   transform: translateX(4px);
 }
 
@@ -236,7 +236,7 @@
   flex-direction: column;
 }
 
-.cityCard:hover {
+.cityCard:focus-visible {
   transform: translateY(-4px);
   box-shadow: 0 12px 32px rgba(47, 47, 47, 0.15);
   border-color: var(--color-accent);
@@ -254,7 +254,7 @@
   transition: transform 0.4s ease;
 }
 
-.cityCard:hover .cityImg {
+.cityCard:focus-visible .cityImg {
   transform: scale(1.05);
 }
 
@@ -372,7 +372,7 @@
   transition: all 0.3s ease;
 }
 
-.cityBadge:hover {
+.cityBadge:focus-visible {
   background: var(--color-accent);
   color: white;
   border-color: var(--color-accent);

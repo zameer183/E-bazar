@@ -10,13 +10,16 @@ import {
   EmailAuthProvider,
   reauthenticateWithCredential,
 } from "firebase/auth";
-import { auth } from "./firebase";
+import { auth, isFirebaseConfigured } from "./firebase";
 import { createUser } from "./firestore";
 
 /**
  * Sign up a new user with email and password
  */
 export const signUpUser = async (email, password, name) => {
+  if (!isFirebaseConfigured || !auth) {
+    return { success: false, error: "Authentication is unavailable. Please configure Firebase." };
+  }
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
@@ -54,6 +57,9 @@ export const signUpUser = async (email, password, name) => {
  * Sign in an existing user
  */
 export const signInUser = async (email, password) => {
+  if (!isFirebaseConfigured || !auth) {
+    return { success: false, error: "Authentication is unavailable. Please configure Firebase." };
+  }
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     return { success: true, user: userCredential.user };
@@ -84,6 +90,9 @@ export const signInUser = async (email, password) => {
  * Sign out current user
  */
 export const signOutUser = async () => {
+  if (!isFirebaseConfigured || !auth) {
+    return { success: false, error: "Authentication is unavailable. Please configure Firebase." };
+  }
   try {
     await signOut(auth);
     return { success: true };
@@ -97,6 +106,9 @@ export const signOutUser = async () => {
  * Get current authenticated user
  */
 export const getCurrentUser = () => {
+  if (!isFirebaseConfigured || !auth) {
+    return null;
+  }
   return auth.currentUser;
 };
 
@@ -104,6 +116,10 @@ export const getCurrentUser = () => {
  * Listen to auth state changes
  */
 export const onAuthChange = (callback) => {
+  if (!isFirebaseConfigured || !auth) {
+    // Return noop unsubscribe
+    return () => {};
+  }
   return onAuthStateChanged(auth, callback);
 };
 
@@ -111,6 +127,9 @@ export const onAuthChange = (callback) => {
  * Change user password
  */
 export const changeUserPassword = async (currentPassword, newPassword) => {
+  if (!isFirebaseConfigured || !auth) {
+    return { success: false, error: "Authentication is unavailable. Please configure Firebase." };
+  }
   try {
     const user = auth.currentUser;
     if (!user) {
@@ -148,6 +167,9 @@ export const changeUserPassword = async (currentPassword, newPassword) => {
  * Delete user account
  */
 export const deleteUserAccount = async (password) => {
+  if (!isFirebaseConfigured || !auth) {
+    return { success: false, error: "Authentication is unavailable. Please configure Firebase." };
+  }
   try {
     const user = auth.currentUser;
     if (!user) {

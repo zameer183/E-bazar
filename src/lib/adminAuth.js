@@ -54,7 +54,7 @@ export const isCurrentUserAdmin = () => {
 
     const authorizedAdmins = getAuthorizedAdmins();
     return authorizedAdmins.includes(user.uid);
-  } catch (error) {
+  } catch {
     return false;
   }
 };
@@ -65,7 +65,7 @@ export const isCurrentUserAdmin = () => {
  */
 export const useAdminGuard = (onUnauthorized) => {
   const checkAdmin = async () => {
-    const { isAdmin, uid } = await checkIsAdmin();
+    const { isAdmin } = await checkIsAdmin();
 
     if (!isAdmin) {
       if (onUnauthorized) {

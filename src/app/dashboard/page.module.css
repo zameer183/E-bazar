@@ -212,11 +212,6 @@
   width: 100%;
 }
 
-.shopItem:hover {
-  border-color: var(--color-accent);
-  transform: translateX(4px);
-}
-
 .shopItemActive {
   border-color: var(--color-accent);
   background: rgba(182, 140, 87, 0.1);
@@ -314,12 +309,6 @@
   align-items: center;
   gap: 16px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.statCard:hover {
-  transform: translateY(-4px);
-  border-color: var(--color-accent);
-  box-shadow: 0 8px 24px rgba(182, 140, 87, 0.15);
 }
 
 .statIcon {
@@ -535,6 +524,12 @@
   font-size: 14px;
 }
 
+.infoLabel {
+  font-weight: 700;
+  color: var(--color-deep-gray);
+  font-size: 14px;
+}
+
 .infoRow span {
   color: rgba(47, 47, 47, 0.7);
   line-height: 1.6;
@@ -721,9 +716,92 @@
 
 .productHeaderActions {
   display: flex;
+  justify-content: flex-end;
   align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
+}
+
+.productActionsDropdown {
+  position: relative;
+}
+
+.productActionsToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--color-deep-gray);
+  color: var(--color-sand);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 12px;
+  transition: all 0.2s ease;
+}
+
+.productActionsToggle:focus-visible {
+  background: rgba(47, 47, 47, 0.9);
+  outline: 2px solid rgba(182, 140, 87, 0.6);
+  outline-offset: 2px;
+}
+
+.productActionsCaret {
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid currentColor;
+}
+
+.productActionsMenu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: #ffffff;
+  border: 1px solid rgba(47, 47, 47, 0.08);
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.18);
+  border-radius: 10px;
+  padding: 12px;
+  min-width: 180px;
+  z-index: 10;
+}
+
+.productActionsMenuItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: var(--color-deep-gray);
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+}
+
+.productActionsMenuItem:focus-visible {
+  background: rgba(47, 47, 47, 0.06);
+}
+
+.productActionsMenuItem:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: transparent;
+}
+
+.productActionsMenuItem input {
+  display: none;
+}
+
+.productActionsDelete {
+  color: #c53030;
 }
 
 .productHeader h3 {
@@ -743,6 +821,25 @@
   font-weight: 600;
   font-size: 12px;
   transition: all 0.2s ease;
+}
+
+.deleteProductButton {
+  background: rgba(197, 48, 48, 0.12);
+  color: #c53030;
+  border: 1px solid rgba(197, 48, 48, 0.4);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.deleteProductButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: rgba(197, 48, 48, 0.12);
+  color: rgba(197, 48, 48, 0.7);
 }
 
 .productPriceControls {
@@ -817,13 +914,7 @@
   background: var(--color-warm-gray);
 }
 
-.productImageCard:hover {
-  transform: translateY(-4px);
-  border-color: var(--color-accent);
-  box-shadow: 0 8px 24px rgba(182, 140, 87, 0.15);
-}
-
-.productImageCard img {
+.productImage {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -907,13 +998,7 @@
   background: var(--color-warm-gray);
 }
 
-.imageCard:hover {
-  transform: translateY(-4px);
-  border-color: var(--color-accent);
-  box-shadow: 0 8px 24px rgba(182, 140, 87, 0.15);
-}
-
-.imageCard img {
+.imageCardImage {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -926,11 +1011,6 @@
   right: 8px;
   display: flex;
   gap: 8px;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.imageCard:hover .imageActions {
   opacity: 1;
 }
 
@@ -962,6 +1042,33 @@
   transition: all 0.2s ease;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+}
+
+.imageCardDeleteButton {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  bottom: auto;
+  left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: rgba(197, 48, 48, 0.95);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.deleteImageLabel {
+  font-size: 11px;
 }
 
 .videoActions {
@@ -1207,6 +1314,12 @@
   font-weight: 600;
   font-size: 14px;
   transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.confirmDeleteButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: rgba(229, 62, 62, 0.7);
 }
 
 .confirmButton {

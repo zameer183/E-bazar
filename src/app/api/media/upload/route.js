@@ -6,6 +6,7 @@ import {
   buildPublicUrl,
   getBucketName,
   getS3Client,
+  getObjectAcl,
 } from "@/lib/s3";
 
 export const runtime = "nodejs";
@@ -50,6 +51,16 @@ const generateObjectKey = (folderPath, originalName) => {
   return safeExt ? `${folderPath}/${safeBase}-${suffix}.${safeExt}` : `${folderPath}/${safeBase}-${suffix}`;
 };
 
+const isAclUnsupportedError = (error) => {
+  const code = error?.Code || error?.code || error?.name;
+  if (code === "AccessControlListNotSupported") {
+    return true;
+  }
+
+  const message = error?.message || "";
+  return message.includes("bucket does not allow ACLs") || message.includes("Access Control List is not supported");
+};
+
 export async function POST(request) {
   try {
     const formData = await request.formData();
@@ -82,16 +93,26 @@ export async function POST(request) {
 
     const client = getS3Client();
     const bucket = getBucketName();
+    const aclConfig = getObjectAcl();
 
-    const putCommand = new PutObjectCommand({
+    const baseParams = {
       Bucket: bucket,
       Key: objectKey,
       Body: fileBuffer,
       ContentType: contentType,
       CacheControl: process.env.AWS_S3_CACHE_CONTROL || undefined,
-    });
+    };
 
-    await client.send(putCommand);
+    try {
+      await client.send(new PutObjectCommand({ ...baseParams, ...aclConfig }));
+    } catch (uploadError) {
+      if (aclConfig.ACL && isAclUnsupportedError(uploadError)) {
+        console.warn("S3 bucket does not accept ACLs; retrying upload without ACL.");
+        await client.send(new PutObjectCommand(baseParams));
+      } else {
+        throw uploadError;
+      }
+    }
 
     const publicUrl = buildPublicUrl(objectKey);
 

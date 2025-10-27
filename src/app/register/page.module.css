@@ -66,11 +66,6 @@
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-.card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 28px 56px rgba(47, 47, 47, 0.18);
-}
-
 .cardDetails {
   display: grid;
   gap: 12px;

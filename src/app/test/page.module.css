@@ -209,10 +209,6 @@
   transition: background 0.2s;
 }
 
-.testLink:hover {
-  background: rgba(102, 126, 234, 0.1);
-}
-
 .expected {
   display: block;
   color: #666;
@@ -253,7 +249,7 @@
 }
 
 .summaryCard ul li::before {
-  content: '• ';
+  content: '- ';
   color: #667eea;
   font-weight: bold;
   margin-right: 8px;

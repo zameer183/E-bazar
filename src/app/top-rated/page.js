@@ -13,8 +13,9 @@ export default function TopRatedPage() {
       <header className={styles.hero}>
         <h1>Top Rated Sellers Across Pakistan</h1>
         <p>
-          These stalls earned the community's trust through honest dealing, strong product quality,
-          and deliveries that arrive when promised. Explore the champions from every city and lane.
+          These stalls earned the community&apos;s trust through honest dealing, strong product
+          quality, and deliveries that arrive when promised. Explore the champions from every city
+          and lane.
         </p>
       </header>
 

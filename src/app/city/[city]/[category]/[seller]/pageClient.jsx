@@ -8,7 +8,6 @@ import {
   STORAGE_KEY,
   createSellerSlug,
   createProductShowcase,
-  getTopRatedSellers,
 } from "@/data/markets";
 import { deriveCategorySlug, normalizeProducts } from "@/lib/products";
 import { buildImageProps } from "@/lib/images";
@@ -19,7 +18,6 @@ import styles from "./page.module.css";
 
 const SERVICE_NOTE =
   "We only provide an online bazaar. Sellers handle payments & delivery directly.";
-const GLOBAL_TOP_RATED = getTopRatedSellers(8);
 const SELLER_REVIEW_KEY = "__seller__";
 
 const FALLBACK_REVIEWERS = [
@@ -37,7 +35,7 @@ const FALLBACK_REVIEWERS = [
 const FALLBACK_COMMENTS = [
   "Impressed with the quality and packaging.",
   "Great service, delivery arrived on time!",
-  "Highly recommended—exactly as described.",
+  "Highly recommended-exactly as described.",
   "Friendly seller and quick responses.",
   "Fantastic experience, will purchase again.",
   "Good value for money and authentic items.",
@@ -49,11 +47,11 @@ const FALLBACK_PRODUCT_COMMENTS = [
   "Exactly what I needed. Works perfectly!",
   "Quality exceeded expectations for the price.",
   "Item arrived well-packed and ready to use.",
-  "Solid build quality—feels premium in hand.",
+  "Solid build quality-feels premium in hand.",
   "Color and finish are exactly as shown in photos.",
   "Very happy with the purchase. Recommended!",
   "Reliable performance during daily use so far.",
-  "Makes a great gift—beautiful presentation.",
+  "Makes a great gift-beautiful presentation.",
   "The attention to detail really stands out.",
   "Smooth transaction and excellent communication.",
 ];
@@ -200,6 +198,11 @@ export default function SellerPageClient({ city, industry, baseSeller, slugs }) 
   const toastTimerRef = useRef(null);
   const permissionWarningRef = useRef({ product: false, seller: false });
 
+  const seller = useMemo(() => baseSeller ?? dynamicSeller ?? null, [
+    baseSeller,
+    dynamicSeller,
+  ]);
+
   const showToast = useCallback((message, type = "info", duration = 3000) => {
     if (toastTimerRef.current) {
       clearTimeout(toastTimerRef.current);
@@ -221,6 +224,7 @@ export default function SellerPageClient({ city, industry, baseSeller, slugs }) 
 
   const loadProductReviews = useCallback(async (shopId, products) => {
     if (!products || products.length === 0) return;
+    const fallbackSellerInfo = dynamicSeller ?? baseSeller ?? { id: shopId };
     try {
       const { getProductReviews } = await import("@/lib/firestore");
       const reviewsData = {};
@@ -228,14 +232,17 @@ export default function SellerPageClient({ city, industry, baseSeller, slugs }) 
       for (const product of products) {
         const productName = typeof product === 'string' ? product : product.name;
         const result = await getProductReviews(shopId, productName);
-        if (result.success && result.data?.length) {
-          reviewsData[productName] = result.data;
-        } else {
-          if (result.code === "permission-denied") {
+        if (result.success) {
+          if (result.fallback && (result.reason === "permission-denied" || result.reason === "firebase-unavailable")) {
             permissionsBlocked = true;
           }
+          const payload = Array.isArray(result.data) && result.data.length > 0
+            ? result.data
+            : generateFallbackProductReviews(fallbackSellerInfo, product);
+          reviewsData[productName] = payload;
+        } else {
           reviewsData[productName] = generateFallbackProductReviews(
-            seller || { id: shopId },
+            fallbackSellerInfo,
             product
           );
         }
@@ -255,14 +262,14 @@ export default function SellerPageClient({ city, industry, baseSeller, slugs }) 
       for (const product of products) {
         const productName = typeof product === 'string' ? product : product.name;
         fallbackReviews[productName] = generateFallbackProductReviews(
-          seller || { id: shopId },
+          fallbackSellerInfo,
           product,
           7
         );
       }
       setProductReviews(fallbackReviews);
     }
-  }, [seller, showToast]);
+  }, [baseSeller, dynamicSeller, showToast]);
 
   const loadSellerReviews = useCallback(async (shopId, fallbackSellerInfo = null) => {
     if (!shopId) {
@@ -272,27 +279,34 @@ export default function SellerPageClient({ city, industry, baseSeller, slugs }) 
     try {
       const { getSellerReviews } = await import("@/lib/firestore");
       const result = await getSellerReviews(shopId);
-      if (result.success) {
+      if (result.success && !result.fallback) {
         setSellerReviews(result.data);
-      } else {
-        const permissionsBlocked = result.code === "permission-denied";
-        const fallbackReviews = generateFallbackSellerReviews(fallbackSellerInfo || seller || { id: shopId });
-        setSellerReviews(fallbackReviews);
-        if (permissionsBlocked && !permissionWarningRef.current.seller) {
-          permissionWarningRef.current.seller = true;
-          showToast(
-            "Seller feedback is unavailable due to Firestore permissions. Showing community samples instead.",
-            "warning",
-            4000,
-          );
-        }
+        return;
+      }
+
+      const fallbackReviews = result.success && result.data?.length
+        ? result.data
+        : generateFallbackSellerReviews(fallbackSellerInfo || seller || { id: shopId });
+      setSellerReviews(fallbackReviews);
+
+      const permissionsBlocked =
+        result.reason === "permission-denied" || result.code === "permission-denied";
+      if (
+        permissionsBlocked &&
+        !permissionWarningRef.current.seller &&
+        process.env.NODE_ENV === "development"
+      ) {
+        permissionWarningRef.current.seller = true;
+        console.warn(
+          "Seller reviews fell back to local samples due to Firestore permissions.",
+        );
       }
     } catch (error) {
       console.warn("Falling back to sample seller reviews.", error);
       const fallbackReviews = generateFallbackSellerReviews(fallbackSellerInfo || seller || { id: shopId });
       setSellerReviews(fallbackReviews);
     }
-  }, [seller, showToast]);
+  }, [seller]);
 
   useEffect(() => {
     const loadShopData = async () => {
@@ -450,11 +464,6 @@ export default function SellerPageClient({ city, industry, baseSeller, slugs }) 
     };
   }, [baseSeller, categorySlug, citySlug, loadProductReviews, loadSellerReviews, sellerSlug]);
 
-  const seller = useMemo(() => baseSeller ?? dynamicSeller ?? null, [
-    baseSeller,
-    dynamicSeller,
-  ]);
-
   useEffect(() => {
     permissionWarningRef.current = { product: false, seller: false };
   }, [seller?.id]);
@@ -561,7 +570,7 @@ export default function SellerPageClient({ city, industry, baseSeller, slugs }) 
       : styles.toastInfo
   }`;
   const toastIcon =
-    toast.type === "success" ? "✓" : toast.type === "error" ? "✕" : toast.type === "warning" ? "⚠" : "ℹ";
+    toast.type === "success" ? "Success" : toast.type === "error" ? "Error" : toast.type === "warning" ? "Warning" : "Info";
 
   const handleChat = (productName) => {
     const message = `Hi! I'm interested in ${productName}. Can you provide more details about this product and delivery information?`;
@@ -746,7 +755,7 @@ export default function SellerPageClient({ city, industry, baseSeller, slugs }) 
                       onClick={() => handleOpenReviewModal(SELLER_REVIEW_KEY)}
                       className={styles.rateButton}
                     >
-                      ⭐ Rate This Seller
+                      Rate This Seller
                     </button>
                   ) : (
                     <span className={styles.rateHint}>
@@ -765,6 +774,29 @@ export default function SellerPageClient({ city, industry, baseSeller, slugs }) 
             )}
           </div>
         </section>
+
+        {shopVideo?.videoUrl && (
+          <section className={styles.shopVideoSection}>
+            <header className={styles.sectionHeader}>
+              <h2>Shop Walkthrough</h2>
+              {shopVideo?.duration ? (
+                <p>Quick {Math.round(shopVideo.duration)} second tour of the storefront.</p>
+              ) : (
+                <p>Take a quick look inside the shop.</p>
+              )}
+            </header>
+            <div className={styles.shopVideoWrapper}>
+              <video
+                className={styles.shopVideo}
+                src={shopVideo.videoUrl}
+                controls
+                preload="metadata"
+              >
+                Your browser does not support the embedded video.
+              </video>
+            </div>
+          </section>
+        )}
 
         <section className={styles.productsSection}>
           <header className={styles.sectionHeader}>
@@ -859,7 +891,7 @@ export default function SellerPageClient({ city, industry, baseSeller, slugs }) 
                             onClick={() => handleOpenReviewModal(productName)}
                             className={styles.rateButton}
                           >
-                            ⭐ Rate Product
+                            Rate Product
                           </button>
                         )}
                         <button
@@ -867,7 +899,7 @@ export default function SellerPageClient({ city, industry, baseSeller, slugs }) 
                           className={styles.chatButton}
                           type="button"
                         >
-                          💬 Chat
+                          Chat
                         </button>
                       </div>
                     </div>

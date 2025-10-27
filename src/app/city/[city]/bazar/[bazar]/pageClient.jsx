@@ -4,13 +4,12 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import SearchBar from "@/components/search-bar/SearchBar";
 import BazaarFooter from "@/components/bazaar-footer/BazaarFooter";
-import { getBazaarDefinition, getTopRatedSellers } from "@/data/markets";
+import { getBazaarDefinition } from "@/data/markets";
 import { buildImageProps } from "@/lib/images";
 import Image from "next/image";
 import styles from "./page.module.css";
 
 const SERVICE_NOTE = "We only provide an online bazaar. Sellers handle payments & delivery directly.";
-const GLOBAL_TOP_RATED = getTopRatedSellers(8);
 
 export default function BazaarPageClient({ city, bazaar, fragranceSellers, heroImage }) {
   const definition = getBazaarDefinition(bazaar.slug);

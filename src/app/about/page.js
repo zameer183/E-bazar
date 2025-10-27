@@ -1,10 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import styles from "./page.module.css";
 
 const WHY_POINTS = [
-  "List your shop in the lanes Pakistanis already trust — no complicated onboarding.",
+  "List your shop in the lanes Pakistanis already trust - no complicated onboarding.",
   "Reach city-wide buyers searching by industry, subcategory, and bazaar culture.",
   "Keep full control of pricing and payments while we surface your story to new customers.",
 ];
@@ -21,10 +20,10 @@ export default function AboutPage() {
       <header className={styles.hero}>
         <h1>About E-Bazar</h1>
         <p>
-          E-Bazar celebrates Pakistan's marketplace heritage — from Karachi's buzzing streets to
-          the artisans of Bahawalpur. We organize that energy into a digital bazaar so buyers can
-          explore confident, city-first shopping without losing the culture that makes every stall
-          special.
+          E-Bazar celebrates Pakistan&apos;s marketplace heritage - from Karachi&apos;s buzzing
+          streets to the artisans of Bahawalpur. We organize that energy into a digital bazaar so
+          buyers can explore confident, city-first shopping without losing the culture that makes
+          every stall special.
         </p>
       </header>
 
@@ -45,15 +44,15 @@ export default function AboutPage() {
       <section className={styles.section}>
         <h2>Grow Without Extra Overheads</h2>
         <p>
-          Buyers don't demand a personal website or fancy marketing campaign here. Just bring your
-          best dealing, honest prices, quality products, and timely delivery. Earn trust, respond
-          quickly, and your lane stays busy.
+          Buyers don&apos;t demand a personal website or fancy marketing campaign here. Just bring
+          your best dealing, honest prices, quality products, and timely delivery. Earn trust,
+          respond quickly, and your lane stays busy.
         </p>
       </section>
 
       <section className={styles.section}>
         <h2>The Road Ahead</h2>
-        <p>We're continuously widening the bazaar so sellers can sell smarter today and tomorrow.</p>
+        <p>We&apos;re continuously widening the bazaar so sellers can sell smarter today and tomorrow.</p>
         <ul className={styles.list}>
           {FUTURE_POINTS.map((point) => (
             <li key={point}>{point}</li>

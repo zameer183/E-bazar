@@ -16,7 +16,7 @@ function ErrorThrower({ shouldThrow }) {
   if (shouldThrow) {
     throw new Error('This is a test error from ErrorThrower component!');
   }
-  return <div className={styles.successMessage}>✅ No error - component working fine</div>;
+  return <div className={styles.successMessage}>Done No error - component working fine</div>;
 }
 
 export default function TestPage() {
@@ -40,7 +40,7 @@ export default function TestPage() {
   return (
     <div className={styles.testContainer}>
       <header className={styles.testHeader}>
-        <h1>🧪 E-Bazar Testing Page</h1>
+        <h1>Test E-Bazar Testing Page</h1>
         <p>Test all the features and fixes we implemented</p>
       </header>
 
@@ -85,15 +85,15 @@ export default function TestPage() {
       {/* Security Headers Test */}
       <section className={styles.testSection}>
         <h2>3. Security Headers Test</h2>
-        <p>Check browser dev tools → Network → Select this page → Headers tab</p>
+        <p>Check browser dev tools {"->"} Network {"->"} Select this page {"->"} Headers tab</p>
         <div className={styles.infoBox}>
           <h4>Expected Headers:</h4>
           <ul>
-            <li>✅ X-Frame-Options: SAMEORIGIN</li>
-            <li>✅ X-Content-Type-Options: nosniff</li>
-            <li>✅ X-XSS-Protection: 1; mode=block</li>
-            <li>✅ Strict-Transport-Security</li>
-            <li>✅ Referrer-Policy: origin-when-cross-origin</li>
+            <li>Done X-Frame-Options: SAMEORIGIN</li>
+            <li>Done X-Content-Type-Options: nosniff</li>
+            <li>Done X-XSS-Protection: 1; mode=block</li>
+            <li>Done Strict-Transport-Security</li>
+            <li>Done Referrer-Policy: origin-when-cross-origin</li>
           </ul>
         </div>
       </section>
@@ -103,7 +103,7 @@ export default function TestPage() {
         <h2>4. Firebase Configuration Test</h2>
         <p>Firebase should be initialized with validated environment variables</p>
         <div className={styles.successBox}>
-          ✅ If you can see this page, Firebase config validation passed!
+          Success: If you can see this page, Firebase config validation passed!
         </div>
       </section>
 
@@ -117,19 +117,19 @@ export default function TestPage() {
               <a href="/admin" target="_blank" className={styles.testLink}>
                 Open Admin Panel (not logged in)
               </a>
-              <span className={styles.expected}>→ Should redirect to login</span>
+              <span className={styles.expected}>{"->"} Should redirect to login</span>
             </li>
             <li>
               <a href="/login" target="_blank" className={styles.testLink}>
                 Login with test account
               </a>
-              <span className={styles.expected}>→ Should show login page</span>
+              <span className={styles.expected}>{"->"} Should show login page</span>
             </li>
             <li>
               <a href="/admin" target="_blank" className={styles.testLink}>
                 Visit Admin Panel (logged in as non-admin)
               </a>
-              <span className={styles.expected}>→ Should show your UID</span>
+              <span className={styles.expected}>{"->"} Should show your UID</span>
             </li>
           </ol>
         </div>
@@ -141,9 +141,9 @@ export default function TestPage() {
         <div className={styles.infoBox}>
           <h4>Run: <code>npm run lint</code></h4>
           <ul>
-            <li>✅ ESLint configured successfully</li>
-            <li>✅ 1 Error fixed (ErrorBoundary Link)</li>
-            <li>⚠️ ~60 Warnings (mostly style issues, not critical)</li>
+            <li>Done ESLint configured successfully</li>
+            <li>Done 1 Error fixed (ErrorBoundary Link)</li>
+            <li>Warning ~60 Warnings (mostly style issues, not critical)</li>
           </ul>
         </div>
       </section>
@@ -152,12 +152,12 @@ export default function TestPage() {
       <section className={styles.testSection}>
         <h2>7. Firebase Security Rules</h2>
         <div className={styles.warningBox}>
-          <h4>⚠️ ACTION REQUIRED:</h4>
+          <h4>Warning: ACTION REQUIRED:</h4>
           <p>Firebase Security Rules need to be deployed manually:</p>
           <ol>
             <li>Go to <a href="https://console.firebase.google.com" target="_blank" rel="noopener noreferrer">Firebase Console</a></li>
             <li>Select project: <strong>e-bazar-a9714</strong></li>
-            <li>Navigate to: Firestore Database → Rules</li>
+            <li>Navigate to: Firestore Database {"->"} Rules</li>
             <li>Copy content from: <code>firestore.rules</code></li>
             <li>Click: <strong>Publish</strong></li>
           </ol>
@@ -170,8 +170,8 @@ export default function TestPage() {
         <div className={styles.infoBox}>
           <h4>Created Files:</h4>
           <ul>
-            <li>✅ <code>firestore.indexes.json</code> - Index configuration</li>
-            <li>✅ <code>FIREBASE_INDEXES.md</code> - Complete documentation</li>
+            <li>Done <code>firestore.indexes.json</code> - Index configuration</li>
+            <li>Done <code>FIREBASE_INDEXES.md</code> - Complete documentation</li>
           </ul>
           <h4>To Create Indexes:</h4>
           <ol>
@@ -183,10 +183,10 @@ export default function TestPage() {
 
       {/* Summary */}
       <section className={styles.testSection}>
-        <h2>📊 Implementation Summary</h2>
+        <h2>Implementation Summary</h2>
         <div className={styles.summaryGrid}>
           <div className={styles.summaryCard}>
-            <h3>✅ Completed</h3>
+            <h3>Completed</h3>
             <ul>
               <li>Firebase env validation</li>
               <li>Security headers (7 headers)</li>
@@ -199,7 +199,7 @@ export default function TestPage() {
             </ul>
           </div>
           <div className={styles.summaryCard}>
-            <h3>⚠️ Manual Steps Required</h3>
+            <h3>Manual Steps Required</h3>
             <ul>
               <li>Deploy Firebase Security Rules</li>
               <li>Deploy Firebase Storage Rules</li>
