@@ -14,22 +14,48 @@
   flex-wrap: wrap;
 }
 
-.registerButton {
-  border: 1px solid rgba(47, 47, 47, 0.2);
-  background-color: var(--color-deep-gray);
-  color: var(--color-sand);
-  padding: 10px 20px;
-  border-radius: 999px;
-  font-size: 14px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+.actionGroup {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
-.registerButton:hover {
+.aboutLink {
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(47, 47, 47, 0.65);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  padding-bottom: 2px;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.aboutLink:hover {
+  color: var(--color-deep-gray);
+  border-color: rgba(47, 47, 47, 0.45);
+}
+
+.topRatedButton {
+  border: 1px solid rgba(47, 47, 47, 0.25);
+  background: transparent;
+  color: var(--color-deep-gray);
+  padding: 10px 22px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.topRatedButton:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 16px var(--color-card-shadow);
+  box-shadow: 0 10px 18px rgba(47, 47, 47, 0.12);
+  background: rgba(246, 240, 228, 0.7);
 }
 
 .tagline {
@@ -103,22 +129,10 @@
   gap: 12px;
 }
 
-.serviceStrip {
-  border: 1px dashed rgba(47, 47, 47, 0.25);
-  background: rgba(255, 255, 255, 0.7);
-  padding: 12px 20px;
-  border-radius: 18px;
-  font-size: 13px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  text-align: center;
-  color: rgba(47, 47, 47, 0.7);
-}
-
 .sliderViewport {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 3 / 2;
   border-radius: 28px;
   overflow: hidden;
   box-shadow: 0 18px 32px rgba(47, 47, 47, 0.18);
@@ -140,6 +154,26 @@
 
 .slideImage {
   object-fit: cover;
+  filter: brightness(0.88);
+}
+
+.slideOverlay {
+  position: absolute;
+  inset: auto 0 0 0;
+  padding: clamp(18px, 4vw, 28px);
+  background: linear-gradient(180deg, rgba(12, 12, 12, 0) 0%, rgba(12, 12, 12, 0.7) 100%);
+  color: #fff;
+  display: grid;
+  gap: 8px;
+}
+
+.slideOverlay h3 {
+  font-size: clamp(18px, 2.8vw, 28px);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1.4;
+  text-transform: uppercase;
+  max-width: 32ch;
 }
 
 .sliderButton {
@@ -200,8 +234,21 @@
 .cityGrid {
   display: grid;
   gap: clamp(20px, 4vw, 28px);
-  grid-template-columns: repeat(auto-fit, minmax(280px, 320px));
-  justify-content: center;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.cityCardLink {
+  display: block;
+  max-width: 340px;
+  width: 100%;
+  margin: 0 auto;
+  text-decoration: none;
+}
+
+.cityCardLink:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(47, 47, 47, 0.25);
+  border-radius: 28px;
 }
 
 .cityCard {
@@ -223,7 +270,8 @@
 .imageWrapper {
   position: relative;
   width: 100%;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 3 / 2;
+  max-height: 220px;
   background: rgba(0, 0, 0, 0.05);
   overflow: hidden;
 }
@@ -241,7 +289,7 @@
 
 .cardContent {
   display: grid;
-  gap: 18px;
+  gap: 14px;
   padding: 24px;
   background: rgba(246, 240, 228, 0.78);
 }
@@ -259,46 +307,96 @@
   color: rgba(47, 47, 47, 0.7);
 }
 
-.industrySlider {
-  display: flex;
-  gap: 12px;
-  overflow-x: auto;
-  padding-bottom: 4px;
-  scrollbar-width: thin;
-  scroll-snap-type: x mandatory;
-}
-
-.industrySlider::-webkit-scrollbar {
-  height: 6px;
-}
-
-.industrySlider::-webkit-scrollbar-thumb {
-  background: rgba(47, 47, 47, 0.2);
-  border-radius: 999px;
-}
-
-.industryPill {
-  flex: 0 0 auto;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 18px;
-  border-radius: 999px;
-  border: 1px solid rgba(47, 47, 47, 0.25);
-  background: rgba(230, 226, 219, 0.65);
-  font-weight: 700;
-  text-transform: uppercase;
+.cardStats {
+  font-size: 12px;
   letter-spacing: 0.05em;
-  font-size: 13px;
+  text-transform: uppercase;
+  color: rgba(47, 47, 47, 0.62);
+}
+
+.topRatedSection {
+  display: grid;
+  gap: 20px;
+  padding: clamp(20px, 5vw, 28px);
+  background: rgba(255, 255, 255, 0.78);
+  border-radius: 28px;
+  border: 1px solid rgba(47, 47, 47, 0.12);
+  box-shadow: 0 18px 32px rgba(47, 47, 47, 0.12);
+}
+
+.topRatedHeader {
+  display: grid;
+  gap: 8px;
+  max-width: 640px;
+}
+
+.topRatedHeader h2 {
+  font-size: clamp(22px, 3.4vw, 30px);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  color: var(--color-deep-gray);
+}
+
+.topRatedHeader p {
+  font-size: 15px;
+  color: rgba(47, 47, 47, 0.7);
+  line-height: 1.6;
+}
+
+.topRatedGrid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.topRatedCard {
+  display: grid;
+  gap: 8px;
+  padding: 18px;
+  border-radius: 20px;
+  border: 1px solid rgba(47, 47, 47, 0.1);
+  background: rgba(246, 240, 228, 0.65);
+  text-decoration: none;
   color: var(--color-deep-gray);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  scroll-snap-align: start;
-  text-decoration: none;
 }
 
-.industryPill:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(47, 47, 47, 0.12);
+.topRatedCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 28px rgba(47, 47, 47, 0.16);
+}
+
+.topRatedCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.topRatedCardHeader h3 {
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+}
+
+.topRatedRating {
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.topRatedMeta {
+  font-size: 13px;
+  color: rgba(47, 47, 47, 0.7);
+}
+
+.topRatedReviews {
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  color: rgba(47, 47, 47, 0.6);
+  text-transform: uppercase;
 }
 
 @media (max-width: 900px) {
@@ -320,13 +418,22 @@
     justify-content: center;
   }
 
+  .actionGroup {
+    justify-content: center;
+  }
+
   .logo {
     order: -1;
   }
 
-  .registerButton {
+  .topRatedButton {
     width: 100%;
     max-width: 240px;
+  }
+
+  .aboutLink {
+    width: 100%;
+    text-align: center;
   }
 
   .tagline {

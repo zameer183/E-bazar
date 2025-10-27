@@ -2,6 +2,101 @@ export const STORAGE_KEY = "eBazarShops";
 
 const plans = ["Featured Store", "Standard Partner", "Premium Partner", "Free Partner"];
 
+const SUBCATEGORY_FOCUS = {
+  clothes: [
+    "fashion-clothing",
+    "footwear",
+    "jewelry-accessories",
+    "beauty-cosmetics",
+    "fashion-designers",
+    "textile-fabric",
+    "tailoring-stitching",
+  ],
+  electronics: [
+    "electronics-gadgets",
+    "mobile-accessories",
+    "computers-laptops",
+    "home-appliances",
+    "electronic-repair",
+  ],
+  perfumes: [
+    "attars-oils",
+    "signature-sprays",
+    "arabian-blends",
+    "gift-sets",
+    "artisan-collections",
+  ],
+};
+
+const NAME_TEMPLATES = {
+  clothes: [
+    "{city} Couture Collective",
+    "{city} Silk House",
+    "{city} Heritage Drapes",
+    "{city} Boutique Lane",
+    "{city} Artisanal Weaves",
+    "{city} Bridal Gallery",
+    "{city} Textile Nook",
+    "{city} Tailor Studio",
+  ],
+  perfumes: [
+    "{city} Fragrance Loft",
+    "{city} Attar Ghar",
+    "{city} Essence Vault",
+    "{city} Aroma Atelier",
+    "{city} Musk Gallery",
+    "{city} Oud House",
+    "{city} Signature Scents",
+    "{city} Perfume Arcade",
+  ],
+  electronics: [
+    "{city} Gadget Hub",
+    "{city} Tech Plaza",
+    "{city} Digital Mart",
+    "{city} Device Loft",
+    "{city} Smart Galleria",
+    "{city} Circuit House",
+    "{city} Tech Arcade",
+    "{city} Innovation Bay",
+  ],
+};
+
+const generateNames = (city, templates) =>
+  templates.map((template) => template.replace("{city}", city));
+
+const createStandardIndustries = ({ city, mobileCode, areas }) => ({
+  clothes: {
+    name: "Clothes",
+    sellers: createSellerList({
+      city,
+      mobileCode,
+      categorySlug: "clothes",
+      names: generateNames(city, NAME_TEMPLATES.clothes),
+      areas: areas.clothes ?? areas.default ?? areas,
+    }),
+  },
+  perfumes: {
+    name: "Perfumes",
+    sellers: createSellerList({
+      city,
+      mobileCode,
+      categorySlug: "perfumes",
+      names: generateNames(city, NAME_TEMPLATES.perfumes),
+      areas: areas.perfumes ?? areas.default ?? areas,
+    }),
+  },
+  electronics: {
+    name: "Electronics",
+    sellers: createSellerList({
+      city,
+      mobileCode,
+      categorySlug: "electronics",
+      names: generateNames(city, NAME_TEMPLATES.electronics),
+      areas: areas.electronics ?? areas.default ?? areas,
+    }),
+  },
+});
+
 const slugify = (text) =>
   text
     .toLowerCase()
@@ -95,6 +190,9 @@ const createSellerList = ({ city, mobileCode, names, areas, categorySlug }) =>
     const rating = Math.min(4.9, +(4.1 + (index * 0.07)).toFixed(1));
     const reviews = 60 + index * 13;
     const plan = plans[index % plans.length];
+    const focusList = SUBCATEGORY_FOCUS[categorySlug] || [];
+    const subcategoryFocus =
+      focusList.length > 0 ? focusList[index % focusList.length] : null;
 
     return {
       name,
@@ -106,6 +204,7 @@ const createSellerList = ({ city, mobileCode, names, areas, categorySlug }) =>
       plan,
       description: `${name} curates authentic ${categorySlug} selections that echo the heritage of ${city}.`,
       products: generateProducts(index, categorySlug),
+      subcategoryFocus,
     };
   });
 
@@ -158,6 +257,13 @@ export const BAZAAR_DEFINITIONS = {
     title: "Fragrance Bazaar",
     description:
       "Experience signature attars, luxury sprays, and scent artisans rooted in city tradition.",
+    subcategories: [
+      { label: "Attars & Oils", categorySlug: "perfumes", focus: "attars-oils" },
+      { label: "Signature Sprays", categorySlug: "perfumes", focus: "signature-sprays" },
+      { label: "Arabian Blends", categorySlug: "perfumes", focus: "arabian-blends" },
+      { label: "Gift Sets", categorySlug: "perfumes", focus: "gift-sets" },
+      { label: "Artisan Collections", categorySlug: "perfumes", focus: "artisan-collections" },
+    ],
     highlights: [
       { name: "Oud-e-Sindh Blend", origin: "Karachi Coastal Distillers" },
       { name: "Rose-Itar Lahore", origin: "Anarkali Floral Houses" },
@@ -638,6 +744,256 @@ export const BASE_CITY_MARKETS = [
       },
     },
   },
+  {
+    name: "Islamabad",
+    slug: "islamabad",
+    image:
+      "https://images.unsplash.com/photo-1544986581-efac024faf62?auto=format&fit=crop&w=1600&q=80",
+    detailImage:
+      "https://images.unsplash.com/photo-1544986581-efac024faf62?auto=format&fit=crop&w=1600&q=80",
+    defaultCategory: "clothes",
+    industries: createStandardIndustries({
+      city: "Islamabad",
+      mobileCode: "51",
+      areas: {
+        default: [
+          "Blue Area",
+          "F-7 Markaz",
+          "Centaurus Mall",
+          "I-8 Markaz",
+          "Super Market F-6",
+          "Giga Mall DHA-II",
+          "F-10 Markaz",
+          "Bahria Town Civic Center",
+        ],
+      },
+    }),
+  },
+  {
+    name: "Rawalpindi",
+    slug: "rawalpindi",
+    image:
+      "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=1600&q=80",
+    detailImage:
+      "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=1600&q=80",
+    defaultCategory: "clothes",
+    industries: createStandardIndustries({
+      city: "Rawalpindi",
+      mobileCode: "51",
+      areas: {
+        default: [
+          "Raja Bazaar",
+          "Saddar Commercial",
+          "Commercial Market",
+          "Bahria Town Phase 7",
+          "Chandni Chowk",
+          "Murree Road",
+          "Peshawar Road",
+          "Satellite Town",
+        ],
+      },
+    }),
+  },
+  {
+    name: "Peshawar",
+    slug: "peshawar",
+    image:
+      "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1600&q=80",
+    detailImage:
+      "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1600&q=80",
+    defaultCategory: "clothes",
+    industries: createStandardIndustries({
+      city: "Peshawar",
+      mobileCode: "91",
+      areas: {
+        default: [
+          "Khyber Bazaar",
+          "Qissa Khwani Bazaar",
+          "Saddar Road",
+          "University Town",
+          "Hayatabad Phase 3",
+          "Karkhano Market",
+          "Cantt Board",
+          "Tehkal Payan",
+        ],
+      },
+    }),
+  },
+  {
+    name: "Multan",
+    slug: "multan",
+    image:
+      "https://images.unsplash.com/photo-1601121141461-7f3c7aea06b0?auto=format&fit=crop&w=1600&q=80",
+    detailImage:
+      "https://images.unsplash.com/photo-1601121141461-7f3c7aea06b0?auto=format&fit=crop&w=1600&q=80",
+    defaultCategory: "clothes",
+    industries: createStandardIndustries({
+      city: "Multan",
+      mobileCode: "61",
+      areas: {
+        default: [
+          "Hussain Agahi Bazaar",
+          "Cantt Sabzi Mandi",
+          "Dera Adda",
+          "Gulgasht Colony",
+          "Nawan Shehr Chowk",
+          "Shah Rukn-e-Alam Colony",
+          "Old Shujabad Road",
+          "Chowk Kumharanwala",
+        ],
+      },
+    }),
+  },
+  {
+    name: "Hyderabad",
+    slug: "hyderabad",
+    image:
+      "https://images.unsplash.com/photo-1578925567535-7b4b879e84f7?auto=format&fit=crop&w=1600&q=80",
+    detailImage:
+      "https://images.unsplash.com/photo-1578925567535-7b4b879e84f7?auto=format&fit=crop&w=1600&q=80",
+    defaultCategory: "clothes",
+    industries: createStandardIndustries({
+      city: "Hyderabad",
+      mobileCode: "22",
+      areas: {
+        default: [
+          "Shahi Bazaar",
+          "Auto Bhan Road",
+          "Qasimabad Main",
+          "Latifabad No. 6",
+          "Station Road",
+          "Saddar Bazaar",
+          "Hala Naka",
+          "Citizen Colony",
+        ],
+      },
+    }),
+  },
+  {
+    name: "Sialkot",
+    slug: "sialkot",
+    image:
+      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80",
+    detailImage:
+      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80",
+    defaultCategory: "clothes",
+    industries: createStandardIndustries({
+      city: "Sialkot",
+      mobileCode: "52",
+      areas: {
+        default: [
+          "Paris Road",
+          "Cantt Avenue",
+          "Ugoki Road",
+          "Daska Road",
+          "Allama Iqbal Chowk",
+          "Murray College Road",
+          "Wazirabad Road",
+          "Shahabpura",
+        ],
+      },
+    }),
+  },
+  {
+    name: "Gujranwala",
+    slug: "gujranwala",
+    image:
+      "https://images.unsplash.com/photo-1543165796-5426273eaab3?auto=format&fit=crop&w=1600&q=80",
+    detailImage:
+      "https://images.unsplash.com/photo-1543165796-5426273eaab3?auto=format&fit=crop&w=1600&q=80",
+    defaultCategory: "clothes",
+    industries: createStandardIndustries({
+      city: "Gujranwala",
+      mobileCode: "55",
+      areas: {
+        default: [
+          "Model Town",
+          "Satellite Town",
+          "Peoples Colony",
+          "Railway Road",
+          "Gujranwala Cantt",
+          "Dhulla Bhutta",
+          "Civil Lines",
+          "G.T. Road",
+        ],
+      },
+    }),
+  },
+  {
+    name: "Bahawalpur",
+    slug: "bahawalpur",
+    image:
+      "https://images.unsplash.com/photo-1589308078054-83288c648b26?auto=format&fit=crop&w=1600&q=80",
+    detailImage:
+      "https://images.unsplash.com/photo-1589308078054-83288c648b26?auto=format&fit=crop&w=1600&q=80",
+    defaultCategory: "clothes",
+    industries: createStandardIndustries({
+      city: "Bahawalpur",
+      mobileCode: "62",
+      areas: {
+        default: [
+          "Farid Gate",
+          "Model Town A",
+          "DC Chowk",
+          "University Road",
+          "Cantt Commercial",
+          "Ahmedpur Road",
+          "Karachi Morr",
+          "Bahawalpur Saddar",
+        ],
+      },
+    }),
+  },
+  {
+    name: "Sargodha",
+    slug: "sargodha",
+    image:
+      "https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=1600&q=80",
+    detailImage:
+      "https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=1600&q=80",
+    defaultCategory: "clothes",
+    industries: createStandardIndustries({
+      city: "Sargodha",
+      mobileCode: "48",
+      areas: {
+        default: [
+          "Kachery Bazaar",
+          "Iqbal Colony",
+          "University Road",
+          "Satellite Town",
+          "Shaheen Chowk",
+          "Qainchi Mor",
+          "Jail Road",
+          "New Satellite Town",
+        ],
+      },
+    }),
+  },
+  {
+    name: "Sukkur",
+    slug: "sukkur",
+    image:
+      "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80",
+    detailImage:
+      "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80",
+    defaultCategory: "clothes",
+    industries: createStandardIndustries({
+      city: "Sukkur",
+      mobileCode: "71",
+      areas: {
+        default: [
+          "Minara Road",
+          "Shikarpur Road",
+          "Barrister House Market",
+          "Clock Tower",
+          "Military Road",
+          "Barrage Colony",
+          "Frere Road",
+          "Lansdowne Bridge Market",
+        ],
+      },
+    }),
+  },
 ];
 
 export const getCityBySlug = (slug) =>
@@ -663,6 +1019,51 @@ export const getPerfumeSellersForCity = (citySlug, limit = 6) => {
 export const getBazaarSubcategories = (slug) => {
   const def = getBazaarDefinition(slug);
   return def?.subcategories || [];
+};
+
+const flattenAllSellers = () => {
+  const sellers = [];
+  BASE_CITY_MARKETS.forEach((city) => {
+    Object.entries(city.industries || {}).forEach(([categorySlug, industry]) => {
+      (industry.sellers || []).forEach((seller) => {
+        sellers.push({
+          ...seller,
+          cityName: city.name,
+          citySlug: city.slug,
+          categorySlug,
+          categoryName: industry.name,
+        });
+      });
+    });
+  });
+  return sellers;
+};
+
+const sortByRatingAndReviews = (a, b) => {
+  const ratingDiff = (b.rating || 0) - (a.rating || 0);
+  if (ratingDiff !== 0) return ratingDiff;
+  const reviewsDiff = (b.reviews || 0) - (a.reviews || 0);
+  if (reviewsDiff !== 0) return reviewsDiff;
+  return a.name.localeCompare(b.name);
+};
+
+export const getTopRatedSellers = (limit = 12) => {
+  return flattenAllSellers()
+    .filter((seller) => (seller.rating || 0) >= 4.2)
+    .sort(sortByRatingAndReviews)
+    .slice(0, limit)
+    .map((seller) => ({
+      name: seller.name,
+      rating: seller.rating,
+      reviews: seller.reviews,
+      slug: seller.slug,
+      cityName: seller.cityName,
+      citySlug: seller.citySlug,
+      categorySlug: seller.categorySlug,
+      categoryName: seller.categoryName,
+      plan: seller.plan,
+      path: `/city/${seller.citySlug}/${seller.categorySlug}/${seller.slug}`,
+    }));
 };
 
 export const CATEGORY_OPTIONS = [

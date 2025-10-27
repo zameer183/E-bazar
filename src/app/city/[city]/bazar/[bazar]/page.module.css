@@ -35,28 +35,11 @@
   border-color: rgba(47, 47, 47, 0.4);
 }
 
-.registerButton {
-  border: 1px solid rgba(47, 47, 47, 0.2);
-  background-color: var(--color-deep-gray);
-  color: var(--color-sand);
-  padding: 10px 20px;
-  border-radius: 999px;
-  font-size: 14px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.registerButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(47, 47, 47, 0.18);
-}
-
 .main {
   display: flex;
   flex-direction: column;
   gap: clamp(32px, 5vw, 56px);
+  padding-bottom: clamp(120px, 16vw, 160px);
 }
 
 .hero {
@@ -101,17 +84,6 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: rgba(47, 47, 47, 0.6);
-}
-
-.serviceNotice {
-  font-size: 12px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: rgba(47, 47, 47, 0.6);
-  border: 1px dashed rgba(47, 47, 47, 0.2);
-  border-radius: 14px;
-  padding: 10px 14px;
-  background: rgba(255, 255, 255, 0.65);
 }
 
 .sectionHeader {
@@ -297,18 +269,13 @@
   margin-top: 4px;
 }
 
-.ctaButton {
-  border: 1px solid rgba(47, 47, 47, 0.25);
-  background: var(--color-deep-gray);
-  color: var(--color-sand);
-  padding: 12px 24px;
-  border-radius: 999px;
-  font-size: 13px;
+.ctaHint {
+  font-size: 12px;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  font-weight: 600;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  color: rgba(47, 47, 47, 0.55);
 }
+
 
 .ctaButton:hover {
   transform: translateY(-2px);
@@ -326,10 +293,11 @@
     padding: 24px 16px 40px;
   }
 
-  .registerButton {
-    width: 100%;
-    max-width: 240px;
+  .main {
+    padding-bottom: 140px;
   }
+
+  
 
   .sellerRatings {
     flex-direction: column;
@@ -337,3 +305,6 @@
     align-items: flex-start;
   }
 }
+
+
+

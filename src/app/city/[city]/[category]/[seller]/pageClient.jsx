@@ -7,13 +7,15 @@ import {
   STORAGE_KEY,
   createSellerSlug,
   createProductShowcase,
+  getTopRatedSellers,
 } from "@/data/markets";
 import BazaarFooter from "@/components/bazaar-footer/BazaarFooter";
 import SearchBar from "@/components/search-bar/SearchBar";
 import styles from "./page.module.css";
 
 const SERVICE_NOTE =
-  "We only provide an online bazaar - sellers handle payments & delivery directly.";
+  "We only provide an online bazaar. Sellers handle payments & delivery directly.";
+const GLOBAL_TOP_RATED = getTopRatedSellers(8);
 
 const toSlug = (text) =>
   text
@@ -108,9 +110,6 @@ export default function SellerPageClient({ city, industry, baseSeller, slugs }) 
           <span>/</span>
           <span>{seller.name}</span>
         </nav>
-        <Link href="/register" className={styles.registerButton}>
-          Register Apni Dukan
-        </Link>
       </header>
 
       <main className={styles.main}>
@@ -152,7 +151,6 @@ export default function SellerPageClient({ city, industry, baseSeller, slugs }) 
               <span>{seller.address}</span>
               <span>{seller.contact}</span>
             </div>
-            <p className={styles.serviceNotice}>{SERVICE_NOTE}</p>
           </aside>
         </section>
 
@@ -188,9 +186,7 @@ export default function SellerPageClient({ city, industry, baseSeller, slugs }) 
                     <p className={styles.productPrice}>{product.price}</p>
                     <div className={styles.productRatings}>
                       <span>
-                        {product.rating
-                          ? `${product.rating.toFixed(1)} ★`
-                          : "New arrival"}
+                        {product.rating ? `${product.rating.toFixed(1)} \u2605` : "New arrival"}
                       </span>
                       <span>
                         {product.reviews
@@ -213,13 +209,17 @@ export default function SellerPageClient({ city, industry, baseSeller, slugs }) 
               continue to manage payments and deliveries.
             </p>
           </div>
-          <Link href="/register" className={styles.ctaButton}>
-            Register Apni Dukan
-          </Link>
+          <p className={styles.ctaHint}>
+            Tap the bottom-right button to start your registration.
+          </p>
         </section>
 
-        <BazaarFooter note={SERVICE_NOTE} />
+        <BazaarFooter note={SERVICE_NOTE} topRatedSellers={GLOBAL_TOP_RATED} />
       </main>
     </div>
   );
 }
+
+
+
+

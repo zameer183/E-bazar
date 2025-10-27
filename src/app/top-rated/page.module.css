@@ -1,0 +1,131 @@
+.page {
+  min-height: 100vh;
+  display: grid;
+  gap: clamp(24px, 6vw, 40px);
+  padding: 40px clamp(16px, 5vw, 72px) 120px;
+  background: linear-gradient(135deg, rgba(246, 240, 228, 0.9), rgba(221, 206, 173, 0.65));
+}
+
+.hero {
+  display: grid;
+  gap: 14px;
+  max-width: 720px;
+}
+
+.hero h1 {
+  font-size: clamp(30px, 5vw, 44px);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--color-deep-gray);
+}
+
+.hero p {
+  font-size: 16px;
+  line-height: 1.7;
+  color: rgba(47, 47, 47, 0.76);
+}
+
+.tips {
+  display: grid;
+  gap: 12px;
+  padding: clamp(20px, 4vw, 28px);
+  border-radius: 24px;
+  border: 1px solid rgba(47, 47, 47, 0.12);
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 18px 32px rgba(47, 47, 47, 0.12);
+  max-width: 760px;
+}
+
+.tips h2 {
+  font-size: clamp(22px, 3.4vw, 30px);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  color: var(--color-deep-gray);
+}
+
+.tips ul {
+  margin: 0;
+  padding-left: 20px;
+  display: grid;
+  gap: 6px;
+  font-size: 14px;
+  color: rgba(47, 47, 47, 0.78);
+  line-height: 1.6;
+}
+
+.tips p {
+  font-size: 14px;
+  color: rgba(47, 47, 47, 0.72);
+  line-height: 1.6;
+}
+
+.grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.card {
+  display: grid;
+  gap: 10px;
+  padding: 18px 20px;
+  border-radius: 20px;
+  border: 1px solid rgba(47, 47, 47, 0.12);
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--color-deep-gray);
+  text-decoration: none;
+  box-shadow: 0 16px 28px rgba(47, 47, 47, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 22px 38px rgba(47, 47, 47, 0.16);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.cardHeader h3 {
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+}
+
+.rating {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.meta {
+  font-size: 13px;
+  color: rgba(47, 47, 47, 0.7);
+}
+
+.reviews {
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  color: rgba(47, 47, 47, 0.62);
+  text-transform: uppercase;
+}
+
+.plan {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(47, 47, 47, 0.6);
+}
+
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

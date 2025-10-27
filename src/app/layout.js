@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -25,6 +26,9 @@ export default function RootLayout({ children }) {
         suppressHydrationWarning
       >
         {children}
+        <Link href="/register" className="stickyRegister">
+          Register Apni Dukan
+        </Link>
       </body>
     </html>
   );

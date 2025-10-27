@@ -6,11 +6,11 @@ import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import SearchBar from "@/components/search-bar/SearchBar";
 import BazaarFooter from "@/components/bazaar-footer/BazaarFooter";
-import { getBazaarDefinition } from "@/data/markets";
+import { getBazaarDefinition, getTopRatedSellers } from "@/data/markets";
 import styles from "./page.module.css";
 
-const SERVICE_NOTE =
-  "We only provide an online bazaar - sellers handle payments & delivery directly.";
+const SERVICE_NOTE = "We only provide an online bazaar. Sellers handle payments & delivery directly.";
+const GLOBAL_TOP_RATED = getTopRatedSellers(8);
 
 export default function BazaarPageClient({ city, bazaar, fragranceSellers, heroImage }) {
   const definition = getBazaarDefinition(bazaar.slug);
@@ -26,9 +26,6 @@ export default function BazaarPageClient({ city, bazaar, fragranceSellers, heroI
           <span>/</span>
           <span>{definition?.title ?? bazaar.title}</span>
         </nav>
-        <Link href="/register" className={styles.registerButton}>
-          Register Apni Dukan
-        </Link>
       </header>
 
       <main className={styles.main}>
@@ -51,7 +48,6 @@ export default function BazaarPageClient({ city, bazaar, fragranceSellers, heroI
             <Suspense fallback={null}>
               <FocusNote />
             </Suspense>
-            <p className={styles.serviceNotice}>{SERVICE_NOTE}</p>
           </div>
 
         </section>
@@ -150,12 +146,12 @@ export default function BazaarPageClient({ city, bazaar, fragranceSellers, heroI
               you instantly.
             </p>
           </div>
-          <Link href="/register" className={styles.ctaButton}>
-            Register Apni Dukan
-          </Link>
+          <p className={styles.ctaHint}>
+            Tap the bottom-right button to start your registration.
+          </p>
         </section>
 
-        <BazaarFooter note={SERVICE_NOTE} />
+        <BazaarFooter note={SERVICE_NOTE} topRatedSellers={GLOBAL_TOP_RATED} />
       </main>
     </div>
   );
@@ -171,4 +167,9 @@ function FocusNote() {
     </p>
   );
 }
+
+
+
+
+
 

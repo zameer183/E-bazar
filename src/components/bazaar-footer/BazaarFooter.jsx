@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import styles from "./BazaarFooter.module.css";
 
@@ -116,7 +117,7 @@ const BAZAAR_SECTIONS = [
     ],
   },
   {
-    title: "☪️ Islamic Bazaar",
+    title: "Islamic Bazaar",
     items: ["Religious Items & Books"],
   },
 ];
@@ -143,11 +144,15 @@ const filterSections = (sections, query) => {
     .filter(Boolean);
 };
 
-export default function BazaarFooter({ note }) {
+export default function BazaarFooter({ note, topRatedSellers = [] }) {
   const [query, setQuery] = useState("");
   const filteredSections = useMemo(
     () => filterSections(BAZAAR_SECTIONS, query.trim()),
     [query],
+  );
+  const hasTopRated = useMemo(
+    () => (topRatedSellers?.length ?? 0) > 0,
+    [topRatedSellers],
   );
 
   return (
@@ -169,6 +174,15 @@ export default function BazaarFooter({ note }) {
           />
         </label>
       </div>
+
+      {hasTopRated && (
+        <div className={styles.topRatedBlock}>
+          <span className={styles.topRatedLabel}>Top Rated Sellers</span>
+          <Link href="/top-rated" className={styles.topRatedLink}>
+            Browse Pakistan-wide champions {"->"}
+          </Link>
+        </div>
+      )}
 
       {filteredSections.length === 0 ? (
         <p className={styles.emptyState}>

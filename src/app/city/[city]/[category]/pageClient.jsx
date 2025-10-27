@@ -5,17 +5,20 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   STORAGE_KEY,
+  CATEGORY_TO_BAZAAR,
   createSellerSlug,
   createProductShowcase,
+  getBazaarSubcategories,
+  getTopRatedSellers,
 } from "@/data/markets";
 import BazaarFooter from "@/components/bazaar-footer/BazaarFooter";
 import SearchBar from "@/components/search-bar/SearchBar";
+import { useSearchParams } from "next/navigation";
 import styles from "./page.module.css";
 
-import { useSearchParams } from "next/navigation";
-
 const SERVICE_NOTE =
-  "We only provide an online bazaar - sellers handle payments & delivery directly.";
+  "We only provide an online bazaar. Sellers handle payments & delivery directly.";
+const GLOBAL_TOP_RATED = getTopRatedSellers(8);
 
 const matchCity = (shop, slug, name) => {
   const shopCitySlug = shop.citySlug?.toLowerCase?.();
@@ -29,8 +32,28 @@ const matchCategory = (shop, slug, name) => {
   return shopCategorySlug === slug || shopCategoryName === name.toLowerCase();
 };
 
-export default function CategoryPageClient({ city, industry, categories }) {
+export default function CategoryPageClient(props) {
+  return (
+    <Suspense fallback={<div className={styles.loading}>Loading bazaar lanes...</div>}>
+      <CategoryPageContent {...props} />
+    </Suspense>
+  );
+}
+
+function CategoryPageContent({ city, industry, categories }) {
   const [dynamicShops, setDynamicShops] = useState([]);
+  const searchParams = useSearchParams();
+  const focusParam = searchParams.get("focus");
+  const bazaarSlug = CATEGORY_TO_BAZAAR[industry.slug];
+  const subcategories = useMemo(
+    () => getBazaarSubcategories(bazaarSlug),
+    [bazaarSlug],
+  );
+  const subcategoryFocuses = useMemo(
+    () => subcategories.map((sub) => sub.focus),
+    [subcategories],
+  );
+  const totalCategories = categories?.length ?? 0;
 
   const loadShops = () => {
     if (typeof window === "undefined") return;
@@ -69,6 +92,10 @@ export default function CategoryPageClient({ city, industry, categories }) {
     const base = industry.sellers || [];
     const dynamic = dynamicShops.map((shop, index) => {
       const slug = shop.slug || createSellerSlug(city.name, shop.name);
+      const fallbackFocus =
+        subcategoryFocuses.length > 0
+          ? subcategoryFocuses[index % subcategoryFocuses.length]
+          : null;
       return {
         name: shop.name,
         slug,
@@ -84,10 +111,38 @@ export default function CategoryPageClient({ city, industry, categories }) {
           shop.products && shop.products.length > 0
             ? shop.products
             : createProductShowcase(industry.slug, index),
+        subcategoryFocus: shop.subcategoryFocus || shop.focus || fallbackFocus,
       };
     });
     return [...base, ...dynamic].sort((a, b) => (b.rating || 0) - (a.rating || 0));
-  }, [industry.sellers, dynamicShops, city.name, industry.name, industry.slug]);
+  }, [
+    industry.sellers,
+    dynamicShops,
+    city.name,
+    industry.name,
+    industry.slug,
+    subcategoryFocuses,
+  ]);
+
+  const filteredSellers = useMemo(() => {
+    if (!focusParam) return sellers;
+    return sellers.filter((seller) => seller.subcategoryFocus === focusParam);
+  }, [focusParam, sellers]);
+
+  const activeSubcategory = useMemo(
+    () => subcategories.find((sub) => sub.focus === focusParam) || null,
+    [focusParam, subcategories],
+  );
+
+  const hasFocus = Boolean(focusParam && activeSubcategory);
+  const basePath = `/city/${city.slug}/${industry.slug}`;
+  const subcategoryLabelMap = useMemo(() => {
+    const map = {};
+    subcategories.forEach((subcategory) => {
+      map[subcategory.focus] = subcategory.label;
+    });
+    return map;
+  }, [subcategories]);
 
   return (
     <div className={styles.page}>
@@ -99,9 +154,6 @@ export default function CategoryPageClient({ city, industry, categories }) {
           <span>/</span>
           <span>{industry.name}</span>
         </nav>
-        <Link href="/register" className={styles.registerButton}>
-          Register Apni Dukan
-        </Link>
       </header>
 
       <main className={styles.main}>
@@ -127,32 +179,46 @@ export default function CategoryPageClient({ city, industry, categories }) {
               Pakistan&apos;s marketplace alive - organized so shoppers reach the
               right lane instantly.
             </p>
-            <p className={styles.serviceNotice}>
-              We only provide an online bazaar. Sellers handle payments &amp;
-              delivery directly.
-            </p>
-            <Suspense fallback={null}>
-              <FocusChip />
-            </Suspense>
-            <p className={styles.sellerCount}>
-              {sellers.length}+ specialist stores listed - Updated in real time
-              with new registrations and reviews.
-            </p>
-            <div className={styles.categoryLinks}>
-              {categories.map((category) => (
+            {subcategories.length > 0 && (
+              <div
+                className={styles.subcategoryBar}
+                role="tablist"
+                aria-label={`${industry.name} subcategories`}
+              >
                 <Link
-                  key={category.slug}
-                  href={`/city/${city.slug}/${category.slug}`}
+                  href={basePath}
                   className={
-                    category.slug === industry.slug
-                      ? styles.categoryLinkActive
-                      : styles.categoryLink
+                    hasFocus ? styles.subcategoryLink : styles.subcategoryLinkActive
                   }
                 >
-                  {category.name}
+                  All lanes
                 </Link>
-              ))}
-            </div>
+                {subcategories.map((subcategory) => (
+                  <Link
+                    key={subcategory.focus}
+                    href={`${basePath}?focus=${subcategory.focus}`}
+                    className={
+                      focusParam === subcategory.focus
+                        ? styles.subcategoryLinkActive
+                        : styles.subcategoryLink
+                    }
+                  >
+                    {subcategory.label}
+                  </Link>
+                ))}
+              </div>
+            )}
+            <p className={styles.sellerCount}>
+              {hasFocus && activeSubcategory
+                ? `Showing ${filteredSellers.length} sellers from the ${activeSubcategory.label} lane.`
+                : `Showing ${filteredSellers.length} sellers across ${Math.max(
+                    subcategories.length,
+                    1,
+                  )} bazaar lanes.`}
+            </p>
+            <p className={styles.marketMeta}>
+              Connected to {totalCategories} major categories in {city.name}.
+            </p>
           </div>
         </section>
 
@@ -164,51 +230,53 @@ export default function CategoryPageClient({ city, industry, categories }) {
               and reviews update as the community shares feedback.
             </p>
           </header>
-          <div className={styles.sellerGrid}>
-            {sellers.map((seller, idx) => (
-              <Link
-                key={seller.slug ?? `${seller.name}-${idx}`}
-                href={`/city/${city.slug}/${industry.slug}/${seller.slug ?? createSellerSlug(city.name, seller.name)}`}
-                className={styles.sellerLink}
-              >
-                <article className={styles.sellerCard}>
-                  <div className={styles.sellerHeader}>
-                    <h3>{seller.name}</h3>
-                    <span className={styles.planTag}>{seller.plan}</span>
-                  </div>
-                  <div className={styles.sellerMeta}>
-                    <span>{seller.address}</span>
-                    <span>{seller.contact}</span>
-                  </div>
-                  <div className={styles.sellerRatings}>
-                    <span>
-                      {seller.rating ? `${seller.rating.toFixed(1)} ★` : "New Store"}
-                    </span>
-                    <span>
-                      {seller.reviews
-                        ? `${seller.reviews} reviews`
-                        : "Awaiting reviews"}
-                    </span>
-                  </div>
-                  <div className={styles.productPreview}>
-                    {(seller.products || [])
-                      .slice(0, 2)
-                      .map((product) => (
-                        <div
-                          key={`${seller.name}-${product.name}`}
-                          className={styles.productChip}
-                        >
-                          <span>{product.name}</span>
-                          <span>
-                            {product.rating ? `${product.rating.toFixed(1)} ★` : "New"}
-                          </span>
-                        </div>
-                      ))}
-                  </div>
-                </article>
+          {filteredSellers.length === 0 ? (
+            <div className={styles.emptyState}>
+              <p>No sellers are listed for this lane yet. Check back soon.</p>
+              <Link href={basePath} className={styles.resetFilter}>
+                View all sellers
               </Link>
-            ))}
-          </div>
+            </div>
+          ) : (
+            <div className={styles.sellerGrid}>
+              {filteredSellers.map((seller, idx) => (
+                <Link
+                  key={seller.slug ?? `${seller.name}-${idx}`}
+                  href={`/city/${city.slug}/${industry.slug}/${seller.slug ?? createSellerSlug(city.name, seller.name)}`}
+                  className={styles.sellerLink}
+                >
+                  <article className={styles.sellerCard}>
+                    <div className={styles.sellerHeader}>
+                      <h3>{seller.name}</h3>
+                      <div className={styles.sellerTags}>
+                        {seller.subcategoryFocus && (
+                          <span className={styles.subcategoryTag}>
+                            {subcategoryLabelMap[seller.subcategoryFocus] ||
+                              seller.subcategoryFocus.replaceAll("-", " ")}
+                          </span>
+                        )}
+                        <span className={styles.planTag}>{seller.plan}</span>
+                      </div>
+                    </div>
+                    <div className={styles.sellerMeta}>
+                      <span>{seller.address}</span>
+                      <span>{seller.contact}</span>
+                    </div>
+                    <div className={styles.sellerRatings}>
+                      <span>
+                        {seller.rating ? `${seller.rating.toFixed(1)} ★` : "New Store"}
+                      </span>
+                      <span>
+                        {seller.reviews
+                          ? `${seller.reviews} reviews`
+                          : "Awaiting reviews"}
+                      </span>
+                    </div>
+                  </article>
+                </Link>
+              ))}
+            </div>
+          )}
         </section>
 
         <section className={styles.ctaBanner}>
@@ -219,24 +287,21 @@ export default function CategoryPageClient({ city, industry, categories }) {
               appear instantly in the right city lane.
             </p>
           </div>
-          <Link href="/register" className={styles.ctaButton}>
-            Register Apni Dukan
-          </Link>
+          <p className={styles.ctaHint}>
+            Tap the bottom-right button to start your registration.
+          </p>
         </section>
 
-        <BazaarFooter note={SERVICE_NOTE} />
+        <BazaarFooter note={SERVICE_NOTE} topRatedSellers={GLOBAL_TOP_RATED} />
       </main>
     </div>
   );
 }
 
-function FocusChip() {
-  const searchParams = useSearchParams();
-  const focus = searchParams.get("focus");
-  if (!focus) return null;
-  return (
-    <p className={styles.focusChip}>
-      Filtering for: {focus.replaceAll("-", " ")}
-    </p>
-  );
-}
+
+
+
+
+
+
+
