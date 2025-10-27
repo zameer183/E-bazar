@@ -108,7 +108,7 @@ const uploadViaApi = async ({ path, file, fileName, onProgress }) => {
           try {
             const response = JSON.parse(xhr.responseText);
             resolve(response);
-          } catch (_error) {
+          } catch {
             reject({ success: false, error: "Unable to parse upload response." });
           }
         } else {

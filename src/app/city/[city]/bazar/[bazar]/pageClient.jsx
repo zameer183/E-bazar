@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import SearchBar from "@/components/search-bar/SearchBar";
 import BazaarFooter from "@/components/bazaar-footer/BazaarFooter";
 import { getBazaarDefinition, getTopRatedSellers } from "@/data/markets";
+import { buildImageProps } from "@/lib/images";
+import Image from "next/image";
 import styles from "./page.module.css";
 
 const SERVICE_NOTE = "We only provide an online bazaar. Sellers handle payments & delivery directly.";
@@ -14,6 +15,7 @@ const GLOBAL_TOP_RATED = getTopRatedSellers(8);
 export default function BazaarPageClient({ city, bazaar, fragranceSellers, heroImage }) {
   const definition = getBazaarDefinition(bazaar.slug);
   const heroVisual = heroImage || city.detailImage || city.image;
+  const heroImageProps = buildImageProps(heroVisual, city.detailImage || city.image || undefined);
 
   return (
     <div className={styles.page} suppressHydrationWarning>
@@ -33,7 +35,7 @@ export default function BazaarPageClient({ city, bazaar, fragranceSellers, heroI
         <section className={styles.hero}>
           <div className={styles.heroImage} suppressHydrationWarning>
             <Image
-              src={heroVisual}
+              {...heroImageProps}
               alt={`${city.name} bazaar visuals`}
               fill
               className={styles.heroAsset}

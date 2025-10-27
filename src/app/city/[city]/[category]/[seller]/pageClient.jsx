@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -11,6 +11,7 @@ import {
   getTopRatedSellers,
 } from "@/data/markets";
 import { deriveCategorySlug, normalizeProducts } from "@/lib/products";
+import { buildImageProps } from "@/lib/images";
 import BazaarFooter from "@/components/bazaar-footer/BazaarFooter";
 import SearchBar from "@/components/search-bar/SearchBar";
 import StarRating from "@/components/star-rating/StarRating";
@@ -197,8 +198,9 @@ export default function SellerPageClient({ city, industry, baseSeller, slugs }) 
   });
   const [toast, setToast] = useState({ show: false, message: "", type: "info" });
   const toastTimerRef = useRef(null);
+  const permissionWarningRef = useRef({ product: false, seller: false });
 
-  const showToast = (message, type = "info", duration = 3000) => {
+  const showToast = useCallback((message, type = "info", duration = 3000) => {
     if (toastTimerRef.current) {
       clearTimeout(toastTimerRef.current);
     }
@@ -207,7 +209,7 @@ export default function SellerPageClient({ city, industry, baseSeller, slugs }) 
       setToast({ show: false, message: "", type: "info" });
       toastTimerRef.current = null;
     }, duration);
-  };
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -217,17 +219,21 @@ export default function SellerPageClient({ city, industry, baseSeller, slugs }) 
     };
   }, []);
 
-  const loadProductReviews = async (shopId, products) => {
+  const loadProductReviews = useCallback(async (shopId, products) => {
     if (!products || products.length === 0) return;
     try {
       const { getProductReviews } = await import("@/lib/firestore");
       const reviewsData = {};
+      let permissionsBlocked = false;
       for (const product of products) {
         const productName = typeof product === 'string' ? product : product.name;
         const result = await getProductReviews(shopId, productName);
         if (result.success && result.data?.length) {
           reviewsData[productName] = result.data;
         } else {
+          if (result.code === "permission-denied") {
+            permissionsBlocked = true;
+          }
           reviewsData[productName] = generateFallbackProductReviews(
             seller || { id: shopId },
             product
@@ -235,6 +241,14 @@ export default function SellerPageClient({ city, industry, baseSeller, slugs }) 
         }
       }
       setProductReviews(reviewsData);
+      if (permissionsBlocked && !permissionWarningRef.current.product) {
+        permissionWarningRef.current.product = true;
+        showToast(
+          "Live product reviews require updated Firestore permissions. Showing marketplace samples instead.",
+          "warning",
+          4000,
+        );
+      }
     } catch (error) {
       console.warn("Falling back to sample product reviews.", error);
       const fallbackReviews = {};
@@ -248,9 +262,9 @@ export default function SellerPageClient({ city, industry, baseSeller, slugs }) 
       }
       setProductReviews(fallbackReviews);
     }
-  };
+  }, [seller, showToast]);
 
-  const loadSellerReviews = async (shopId, fallbackSellerInfo = null) => {
+  const loadSellerReviews = useCallback(async (shopId, fallbackSellerInfo = null) => {
     if (!shopId) {
       setSellerReviews([]);
       return;
@@ -261,15 +275,24 @@ export default function SellerPageClient({ city, industry, baseSeller, slugs }) 
       if (result.success) {
         setSellerReviews(result.data);
       } else {
+        const permissionsBlocked = result.code === "permission-denied";
         const fallbackReviews = generateFallbackSellerReviews(fallbackSellerInfo || seller || { id: shopId });
         setSellerReviews(fallbackReviews);
+        if (permissionsBlocked && !permissionWarningRef.current.seller) {
+          permissionWarningRef.current.seller = true;
+          showToast(
+            "Seller feedback is unavailable due to Firestore permissions. Showing community samples instead.",
+            "warning",
+            4000,
+          );
+        }
       }
     } catch (error) {
       console.warn("Falling back to sample seller reviews.", error);
       const fallbackReviews = generateFallbackSellerReviews(fallbackSellerInfo || seller || { id: shopId });
       setSellerReviews(fallbackReviews);
     }
-  };
+  }, [seller, showToast]);
 
   useEffect(() => {
     const loadShopData = async () => {
@@ -425,12 +448,26 @@ export default function SellerPageClient({ city, industry, baseSeller, slugs }) 
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('localStorageUpdated', handleCustomStorageUpdate);
     };
-  }, [baseSeller, citySlug, categorySlug, sellerSlug]);
+  }, [baseSeller, categorySlug, citySlug, loadProductReviews, loadSellerReviews, sellerSlug]);
 
   const seller = useMemo(() => baseSeller ?? dynamicSeller ?? null, [
     baseSeller,
     dynamicSeller,
   ]);
+
+  useEffect(() => {
+    permissionWarningRef.current = { product: false, seller: false };
+  }, [seller?.id]);
+
+  const heroImageSource =
+    shopImages.length > 0
+      ? shopImages[0].imageUrl
+      : seller?.shopImage || city.detailImage || city.image;
+
+  const heroImageProps = useMemo(
+    () => buildImageProps(heroImageSource, city.detailImage || city.image || undefined),
+    [heroImageSource, city.detailImage, city.image],
+  );
 
   const sellerReviewStats = useMemo(() => {
     if (!sellerReviews || sellerReviews.length === 0) {
@@ -646,11 +683,7 @@ export default function SellerPageClient({ city, industry, baseSeller, slugs }) 
         <section className={styles.hero}>
           <div className={styles.shopImageContainer}>
             <Image
-              src={
-                shopImages.length > 0
-                  ? shopImages[0].imageUrl
-                  : seller.shopImage || city.detailImage || city.image
-              }
+              {...heroImageProps}
               alt={`${seller.name} shop`}
               fill
               className={styles.shopImage}
@@ -773,6 +806,9 @@ export default function SellerPageClient({ city, industry, baseSeller, slugs }) 
                   displayReviewCount > 0
                     ? `${displayReviewCount === 1 ? "1 review" : `${displayReviewCount} reviews`}`
                     : null;
+                const productImageProps = buildImageProps(
+                  uploadedImageUrl || product.image,
+                );
 
                 return (
                   <article
@@ -781,7 +817,7 @@ export default function SellerPageClient({ city, industry, baseSeller, slugs }) 
                   >
                     <div className={styles.productImage}>
                       <Image
-                        src={uploadedImageUrl || product.image}
+                        {...productImageProps}
                         alt={productName}
                         fill
                         sizes="(max-width: 768px) 100vw, 25vw"

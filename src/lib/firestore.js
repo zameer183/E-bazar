@@ -532,8 +532,16 @@ export const getProductReviews = async (shopId, productName) => {
 
     return { success: true, data: reviews };
   } catch (error) {
-    console.error("Error getting product reviews:", error);
-    return { success: false, error: error.message };
+    if (error?.code === "permission-denied") {
+      console.warn("Permission denied when getting product reviews:", error);
+    } else {
+      console.error("Error getting product reviews:", error);
+    }
+    return {
+      success: false,
+      error: error.message,
+      code: error.code || null,
+    };
   }
 };
 
@@ -561,8 +569,16 @@ export const getShopReviews = async (shopId) => {
 
     return { success: true, data: reviews };
   } catch (error) {
-    console.error("Error getting shop reviews:", error);
-    return { success: false, error: error.message };
+    if (error?.code === "permission-denied") {
+      console.warn("Permission denied when getting shop reviews:", error);
+    } else {
+      console.error("Error getting shop reviews:", error);
+    }
+    return {
+      success: false,
+      error: error.message,
+      code: error.code || null,
+    };
   }
 };
 
@@ -644,7 +660,15 @@ export const getSellerReviews = async (shopId) => {
 
     return { success: true, data: reviews };
   } catch (error) {
-    console.warn("Unable to fetch seller reviews:", error);
-    return { success: false, error: error.message };
+    if (error?.code === "permission-denied") {
+      console.warn("Permission denied when getting seller reviews:", error);
+    } else {
+      console.warn("Unable to fetch seller reviews:", error);
+    }
+    return {
+      success: false,
+      error: error.message,
+      code: error.code || null,
+    };
   }
 };

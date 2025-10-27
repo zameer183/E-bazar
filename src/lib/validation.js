@@ -182,7 +182,7 @@ export const validateURL = (url, options = {}) => {
     }
 
     return { valid: true };
-  } catch (error) {
+  } catch {
     return { valid: false, error: 'Please enter a valid URL' };
   }
 };
