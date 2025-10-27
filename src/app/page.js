@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import Navbar from "@/components/Navbar/Navbar";
+import ReviewSummary from "@/components/reviews/ReviewSummary";
 import { BASE_CITY_MARKETS, HERO_SLIDES, getTopRatedSellers, STORAGE_KEY } from "@/data/markets";
 import styles from "./page.module.css";
 
@@ -39,8 +39,6 @@ export default function Home() {
 
   return (
     <div className={styles.page} suppressHydrationWarning>
-      <Navbar />
-
       {/* Notification Toast */}
       {notification.show && (
         <div className={styles.notification}>
@@ -92,6 +90,18 @@ export default function Home() {
               </Link>
             );
           })}
+          <Link
+            href="/cities"
+            className={styles.cityButtonCta}
+            aria-label="View all city marketplaces"
+          >
+            <span className={styles.cityButtonCtaLabel}>
+              View All Cities
+              <span aria-hidden="true" className={styles.cityButtonCtaHint}>
+                See every marketplace across Pakistan
+              </span>
+            </span>
+          </Link>
         </section>
 
                         <section id="top-rated" className={styles.topRatedSection} aria-labelledby="top-rated-title">
@@ -111,26 +121,30 @@ export default function Home() {
               >
                 <div className={styles.topRatedCardHeader} suppressHydrationWarning>
                   <h3>{seller.name}</h3>
-                  {seller.rating ? (
-                    <span className={styles.topRatedRating}>
-                      {`${seller.rating.toFixed(1)} ${STAR}`}
-                    </span>
-                  ) : (
-                    <span className={styles.topRatedRating}>New</span>
-                  )}
                 </div>
                 <p className={styles.topRatedMeta}>
                   {seller.categoryName} - {seller.cityName}
                 </p>
-                <p className={styles.topRatedReviews}>
-                  {seller.reviews ? `${seller.reviews} reviews` : "Awaiting reviews"}
-                </p>
+                <ReviewSummary
+                  rating={seller.rating ?? 0}
+                  count={seller.reviews ?? 0}
+                  readHref={`${seller.path}#reviews`}
+                  readLabel="Read reviews"
+                  writeHref={`/reviews?seller=${encodeURIComponent(seller.slug || seller.name)}`}
+                  writeLabel="Write a review"
+                />
               </Link>
             ))}
           </div>
+          <Link href="/top-rated" className={styles.topRatedCta}>
+            <span className={styles.topRatedCtaCircle} aria-hidden="true">
+              <span className={`${styles.topRatedCtaIcon} ${styles.topRatedCtaArrow}`} />
+            </span>
+            <span className={styles.topRatedCtaLabel}>Browse Pakistan-wide champions</span>
+          </Link>
         </section>
 
-        <BazaarFooter note={SERVICE_NOTE} topRatedSellers={TOP_RATED_SELLERS} />
+        <BazaarFooter note={SERVICE_NOTE} />
       </main>
     </div>
   );

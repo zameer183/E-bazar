@@ -3,12 +3,12 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import Navbar from "@/components/Navbar/Navbar";
 import {
   STORAGE_KEY,
   CATEGORY_TO_BAZAAR,
   createSellerSlug,
   createProductShowcase,
+  getBazaarDefinition,
   getBazaarSubcategories,
   getTopRatedSellers,
 } from "@/data/markets";
@@ -51,6 +51,26 @@ export default function CategoryPageClient({ city, industry, categories }) {
     [subcategories],
   );
   const totalCategories = categories?.length ?? 0;
+  const orderedCategories = useMemo(() => {
+    if (!Array.isArray(categories)) return [];
+    const prioritySlug = "art-craft";
+    return [...categories].sort((a, b) => {
+      if (a.slug === prioritySlug) return -1;
+      if (b.slug === prioritySlug) return 1;
+      return a.name.localeCompare(b.name);
+    });
+  }, [categories]);
+
+  const formatCategoryLabel = (category) => {
+    if (!category) return "";
+    const bazaarSlugForCategory = CATEGORY_TO_BAZAAR[category.slug];
+    if (bazaarSlugForCategory) {
+      const definition = getBazaarDefinition(bazaarSlugForCategory);
+      if (definition?.title) return definition.title;
+    }
+    const trimmed = category.name?.trim?.() ?? "";
+    return trimmed.toLowerCase().includes("bazaar") ? trimmed : `${trimmed} Bazaar`;
+  };
 
   useEffect(() => {
     const loadShops = () => {
@@ -111,7 +131,7 @@ export default function CategoryPageClient({ city, industry, categories }) {
         subcategoryFocus: shop.subcategoryFocus || shop.focus || fallbackFocus,
       };
     });
-    return [...base, ...dynamic].sort((a, b) => (b.rating || 0) - (a.rating || 0));
+    return [...base, ...dynamic].sort((a, b) => a.name.localeCompare(b.name));
   }, [
     industry.sellers,
     dynamicShops,
@@ -143,8 +163,6 @@ export default function CategoryPageClient({ city, industry, categories }) {
 
   return (
     <div className={styles.page}>
-      <Navbar />
-
       <header className={styles.header}>
         <nav className={styles.breadcrumbs} aria-label="Breadcrumb">
           <Link href="/">Home</Link>
@@ -166,33 +184,52 @@ export default function CategoryPageClient({ city, industry, categories }) {
 
         <SearchBar citySlug={city.slug} lockCity />
 
-        {subcategories.length > 0 && (
+        {/* Category Navigation - Show all main categories for this city */}
+        {totalCategories > 0 && (
           <div
             className={styles.subcategoryBar}
             role="tablist"
-            aria-label={`${industry.name} subcategories`}
+            aria-label={`${city.name} categories`}
           >
-            <Link
-              href={basePath}
-              className={
-                hasFocus ? styles.subcategoryLink : styles.subcategoryLinkActive
-              }
-            >
-              All lanes
-            </Link>
-            {subcategories.map((subcategory) => (
+            {orderedCategories.map((category) => (
               <Link
-                key={subcategory.focus}
-                href={`${basePath}?focus=${subcategory.focus}`}
+                key={category.slug}
+                href={`/city/${city.slug}/${category.slug}`}
                 className={
-                  focusParam === subcategory.focus
+                  category.slug === industry.slug
                     ? styles.subcategoryLinkActive
                     : styles.subcategoryLink
                 }
               >
-                {subcategory.label}
+                {formatCategoryLabel(category)}
               </Link>
             ))}
+          </div>
+        )}
+
+        {subcategories.length > 0 && (
+          <div className={styles.subcategoryFocusWrapper}>
+            <div className={styles.subcategoryFocusBar} role="tablist" aria-label={`${industry.name} subcategories`}>
+              <Link
+                href={basePath}
+                className={!hasFocus ? styles.focusLinkActive : styles.focusLink}
+              >
+                All {industry.name}
+              </Link>
+              {subcategories.map((subcategory) => (
+                <Link
+                  key={subcategory.focus}
+                  href={`${basePath}?focus=${subcategory.focus}`}
+                  className={
+                    focusParam === subcategory.focus
+                      ? styles.focusLinkActive
+                      : styles.focusLink
+                  }
+                >
+                  {subcategory.label}
+                </Link>
+              ))}
+            </div>
           </div>
         )}
 
@@ -253,7 +290,7 @@ export default function CategoryPageClient({ city, industry, categories }) {
           )}
         </section>
 
-        <BazaarFooter note={SERVICE_NOTE} topRatedSellers={GLOBAL_TOP_RATED} />
+        <BazaarFooter note={SERVICE_NOTE} />
       </main>
     </div>
   );

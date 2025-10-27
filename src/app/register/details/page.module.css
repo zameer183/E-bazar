@@ -143,11 +143,6 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.submitButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 20px rgba(47, 47, 47, 0.15);
-}
-
 @media (max-width: 768px) {
   .page {
     padding: 24px 16px 40px;

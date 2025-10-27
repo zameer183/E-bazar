@@ -1,3 +1,5 @@
+"use client";
+
 import { BASE_CITY_MARKETS } from "@/data/markets";
 import { db } from "./firebase";
 import { collection, addDoc, serverTimestamp, writeBatch, doc, getDocs, deleteDoc } from "firebase/firestore";

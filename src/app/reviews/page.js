@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import Navbar from "@/components/Navbar/Navbar";
 import styles from "./page.module.css";
 
 const SELLER_REVIEWS = [
@@ -206,8 +205,6 @@ export default function ReviewsPage() {
 
   return (
     <div className={styles.page}>
-      <Navbar />
-
       <header className={styles.header}>
         <nav className={styles.breadcrumbs}>
           <Link href="/">Home</Link>
@@ -275,10 +272,10 @@ export default function ReviewsPage() {
         <h2>Join Thousands of Happy Sellers & Buyers</h2>
         <p>Start your journey with E-Bazar today and experience the difference.</p>
         <div className={styles.ctaButtons}>
-          <Link href="/register" className={styles.ctaButton}>
-            Register Your Business
+          <Link href="/register" className={styles.stickyRegister}>
+            Register Apni Dukan
           </Link>
-          <Link href="/" className={styles.ctaButtonSecondary}>
+          <Link href="/" className={styles.ctaButton}>
             Start Shopping
           </Link>
         </div>

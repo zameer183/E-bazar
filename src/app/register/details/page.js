@@ -3,13 +3,11 @@
 import { Suspense, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import Navbar from "@/components/Navbar/Navbar";
 import {
   CATEGORY_OPTIONS,
   CITY_OPTIONS,
   STORAGE_KEY,
   createSellerSlug,
-  createProductShowcase,
 } from "@/data/markets";
 import styles from "./page.module.css";
 
@@ -103,7 +101,7 @@ function RegisterDetailsClient() {
         planLabel: selectedPackage.label,
         slug: createSellerSlug(cityOption?.name ?? formState.citySlug, formState.name),
         description: `${formState.name} connects with buyers looking for ${categoryOption?.name?.toLowerCase() ?? "marketplace goods"} in ${cityOption?.name ?? formState.citySlug}.`,
-        products: createProductShowcase(formState.categorySlug, Math.floor(Math.random() * 50)),
+        products: [],
         rating: 0,
         reviews: 0,
         visitors: 0,
@@ -147,8 +145,6 @@ function RegisterDetailsClient() {
 
   return (
     <div className={styles.page}>
-      <Navbar />
-
       <main className={styles.main}>
         <section className={styles.summary}>
           <h1>Complete Your Store Profile</h1>
@@ -166,6 +162,7 @@ function RegisterDetailsClient() {
               id="name"
               name="name"
               type="text"
+              autoComplete="organization"
               value={formState.name}
               onChange={handleChange}
               placeholder="Enter your shop name"
@@ -179,6 +176,7 @@ function RegisterDetailsClient() {
               <select
                 id="city"
                 name="citySlug"
+                autoComplete="address-level2"
                 value={formState.citySlug}
                 onChange={handleChange}
               >
@@ -195,6 +193,7 @@ function RegisterDetailsClient() {
               <select
                 id="category"
                 name="categorySlug"
+                autoComplete="off"
                 value={formState.categorySlug}
                 onChange={handleChange}
               >
@@ -213,6 +212,7 @@ function RegisterDetailsClient() {
               id="contact"
               name="contact"
               type="tel"
+              autoComplete="tel"
               value={formState.contact}
               onChange={handleChange}
               placeholder="+92 3XX XXXXXXX"
@@ -225,6 +225,7 @@ function RegisterDetailsClient() {
             <textarea
               id="address"
               name="address"
+              autoComplete="street-address"
               value={formState.address}
               onChange={handleChange}
               placeholder="Include building, street, and area details"
@@ -240,6 +241,7 @@ function RegisterDetailsClient() {
                 id="webLink"
                 name="webLink"
                 type="url"
+                autoComplete="url"
                 value={formState.webLink}
                 onChange={handleChange}
                 placeholder="https://www.yourwebsite.com or social media profile"

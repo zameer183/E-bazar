@@ -57,7 +57,7 @@ export default function TestFirebase() {
       <h1>Firebase Connection Test</h1>
 
       <h2>Environment Variables:</h2>
-      <pre style={{ background: "#f5f5f5", padding: "20px", borderRadius: "8px" }}>
+      <pre style={{ background: "#f5f5f5", padding: "20px" }}>
         {JSON.stringify(envVars, null, 2)}
       </pre>
 
@@ -67,7 +67,7 @@ export default function TestFirebase() {
       {error && (
         <>
           <h2 style={{ color: "red" }}>Error:</h2>
-          <pre style={{ background: "#ffe6e6", padding: "20px", borderRadius: "8px", color: "red" }}>
+          <pre style={{ background: "#ffe6e6", padding: "20px", color: "red" }}>
             {error}
           </pre>
         </>

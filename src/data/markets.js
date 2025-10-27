@@ -100,8 +100,23 @@ const NAME_TEMPLATES = {
 const generateNames = (city, templates) =>
   templates.map((template) => template.replace("{city}", city));
 
-const createStandardIndustries = ({ city, mobileCode, areas }) => ({
-  clothes: {
+const createAllIndustries = (categoryOptions) => {
+  const industries = {};
+  categoryOptions.forEach((category) => {
+    industries[category.slug] = {
+      name: category.name,
+      sellers: [], // Empty sellers array for new categories, will be populated by user registrations
+    };
+  });
+  return industries;
+};
+
+const createStandardIndustries = ({ city, mobileCode, areas }) => {
+  // First create all industries with empty sellers
+  const allIndustries = createAllIndustries(CATEGORY_OPTIONS_TEMP);
+
+  // Then populate the main three categories with sellers
+  allIndustries.clothes = {
     name: "Clothes",
     sellers: createSellerList({
       city,
@@ -110,8 +125,8 @@ const createStandardIndustries = ({ city, mobileCode, areas }) => ({
       names: generateNames(city, NAME_TEMPLATES.clothes),
       areas: areas.clothes ?? areas.default ?? areas,
     }),
-  },
-  perfumes: {
+  };
+  allIndustries.perfumes = {
     name: "Perfumes",
     sellers: createSellerList({
       city,
@@ -120,8 +135,8 @@ const createStandardIndustries = ({ city, mobileCode, areas }) => ({
       names: generateNames(city, NAME_TEMPLATES.perfumes),
       areas: areas.perfumes ?? areas.default ?? areas,
     }),
-  },
-  electronics: {
+  };
+  allIndustries.electronics = {
     name: "Electronics",
     sellers: createSellerList({
       city,
@@ -130,8 +145,38 @@ const createStandardIndustries = ({ city, mobileCode, areas }) => ({
       names: generateNames(city, NAME_TEMPLATES.electronics),
       areas: areas.electronics ?? areas.default ?? areas,
     }),
-  },
-});
+  };
+
+  return allIndustries;
+};
+
+// Temporary constant defined before CATEGORY_OPTIONS for use in createStandardIndustries
+const CATEGORY_OPTIONS_TEMP = [
+  { name: "Clothes", slug: "clothes" },
+  { name: "Perfumes", slug: "perfumes" },
+  { name: "Electronics", slug: "electronics" },
+  { name: "Furniture", slug: "furniture" },
+  { name: "Jewelry", slug: "jewelry" },
+  { name: "Books & Stationery", slug: "books-stationery" },
+  { name: "Home Decor", slug: "home-decor" },
+  { name: "Sports & Fitness", slug: "sports-fitness" },
+  { name: "Toys & Games", slug: "toys-games" },
+  { name: "Automotive", slug: "automotive" },
+  { name: "Mobile Phones", slug: "mobile-phones" },
+  { name: "Computers & Laptops", slug: "computers-laptops" },
+  { name: "Kitchen Appliances", slug: "kitchen-appliances" },
+  { name: "Footwear", slug: "footwear" },
+  { name: "Beauty & Cosmetics", slug: "beauty-cosmetics" },
+  { name: "Bags & Luggage", slug: "bags-luggage" },
+  { name: "Watches", slug: "watches" },
+  { name: "Groceries", slug: "groceries" },
+  { name: "Pet Supplies", slug: "pet-supplies" },
+  { name: "Baby Products", slug: "baby-products" },
+  { name: "Medical Equipment", slug: "medical-equipment" },
+  { name: "Art & Craft", slug: "art-craft" },
+  { name: "Photography", slug: "photography" },
+  { name: "Garden & Outdoor", slug: "garden-outdoor" },
+];
 
 const slugify = (text) =>
   text
@@ -383,9 +428,10 @@ export const BASE_CITY_MARKETS = [
     slug: "karachi",
     image: "/images/mazar-e-quaid.png",
     detailImage: "/images/mazar-e-quaid.png",
-    defaultCategory: "clothes",
-    industries: {
-      clothes: {
+    defaultCategory: "art-craft",
+    industries: (() => {
+      const allIndustries = createAllIndustries(CATEGORY_OPTIONS_TEMP);
+      allIndustries.clothes = {
         name: "Clothes",
         sellers: createSellerList({
           city: "Karachi",
@@ -418,8 +464,8 @@ export const BASE_CITY_MARKETS = [
             "Korangi Industrial Area",
           ],
         }),
-      },
-      perfumes: {
+      };
+      allIndustries.perfumes = {
         name: "Perfumes",
         sellers: createSellerList({
           city: "Karachi",
@@ -451,8 +497,8 @@ export const BASE_CITY_MARKETS = [
             "Lucky One Mall",
           ],
         }),
-      },
-      electronics: {
+      };
+      allIndustries.electronics = {
         name: "Electronics",
         sellers: createSellerList({
           city: "Karachi",
@@ -484,17 +530,19 @@ export const BASE_CITY_MARKETS = [
             "Bolton Market",
           ],
         }),
-      },
-    },
+      };
+      return allIndustries;
+    })(),
   },
   {
     name: "Lahore",
     slug: "lahore",
     image: "/images/lahore.jpg",
     detailImage: "/images/lahore.jpg",
-    defaultCategory: "clothes",
-    industries: {
-      clothes: {
+    defaultCategory: "art-craft",
+    industries: (() => {
+      const allIndustries = createAllIndustries(CATEGORY_OPTIONS_TEMP);
+      allIndustries.clothes = {
         name: "Clothes",
         sellers: createSellerList({
           city: "Lahore",
@@ -527,8 +575,8 @@ export const BASE_CITY_MARKETS = [
             "Lahore Cantt",
           ],
         }),
-      },
-      perfumes: {
+      };
+      allIndustries.perfumes = {
         name: "Perfumes",
         sellers: createSellerList({
           city: "Lahore",
@@ -560,8 +608,8 @@ export const BASE_CITY_MARKETS = [
             "Johar Town, Emporium",
           ],
         }),
-      },
-      electronics: {
+      };
+      allIndustries.electronics = {
         name: "Electronics",
         sellers: createSellerList({
           city: "Lahore",
@@ -593,17 +641,19 @@ export const BASE_CITY_MARKETS = [
             "Gulshan-e-Ravi",
           ],
         }),
-      },
-    },
+      };
+      return allIndustries;
+    })(),
   },
   {
     name: "Faisalabad",
     slug: "faisalabad",
     image: "/images/faisalabad.jpg",
     detailImage: "/images/faisalabad-hero.jpg",
-    defaultCategory: "clothes",
-    industries: {
-      clothes: {
+    defaultCategory: "art-craft",
+    industries: (() => {
+      const allIndustries = createAllIndustries(CATEGORY_OPTIONS_TEMP);
+      allIndustries.clothes = {
         name: "Clothes",
         sellers: createSellerList({
           city: "Faisalabad",
@@ -635,8 +685,8 @@ export const BASE_CITY_MARKETS = [
             "Sargodha Road",
           ],
         }),
-      },
-      perfumes: {
+      };
+      allIndustries.perfumes = {
         name: "Perfumes",
         sellers: createSellerList({
           city: "Faisalabad",
@@ -668,8 +718,8 @@ export const BASE_CITY_MARKETS = [
             "Iqbal Stadium",
           ],
         }),
-      },
-      electronics: {
+      };
+      allIndustries.electronics = {
         name: "Electronics",
         sellers: createSellerList({
           city: "Faisalabad",
@@ -702,17 +752,19 @@ export const BASE_CITY_MARKETS = [
             "Iqbal Town",
           ],
         }),
-      },
-    },
+      };
+      return allIndustries;
+    })(),
   },
   {
     name: "Quetta",
     slug: "quetta",
     image: "/images/bahawalpur.jpg",
     detailImage: "/images/bahawalpur.jpg",
-    defaultCategory: "clothes",
-    industries: {
-      clothes: {
+    defaultCategory: "art-craft",
+    industries: (() => {
+      const allIndustries = createAllIndustries(CATEGORY_OPTIONS_TEMP);
+      allIndustries.clothes = {
         name: "Clothes",
         sellers: createSellerList({
           city: "Quetta",
@@ -744,8 +796,8 @@ export const BASE_CITY_MARKETS = [
             "Brewery Road",
           ],
         }),
-      },
-      perfumes: {
+      };
+      allIndustries.perfumes = {
         name: "Perfumes",
         sellers: createSellerList({
           city: "Quetta",
@@ -777,8 +829,8 @@ export const BASE_CITY_MARKETS = [
             "Spinny Road",
           ],
         }),
-      },
-      electronics: {
+      };
+      allIndustries.electronics = {
         name: "Electronics",
         sellers: createSellerList({
           city: "Quetta",
@@ -810,15 +862,16 @@ export const BASE_CITY_MARKETS = [
             "Fatima Jinnah Road",
           ],
         }),
-      },
-    },
+      };
+      return allIndustries;
+    })(),
   },
   {
     name: "Islamabad",
     slug: "islamabad",
     image: "/images/islamabad.jpg",
     detailImage: "/images/islamabad.jpg",
-    defaultCategory: "clothes",
+    defaultCategory: "art-craft",
     industries: createStandardIndustries({
       city: "Islamabad",
       mobileCode: "51",
@@ -853,7 +906,7 @@ export const BASE_CITY_MARKETS = [
     slug: "rawalpindi",
     image: "/images/islamabad.jpg",
     detailImage: "/images/islamabad.jpg",
-    defaultCategory: "clothes",
+    defaultCategory: "art-craft",
     industries: createStandardIndustries({
       city: "Rawalpindi",
       mobileCode: "51",
@@ -888,7 +941,7 @@ export const BASE_CITY_MARKETS = [
     slug: "peshawar",
     image: "/images/peshawar.jpg",
     detailImage: "/images/peshawar.jpg",
-    defaultCategory: "clothes",
+    defaultCategory: "art-craft",
     industries: createStandardIndustries({
       city: "Peshawar",
       mobileCode: "91",
@@ -923,7 +976,7 @@ export const BASE_CITY_MARKETS = [
     slug: "multan",
     image: "/images/multan.jpg",
     detailImage: "/images/multan.jpg",
-    defaultCategory: "clothes",
+    defaultCategory: "art-craft",
     industries: createStandardIndustries({
       city: "Multan",
       mobileCode: "61",
@@ -958,7 +1011,7 @@ export const BASE_CITY_MARKETS = [
     slug: "hyderabad",
     image: "/images/mazar-e-quaid.png",
     detailImage: "/images/mazar-e-quaid.png",
-    defaultCategory: "clothes",
+    defaultCategory: "art-craft",
     industries: createStandardIndustries({
       city: "Hyderabad",
       mobileCode: "22",
@@ -993,7 +1046,7 @@ export const BASE_CITY_MARKETS = [
     slug: "sialkot",
     image: "/images/sialkot.jpg",
     detailImage: "/images/sialkot.jpg",
-    defaultCategory: "clothes",
+    defaultCategory: "art-craft",
     industries: createStandardIndustries({
       city: "Sialkot",
       mobileCode: "52",
@@ -1028,7 +1081,7 @@ export const BASE_CITY_MARKETS = [
     slug: "gujranwala",
     image: "/images/gujranwala.webp",
     detailImage: "/images/gujranwala.webp",
-    defaultCategory: "clothes",
+    defaultCategory: "art-craft",
     industries: createStandardIndustries({
       city: "Gujranwala",
       mobileCode: "55",
@@ -1063,7 +1116,7 @@ export const BASE_CITY_MARKETS = [
     slug: "bahawalpur",
     image: "/images/bahawalpur.jpg",
     detailImage: "/images/bahawalpur.jpg",
-    defaultCategory: "clothes",
+    defaultCategory: "art-craft",
     industries: createStandardIndustries({
       city: "Bahawalpur",
       mobileCode: "62",
@@ -1098,7 +1151,7 @@ export const BASE_CITY_MARKETS = [
     slug: "sargodha",
     image: "/images/multan.jpg",
     detailImage: "/images/multan.jpg",
-    defaultCategory: "clothes",
+    defaultCategory: "art-craft",
     industries: createStandardIndustries({
       city: "Sargodha",
       mobileCode: "48",
@@ -1133,7 +1186,7 @@ export const BASE_CITY_MARKETS = [
     slug: "sukkur",
     image: "/images/mazar-e-quaid.png",
     detailImage: "/images/mazar-e-quaid.png",
-    defaultCategory: "clothes",
+    defaultCategory: "art-craft",
     industries: createStandardIndustries({
       city: "Sukkur",
       mobileCode: "71",
@@ -1172,10 +1225,12 @@ export const getIndustryFromCity = (city, industrySlug) =>
   city?.industries?.[industrySlug] || null;
 
 export const getIndustrySlugs = (city) =>
-  Object.keys(city.industries || {}).map((slug) => ({
-    slug,
-    name: city.industries[slug].name,
-  }));
+  Object.keys(city.industries || {})
+    .map((slug) => ({
+      slug,
+      name: city.industries[slug].name,
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name));
 
 
 export const getPerfumeSellersForCity = (citySlug, limit = 6) => {

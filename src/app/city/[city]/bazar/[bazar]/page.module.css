@@ -281,11 +281,6 @@
 }
 
 
-.ctaButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 20px rgba(47, 47, 47, 0.15);
-}
-
 @media (max-width: 900px) {
   .hero {
     grid-template-columns: 1fr;

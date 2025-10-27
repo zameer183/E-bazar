@@ -3,7 +3,6 @@
 import { Suspense, use } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import Navbar from "@/components/Navbar/Navbar";
 import { BASE_CITY_MARKETS, getBazaarDefinition } from "@/data/markets";
 import SearchBar from "@/components/search-bar/SearchBar";
 import BazaarFooter from "@/components/bazaar-footer/BazaarFooter";
@@ -22,7 +21,6 @@ function BazaarPageContent({ params }) {
   if (!bazaarDef) {
     return (
       <div className={styles.page}>
-        <Navbar />
         <div className={styles.error}>
           <h1>Bazaar Not Found</h1>
           <p>The bazaar you're looking for doesn't exist.</p>
@@ -40,8 +38,6 @@ function BazaarPageContent({ params }) {
 
   return (
     <div className={styles.page}>
-      <Navbar />
-
       <header className={styles.header}>
         <nav className={styles.breadcrumbs}>
           <Link href="/">Home</Link>

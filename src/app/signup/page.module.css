@@ -141,11 +141,6 @@
   margin-top: 8px;
 }
 
-.submitButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(47, 47, 47, 0.2);
-}
-
 .footer {
   margin-top: 24px;
   padding-top: 24px;

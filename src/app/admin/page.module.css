@@ -63,11 +63,6 @@
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.loginButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-}
-
 .hint {
   margin-top: 16px;
   font-size: 13px;
@@ -220,10 +215,6 @@
   transition: background 0.3s;
 }
 
-.refreshButton:hover:not(:disabled) {
-  background: #5568d3;
-}
-
 .refreshButton:disabled {
   opacity: 0.6;
   cursor: not-allowed;
@@ -320,12 +311,6 @@
   width: 100%;
 }
 
-.actionButton:hover:not(:disabled) {
-  background: #5568d3;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-}
-
 .actionButton:disabled {
   opacity: 0.6;
   cursor: not-allowed;
@@ -333,11 +318,6 @@
 
 .dangerButton {
   background: #dc3545;
-}
-
-.dangerButton:hover:not(:disabled) {
-  background: #c82333;
-  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
 }
 
 .infoSection {
@@ -387,62 +367,57 @@
 
 .notification {
   position: fixed;
-  top: 100px;
-  right: 20px;
-  background: white;
-  padding: 16px 24px;
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2500;
   display: flex;
-  align-items: center;
-  gap: 12px;
-  z-index: 1000;
-  animation: slideIn 0.3s ease;
+  flex-direction: column;
+  gap: 16px;
+  padding: 28px 40px;
+  background: rgba(255, 255, 255, 0.98);
+  border: 1px solid rgba(182, 140, 87, 0.25);
+  border-radius: 0;
+  box-shadow: 0 28px 64px rgba(17, 13, 8, 0.28);
+  min-width: min(420px, 90vw);
+  text-align: center;
+  animation: fadeInScale 0.24s ease-out;
 }
 
-@keyframes slideIn {
+@keyframes fadeInScale {
   from {
-    transform: translateX(400px);
     opacity: 0;
+    transform: translate(-50%, -50%) scale(0.92);
   }
   to {
-    transform: translateX(0);
     opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
   }
 }
 
 .notification.success {
-  border-left: 4px solid #28a745;
+  border-color: rgba(47, 133, 90, 0.35);
 }
 
 .notification.error {
-  border-left: 4px solid #dc3545;
+  border-color: rgba(197, 48, 48, 0.35);
 }
 
 .notificationIcon {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  font-size: 16px;
-}
-
-.notification.success .notificationIcon {
-  background: #28a745;
-  color: white;
-}
-
-.notification.error .notificationIcon {
-  background: #dc3545;
-  color: white;
+  font-size: 32px;
 }
 
 .notificationMessage {
-  color: #333;
-  font-weight: 500;
+  color: var(--color-deep-gray);
+  font-weight: 600;
+}
+
+.notification.success .notificationIcon {
+  color: #2f855a;
+}
+
+.notification.error .notificationIcon {
+  color: #c53030;
 }
 
 @media (max-width: 768px) {

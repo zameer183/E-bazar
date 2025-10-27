@@ -92,10 +92,6 @@
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.primaryButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-}
 
 .secondaryButton {
   padding: 14px 28px;
@@ -109,10 +105,6 @@
   transition: all 0.2s;
 }
 
-.secondaryButton:hover {
-  background: #f8f9fa;
-  transform: translateY(-2px);
-}
 
 .linkButton {
   padding: 14px 28px;
@@ -126,10 +118,6 @@
   display: inline-block;
 }
 
-.linkButton:hover {
-  background: #f8f9fa;
-  color: #333;
-}
 
 @media (max-width: 640px) {
   .errorCard {

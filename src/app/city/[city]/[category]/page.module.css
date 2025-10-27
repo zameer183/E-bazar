@@ -108,6 +108,48 @@
   box-shadow: 0 10px 18px rgba(47, 47, 47, 0.18);
 }
 
+.subcategoryFocusWrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.subcategoryFocusBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 18px;
+  background: rgba(255, 255, 255, 0.75);
+  border-radius: 16px;
+  border: 1px solid rgba(47, 47, 47, 0.12);
+  box-shadow: 0 8px 20px rgba(47, 47, 47, 0.1);
+}
+
+.focusLink,
+.focusLinkActive {
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: rgba(47, 47, 47, 0.75);
+  border: 1px solid transparent;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.focusLink:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 18px rgba(47, 47, 47, 0.1);
+  border-color: rgba(47, 47, 47, 0.18);
+}
+
+.focusLinkActive {
+  background: rgba(47, 47, 47, 0.9);
+  color: var(--color-sand);
+  border-color: rgba(47, 47, 47, 0.9);
+  box-shadow: 0 10px 20px rgba(47, 47, 47, 0.15);
+}
+
 .sellerCount {
   font-size: 12px;
   text-transform: uppercase;
@@ -176,11 +218,6 @@
   color: var(--color-deep-gray);
   text-decoration: none;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.resetFilter:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 20px rgba(47, 47, 47, 0.15);
 }
 
 
@@ -355,6 +392,21 @@
   .subcategoryLinkActive {
     padding: 8px 14px;
     font-size: 11px;
+  }
+
+  .subcategoryFocusWrapper {
+    justify-content: flex-start;
+  }
+
+  .subcategoryFocusBar {
+    padding: 10px 12px;
+    gap: 6px;
+  }
+
+  .focusLink,
+  .focusLinkActive {
+    font-size: 11px;
+    padding: 6px 12px;
   }
 
   .sectionHeader h2 {

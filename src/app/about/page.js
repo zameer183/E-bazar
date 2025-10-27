@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Navbar from "@/components/Navbar/Navbar";
 import styles from "./page.module.css";
 
 const WHY_POINTS = [
@@ -19,8 +18,6 @@ const FUTURE_POINTS = [
 export default function AboutPage() {
   return (
     <div className={styles.page}>
-      <Navbar />
-
       <header className={styles.hero}>
         <h1>About E-Bazar</h1>
         <p>

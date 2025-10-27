@@ -1,0 +1,33 @@
+.page {
+  min-height: 100vh;
+  padding: clamp(40px, 6vw, 80px) clamp(16px, 5vw, 80px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(32px, 5vw, 48px);
+  background: linear-gradient(135deg, rgba(246, 240, 228, 0.55), rgba(230, 226, 219, 0.4));
+}
+
+.header {
+  max-width: 720px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.header h1 {
+  font-size: clamp(32px, 5vw, 44px);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: var(--color-deep-gray);
+  text-transform: uppercase;
+}
+
+.header p {
+  font-size: clamp(15px, 2.6vw, 18px);
+  line-height: 1.6;
+  color: rgba(47, 47, 47, 0.65);
+}
+
+.cityGrid {
+  width: 100%;
+}

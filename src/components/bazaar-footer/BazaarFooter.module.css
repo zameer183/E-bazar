@@ -53,39 +53,6 @@
   line-height: 1.6;
 }
 
-.searchField {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  min-width: min(340px, 100%);
-}
-
-.searchField span {
-  font-size: 12px;
-  font-weight: 600;
-  color: rgba(47, 47, 47, 0.65);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.searchField input {
-  padding: 12px 16px;
-  border-radius: 8px;
-  border: 1px solid rgba(47, 47, 47, 0.15);
-  background: var(--color-sand);
-  font-size: 15px;
-  color: var(--color-deep-gray);
-  font-family: inherit;
-  transition: all 0.2s ease;
-}
-
-.searchField input:focus {
-  outline: none;
-  border-color: var(--color-accent);
-  background: white;
-  box-shadow: 0 0 0 3px rgba(182, 140, 87, 0.1);
-}
-
 .topRatedBlock {
   display: flex;
   flex-wrap: wrap;
@@ -126,7 +93,7 @@
 
 .emptyState {
   padding: 32px;
-  border-radius: 12px;
+  border-radius: 0;
   background: var(--color-sand);
   border: 1px solid rgba(47, 47, 47, 0.08);
   font-size: 14px;
@@ -147,7 +114,7 @@
   flex-direction: column;
   gap: 14px;
   padding: 20px;
-  border-radius: 12px;
+  border-radius: 0;
   background: rgba(255, 255, 255, 0.5);
   backdrop-filter: blur(5px);
   transition: all 0.3s ease;
@@ -250,10 +217,6 @@
 
   .titleBlock p {
     font-size: 14px;
-  }
-
-  .searchField {
-    min-width: 100%;
   }
 
   .grid {

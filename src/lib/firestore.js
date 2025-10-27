@@ -1,3 +1,5 @@
+"use client";
+
 import {
   collection,
   doc,
@@ -13,7 +15,20 @@ import {
   limit,
   serverTimestamp,
 } from "firebase/firestore";
-import { db } from "./firebase";
+import { auth, db } from "./firebase";
+
+const getCurrentUserId = () => {
+  const current = auth?.currentUser?.uid;
+  if (current) return current;
+  if (typeof window !== "undefined") {
+    try {
+      return window.localStorage.getItem("eBazarCurrentUser");
+    } catch (error) {
+      console.warn("Unable to access localStorage for user ID fallback", error);
+    }
+  }
+  return null;
+};
 
 // ==================== USER OPERATIONS ====================
 
@@ -454,6 +469,182 @@ export const incrementVisitorCount = async (shopId) => {
     return { success: false, error: "Shop not found" };
   } catch (error) {
     console.error("Error incrementing visitor count:", error);
+    return { success: false, error: error.message };
+  }
+};
+
+// ==================== PRODUCT REVIEW OPERATIONS ====================
+
+/**
+ * Add a review for a product
+ */
+export const addProductReview = async (shopId, productName, reviewData) => {
+  try {
+    const payload = {
+      shopId,
+      productName,
+      name: reviewData.name,
+      comment: reviewData.comment,
+      rating: reviewData.rating,
+      userId: reviewData.userId ?? getCurrentUserId(),
+      createdAt: serverTimestamp(),
+    };
+
+    Object.keys(payload).forEach((key) => {
+      if (payload[key] === undefined || payload[key] === null) {
+        throw new Error(`Missing required review field: ${key}`);
+      }
+    });
+
+    const reviewRef = await addDoc(collection(db, "productReviews"), {
+      ...payload,
+    });
+    return { success: true, reviewId: reviewRef.id };
+  } catch (error) {
+    console.error("Error adding product review:", error);
+    return { success: false, error: error.message };
+  }
+};
+
+/**
+ * Get all reviews for a specific product
+ */
+export const getProductReviews = async (shopId, productName) => {
+  try {
+    const q = query(
+      collection(db, "productReviews"),
+      where("shopId", "==", shopId),
+      where("productName", "==", productName)
+      // orderBy("createdAt", "desc") - requires index, sorting in memory instead
+    );
+    const querySnapshot = await getDocs(q);
+    const reviews = [];
+    querySnapshot.forEach((doc) => {
+      reviews.push({ id: doc.id, ...doc.data() });
+    });
+
+    // Sort in memory
+    reviews.sort((a, b) => {
+      const aTime = a.createdAt?.toMillis?.() || 0;
+      const bTime = b.createdAt?.toMillis?.() || 0;
+      return bTime - aTime;
+    });
+
+    return { success: true, data: reviews };
+  } catch (error) {
+    console.error("Error getting product reviews:", error);
+    return { success: false, error: error.message };
+  }
+};
+
+/**
+ * Get all reviews for a shop (across all products)
+ */
+export const getShopReviews = async (shopId) => {
+  try {
+    const q = query(
+      collection(db, "productReviews"),
+      where("shopId", "==", shopId)
+    );
+    const querySnapshot = await getDocs(q);
+    const reviews = [];
+    querySnapshot.forEach((doc) => {
+      reviews.push({ id: doc.id, ...doc.data() });
+    });
+
+    // Sort in memory
+    reviews.sort((a, b) => {
+      const aTime = a.createdAt?.toMillis?.() || 0;
+      const bTime = b.createdAt?.toMillis?.() || 0;
+      return bTime - aTime;
+    });
+
+    return { success: true, data: reviews };
+  } catch (error) {
+    console.error("Error getting shop reviews:", error);
+    return { success: false, error: error.message };
+  }
+};
+
+/**
+ * Update product rating and review count based on reviews
+ */
+export const updateProductStats = async (shopId, productName) => {
+  try {
+    // Get all reviews for this product
+    const reviewsResult = await getProductReviews(shopId, productName);
+    if (!reviewsResult.success) {
+      return reviewsResult;
+    }
+
+    const reviews = reviewsResult.data;
+    const reviewCount = reviews.length;
+    const averageRating = reviewCount > 0
+      ? reviews.reduce((sum, review) => sum + (review.rating || 0), 0) / reviewCount
+      : 0;
+
+    // Update shop with new stats (this would need to be adjusted based on your data structure)
+    // For now, just return the calculated stats
+    return {
+      success: true,
+      data: {
+        reviewCount,
+        averageRating: Math.round(averageRating * 10) / 10,
+      },
+    };
+  } catch (error) {
+    console.error("Error updating product stats:", error);
+    return { success: false, error: error.message };
+  }
+};
+
+// ==================== SELLER REVIEW OPERATIONS ====================
+
+export const addSellerReview = async (shopId, reviewData) => {
+  try {
+    const payload = {
+      shopId,
+      name: reviewData.name,
+      comment: reviewData.comment,
+      rating: reviewData.rating,
+      userId: reviewData.userId ?? getCurrentUserId(),
+      createdAt: serverTimestamp(),
+    };
+
+    Object.keys(payload).forEach((key) => {
+      if (payload[key] === undefined || payload[key] === null) {
+        throw new Error(`Missing required review field: ${key}`);
+      }
+    });
+
+    const reviewRef = await addDoc(collection(db, "sellerReviews"), {
+      ...payload,
+    });
+    return { success: true, reviewId: reviewRef.id };
+  } catch (error) {
+    console.error("Error adding seller review:", error);
+    return { success: false, error: error.message };
+  }
+};
+
+export const getSellerReviews = async (shopId) => {
+  try {
+    const q = query(collection(db, "sellerReviews"), where("shopId", "==", shopId));
+    const querySnapshot = await getDocs(q);
+    const reviews = [];
+    querySnapshot.forEach((doc) => {
+      reviews.push({ id: doc.id, ...doc.data() });
+    });
+
+    reviews.sort((a, b) => {
+      const aTime = a.createdAt?.toMillis?.() || 0;
+      const bTime = b.createdAt?.toMillis?.() || 0;
+      return bTime - aTime;
+    });
+
+    return { success: true, data: reviews };
+  } catch (error) {
+    console.warn("Unable to fetch seller reviews:", error);
     return { success: false, error: error.message };
   }
 };

@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
 import styles from "./BazaarFooter.module.css";
 
 const BAZAAR_SECTIONS = [
@@ -15,6 +14,16 @@ const BAZAAR_SECTIONS = [
       "Fashion Designers & Boutiques",
       "Textile & Fabric",
       "Tailoring & Stitching",
+    ],
+  },
+  {
+    title: "Fragrance Bazaar",
+    items: [
+      "Attars & Oils",
+      "Signature Sprays",
+      "Arabian Blends",
+      "Gift Sets",
+      "Artisan Collections",
     ],
   },
   {
@@ -122,38 +131,8 @@ const BAZAAR_SECTIONS = [
   },
 ];
 
-const matchesQuery = (section, query) => {
-  const normalized = query.toLowerCase();
-  if (section.title.toLowerCase().includes(normalized)) return true;
-  return section.items.some((item) => item.toLowerCase().includes(normalized));
-};
-
-const filterSections = (sections, query) => {
-  if (!query) return sections;
-  return sections
-    .map((section) => {
-      if (!matchesQuery(section, query)) return null;
-      if (section.title.toLowerCase().includes(query.toLowerCase())) {
-        return section;
-      }
-      const filteredItems = section.items.filter((item) =>
-        item.toLowerCase().includes(query.toLowerCase()),
-      );
-      return { ...section, items: filteredItems };
-    })
-    .filter(Boolean);
-};
-
-export default function BazaarFooter({ note, topRatedSellers = [] }) {
-  const [query, setQuery] = useState("");
-  const filteredSections = useMemo(
-    () => filterSections(BAZAAR_SECTIONS, query.trim()),
-    [query],
-  );
-  const hasTopRated = useMemo(
-    () => (topRatedSellers?.length ?? 0) > 0,
-    [topRatedSellers],
-  );
+export default function BazaarFooter({ note }) {
+  const filteredSections = BAZAAR_SECTIONS;
 
   return (
     <footer className={styles.footer}>
@@ -161,28 +140,10 @@ export default function BazaarFooter({ note, topRatedSellers = [] }) {
         <div className={styles.titleBlock} suppressHydrationWarning>
           <h2>Marketplace Directory</h2>
           <p>
-            Explore Pakistan&apos;s bazaar taxonomy or search for the category you need.
+            Explore Pakistan&apos;s bazaar taxonomy to find the category you need.
           </p>
         </div>
-        <label className={styles.searchField}>
-          <span>Search categories</span>
-          <input
-            type="search"
-            placeholder="Type to filter e.g. electronics, tailoring, travel..."
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-          />
-        </label>
       </div>
-
-      {hasTopRated && (
-        <div className={styles.topRatedBlock} suppressHydrationWarning>
-          <span className={styles.topRatedLabel}>Top Rated Sellers</span>
-          <Link href="/top-rated" className={styles.topRatedLink}>
-            Browse Pakistan-wide champions {"->"}
-          </Link>
-        </div>
-      )}
 
       {filteredSections.length === 0 ? (
         <p className={styles.emptyState}>
@@ -194,6 +155,7 @@ export default function BazaarFooter({ note, topRatedSellers = [] }) {
             // Map section titles to bazaar slugs
             const bazaarSlugMap = {
               "Fashion Bazaar": "fashion",
+              "Fragrance Bazaar": "fragrance",
               "Tech Bazaar": "tech",
               "Home Bazaar": "home",
               "Grocery Bazaar": "grocery",

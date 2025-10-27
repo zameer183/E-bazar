@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { Poppins, Inter } from "next/font/google";
-import Watermark from "@/components/watermark/Watermark";
 import "./globals.css";
+import Navbar from "@/components/Navbar/Navbar";
+import StickyRegisterLink from "@/components/StickyRegisterLink";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -27,11 +27,9 @@ export default function RootLayout({ children }) {
         className={`${poppins.variable} ${inter.variable}`}
         suppressHydrationWarning
       >
-        <Watermark />
+        <Navbar />
         {children}
-        <Link href="/register" className="stickyRegister">
-          Register Apni Dukan
-        </Link>
+        <StickyRegisterLink />
       </body>
     </html>
   );

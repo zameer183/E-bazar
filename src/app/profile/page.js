@@ -2,8 +2,20 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Navbar from "@/components/Navbar/Navbar";
 import styles from "./page.module.css";
+
+const PROFILE_FIELD_IDS = {
+  name: "profile-full-name",
+  email: "profile-email",
+  phone: "profile-phone",
+  bio: "profile-bio",
+  currentPassword: "profile-current-password",
+  newPassword: "profile-new-password",
+  confirmPassword: "profile-confirm-password",
+  emailNotifications: "profile-email-notifications",
+  marketingEmails: "profile-marketing-emails",
+  profileVisibility: "profile-visibility",
+};
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -306,8 +318,6 @@ export default function ProfilePage() {
 
   return (
     <div className={styles.profileContainer}>
-      <Navbar />
-
       {/* Notification Toast */}
       {notification.show && (
         <div className={`${styles.notification} ${styles[notification.type]}`}>
@@ -346,6 +356,8 @@ export default function ProfilePage() {
                   type="file"
                   accept="image/*"
                   onChange={handleProfileImageUpload}
+                  name="profile-image-settings"
+                  id="profile-image-settings"
                   style={{ display: "none" }}
                 />
               </label>
@@ -387,11 +399,13 @@ export default function ProfilePage() {
           </div>
           <div className={styles.profileInfo}>
             <div className={styles.infoRow}>
-              <label>Full Name</label>
+              <label htmlFor={PROFILE_FIELD_IDS.name}>Full Name</label>
               {isEditingProfile ? (
                 <input
+                  id={PROFILE_FIELD_IDS.name}
                   type="text"
                   name="name"
+                  autoComplete="name"
                   value={formData.name}
                   onChange={handleProfileChange}
                   className={styles.input}
@@ -402,11 +416,13 @@ export default function ProfilePage() {
               )}
             </div>
             <div className={styles.infoRow}>
-              <label>Email Address</label>
+              <label htmlFor={PROFILE_FIELD_IDS.email}>Email Address</label>
               {isEditingProfile ? (
                 <input
+                  id={PROFILE_FIELD_IDS.email}
                   type="email"
                   name="email"
+                  autoComplete="email"
                   value={formData.email}
                   onChange={handleProfileChange}
                   className={styles.input}
@@ -417,11 +433,13 @@ export default function ProfilePage() {
               )}
             </div>
             <div className={styles.infoRow}>
-              <label>Phone Number</label>
+              <label htmlFor={PROFILE_FIELD_IDS.phone}>Phone Number</label>
               {isEditingProfile ? (
                 <input
+                  id={PROFILE_FIELD_IDS.phone}
                   type="tel"
                   name="phone"
+                  autoComplete="tel"
                   value={formData.phone}
                   onChange={handleProfileChange}
                   className={styles.input}
@@ -432,10 +450,12 @@ export default function ProfilePage() {
               )}
             </div>
             <div className={styles.infoRow}>
-              <label>Bio</label>
+              <label htmlFor={PROFILE_FIELD_IDS.bio}>Bio</label>
               {isEditingProfile ? (
                 <textarea
+                  id={PROFILE_FIELD_IDS.bio}
                   name="bio"
+                  autoComplete="off"
                   value={formData.bio}
                   onChange={handleProfileChange}
                   className={styles.textarea}
@@ -462,10 +482,12 @@ export default function ProfilePage() {
           {isChangingPassword ? (
             <div className={styles.profileInfo}>
               <div className={styles.infoRow}>
-                <label>Current Password</label>
+                <label htmlFor={PROFILE_FIELD_IDS.currentPassword}>Current Password</label>
                 <input
+                  id={PROFILE_FIELD_IDS.currentPassword}
                   type="password"
                   name="currentPassword"
+                  autoComplete="current-password"
                   value={passwordData.currentPassword}
                   onChange={handlePasswordChange}
                   className={styles.input}
@@ -473,10 +495,12 @@ export default function ProfilePage() {
                 />
               </div>
               <div className={styles.infoRow}>
-                <label>New Password</label>
+                <label htmlFor={PROFILE_FIELD_IDS.newPassword}>New Password</label>
                 <input
+                  id={PROFILE_FIELD_IDS.newPassword}
                   type="password"
                   name="newPassword"
+                  autoComplete="new-password"
                   value={passwordData.newPassword}
                   onChange={handlePasswordChange}
                   className={styles.input}
@@ -484,10 +508,12 @@ export default function ProfilePage() {
                 />
               </div>
               <div className={styles.infoRow}>
-                <label>Confirm New Password</label>
+                <label htmlFor={PROFILE_FIELD_IDS.confirmPassword}>Confirm New Password</label>
                 <input
+                  id={PROFILE_FIELD_IDS.confirmPassword}
                   type="password"
                   name="confirmPassword"
+                  autoComplete="new-password"
                   value={passwordData.confirmPassword}
                   onChange={handlePasswordChange}
                   className={styles.input}
@@ -523,47 +549,57 @@ export default function ProfilePage() {
           <div className={styles.settingsInfo}>
             <div className={styles.settingRow}>
               <div className={styles.settingLabel}>
-                <label>Email Notifications</label>
+                <label htmlFor={PROFILE_FIELD_IDS.emailNotifications}>Email Notifications</label>
                 <span className={styles.settingDescription}>
                   Receive email notifications about your shop activity
                 </span>
               </div>
-              <label className={styles.switch}>
+              <div className={styles.switchWrapper}>
                 <input
+                  id={PROFILE_FIELD_IDS.emailNotifications}
+                  className={styles.switchInput}
                   type="checkbox"
                   name="emailNotifications"
                   checked={settings.emailNotifications}
                   onChange={handleSettingsChange}
                 />
-                <span className={styles.slider}></span>
-              </label>
+                <label className={styles.switch} htmlFor={PROFILE_FIELD_IDS.emailNotifications}>
+                  <span className={styles.slider}></span>
+                </label>
+              </div>
             </div>
             <div className={styles.settingRow}>
               <div className={styles.settingLabel}>
-                <label>Marketing Emails</label>
+                <label htmlFor={PROFILE_FIELD_IDS.marketingEmails}>Marketing Emails</label>
                 <span className={styles.settingDescription}>
                   Receive promotional emails and special offers
                 </span>
               </div>
-              <label className={styles.switch}>
+              <div className={styles.switchWrapper}>
                 <input
+                  id={PROFILE_FIELD_IDS.marketingEmails}
+                  className={styles.switchInput}
                   type="checkbox"
                   name="marketingEmails"
                   checked={settings.marketingEmails}
                   onChange={handleSettingsChange}
                 />
-                <span className={styles.slider}></span>
-              </label>
+                <label className={styles.switch} htmlFor={PROFILE_FIELD_IDS.marketingEmails}>
+                  <span className={styles.slider}></span>
+                </label>
+              </div>
             </div>
             <div className={styles.settingRow}>
               <div className={styles.settingLabel}>
-                <label>Profile Visibility</label>
+                <label htmlFor={PROFILE_FIELD_IDS.profileVisibility}>Profile Visibility</label>
                 <span className={styles.settingDescription}>
                   Control who can see your profile information
                 </span>
               </div>
               <select
+                id={PROFILE_FIELD_IDS.profileVisibility}
                 name="profileVisibility"
+                autoComplete="off"
                 value={settings.profileVisibility}
                 onChange={handleSettingsChange}
                 className={styles.select}

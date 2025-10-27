@@ -56,11 +56,6 @@
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.primaryButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-}
-
 .dangerButton {
   padding: 14px 28px;
   background: #dc3545;
@@ -71,11 +66,6 @@
   font-weight: 600;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.dangerButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
 }
 
 .testArea {

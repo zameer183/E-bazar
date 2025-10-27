@@ -3,7 +3,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
-import Navbar from "@/components/Navbar/Navbar";
 import SearchBar from "@/components/search-bar/SearchBar";
 import BazaarFooter from "@/components/bazaar-footer/BazaarFooter";
 import { getBazaarDefinition, getTopRatedSellers } from "@/data/markets";
@@ -18,8 +17,6 @@ export default function BazaarPageClient({ city, bazaar, fragranceSellers, heroI
 
   return (
     <div className={styles.page} suppressHydrationWarning>
-      <Navbar />
-
       <header className={styles.header}>
         <nav className={styles.breadcrumbs} aria-label="Breadcrumb">
           <Link href="/">Home</Link>
@@ -138,7 +135,7 @@ export default function BazaarPageClient({ city, bazaar, fragranceSellers, heroI
           </section>
         )}
 
-        <BazaarFooter note={SERVICE_NOTE} topRatedSellers={GLOBAL_TOP_RATED} />
+        <BazaarFooter note={SERVICE_NOTE} />
       </main>
     </div>
   );

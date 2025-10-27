@@ -42,6 +42,8 @@ export default function SearchBar({ citySlug, lockCity = false, enableCityFilter
   );
   const [showResults, setShowResults] = useState(false);
   const [storedShops, setStoredShops] = useState([]);
+  const [searchHistory, setSearchHistory] = useState([]);
+  const [searchMessage, setSearchMessage] = useState("");
 
   // Initialize selectedCity from URL when enableCityFilter is true
   useEffect(() => {
@@ -61,6 +63,19 @@ export default function SearchBar({ citySlug, lockCity = false, enableCityFilter
       router.push(`/bazar/${bazaarSlug}?city=${selectedCity}`);
     }
   }, [selectedCity, enableCityFilter, bazaarSlug, router]);
+
+  // Load search history from localStorage
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const history = window.localStorage.getItem("eBazarSearchHistory");
+      if (history) {
+        setSearchHistory(JSON.parse(history));
+      }
+    } catch (error) {
+      console.error("Unable to load search history", error);
+    }
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -99,20 +114,35 @@ export default function SearchBar({ citySlug, lockCity = false, enableCityFilter
     [selectedCity],
   );
 
-  const subcategoryEntries = useMemo(
+  // Removed subcategoryEntries - no longer showing subcategories in search
+  // const subcategoryEntries = useMemo(
+  //   () =>
+  //     BAZAAR_ORDER.flatMap((slug) => {
+  //       const bazaar = getBazaarDefinition(slug);
+  //       return (bazaar?.subcategories || []).map((sub) => ({
+  //         id: `${selectedCity}-${slug}-${slugify(sub.label)}`,
+  //         type: "subcategory",
+  //         label: sub.label,
+  //         meta: `${bazaar?.title ?? "Bazaar"} - Subcategory`,
+  //         path: `/city/${selectedCity}/bazar/${slug}?focus=${sub.focus}`,
+  //         keywords: [sub.label, slug, bazaar?.title ?? ""],
+  //       }));
+  //     }),
+  //   [selectedCity],
+  // );
+
+  // Search history entries
+  const searchHistoryEntries = useMemo(
     () =>
-      BAZAAR_ORDER.flatMap((slug) => {
-        const bazaar = getBazaarDefinition(slug);
-        return (bazaar?.subcategories || []).map((sub) => ({
-          id: `${selectedCity}-${slug}-${slugify(sub.label)}`,
-          type: "subcategory",
-          label: sub.label,
-          meta: `${bazaar?.title ?? "Bazaar"} - Subcategory`,
-          path: `/city/${selectedCity}/bazar/${slug}?focus=${sub.focus}`,
-          keywords: [sub.label, slug, bazaar?.title ?? ""],
-        }));
-      }),
-    [selectedCity],
+      searchHistory.slice(0, 5).map((item, index) => ({
+        id: `history-${index}`,
+        type: "history",
+        label: item.query,
+        meta: "Recent search",
+        path: item.path,
+        keywords: [item.query],
+      })),
+    [searchHistory],
   );
 
   const baseSellers = useMemo(
@@ -195,37 +225,82 @@ export default function SearchBar({ citySlug, lockCity = false, enableCityFilter
   const allEntries = useMemo(
     () => [
       ...bazaarEntries,
-      ...subcategoryEntries,
       ...highlightEntries,
       ...sellerEntries,
       ...productEntries,
     ],
-    [bazaarEntries, subcategoryEntries, highlightEntries, sellerEntries, productEntries],
+    [bazaarEntries, highlightEntries, sellerEntries, productEntries],
   );
 
   const defaultResults = useMemo(
     () => [
-      ...bazaarEntries.slice(0, 2),
-      ...subcategoryEntries.slice(0, 3),
+      ...searchHistoryEntries,
+      ...bazaarEntries.slice(0, 3),
       ...sellerEntries.slice(0, 5),
     ],
-    [bazaarEntries, subcategoryEntries, sellerEntries],
+    [searchHistoryEntries, bazaarEntries, sellerEntries],
   );
 
-  const results = useMemo(() => {
+  const { derivedResults, hasMatches, showFallbackMessage } = useMemo(() => {
     const trimmed = query.trim().toLowerCase();
-    if (!trimmed) return defaultResults;
-    return allEntries
-      .filter((entry) =>
-        entry.keywords.some((word) => word?.toLowerCase?.().includes(trimmed)),
-      )
-      .slice(0, 12);
+    if (!trimmed) {
+      return {
+        derivedResults: defaultResults,
+        hasMatches: true,
+        showFallbackMessage: false,
+      };
+    }
+
+    const filtered = allEntries.filter((entry) =>
+      entry.keywords.some((word) => word?.toLowerCase?.().includes(trimmed)),
+    );
+
+    if (filtered.length > 0) {
+      return {
+        derivedResults: filtered.slice(0, 12),
+        hasMatches: true,
+        showFallbackMessage: false,
+      };
+    }
+
+    return {
+      derivedResults: defaultResults,
+      hasMatches: false,
+      showFallbackMessage: true,
+    };
   }, [query, allEntries, defaultResults]);
+
+  useEffect(() => {
+    if (!query.trim()) {
+      setSearchMessage("");
+      return;
+    }
+    if (showFallbackMessage) {
+      setSearchMessage("Product Will Be Listed Soon InshAllah");
+    } else {
+      setSearchMessage("");
+    }
+  }, [query, showFallbackMessage]);
 
   const handleNavigate = (entry) => {
     if (!entry?.path) return;
+
+    // Save to search history
+    if (entry.type !== "history" && query.trim()) {
+      const newHistory = [
+        { query: query.trim(), path: entry.path, timestamp: Date.now() },
+        ...searchHistory.filter(item => item.query !== query.trim())
+      ].slice(0, 10); // Keep only last 10 searches
+
+      setSearchHistory(newHistory);
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem("eBazarSearchHistory", JSON.stringify(newHistory));
+      }
+    }
+
     router.push(entry.path);
     setShowResults(false);
+    setSearchMessage("");
   };
 
   const handleSubmit = (event) => {
@@ -243,10 +318,14 @@ export default function SearchBar({ citySlug, lockCity = false, enableCityFilter
       return;
     }
 
-    if (results.length > 0) {
-      handleNavigate(results[0]);
-    } else {
-      alert("No results found. Try a different search term.");
+    if (!hasMatches) {
+      setShowResults(true);
+      setSearchMessage("Product Will Be Listed Soon InshAllah");
+      return;
+    }
+
+    if (derivedResults.length > 0) {
+      handleNavigate(derivedResults[0]);
     }
   };
 
@@ -288,9 +367,14 @@ export default function SearchBar({ citySlug, lockCity = false, enableCityFilter
         </button>
       </form>
 
-      {showResults && results.length > 0 && (
+      {showResults && derivedResults.length > 0 && (
         <div className={styles.resultsPanel} role="listbox">
-          {results.map((entry) => (
+          {searchMessage && (
+            <div className={styles.resultNotice} role="status">
+              {searchMessage}
+            </div>
+          )}
+          {derivedResults.map((entry) => (
             <button
               key={entry.id}
               type="button"
@@ -304,9 +388,11 @@ export default function SearchBar({ citySlug, lockCity = false, enableCityFilter
         </div>
       )}
 
-      {showResults && results.length === 0 && (
+      {showResults && derivedResults.length === 0 && (
         <div className={styles.resultsPanel}>
-          <span className={styles.empty}>No matches. Try another keyword.</span>
+          <span className={styles.empty}>
+            {searchMessage || "Product Will Be Listed Soon InshAllah"}
+          </span>
         </div>
       )}
     </div>

@@ -36,19 +36,9 @@ export default function DashboardError({ error, reset }) {
           color: '#f6f0e4',
           padding: '12px 24px',
           border: 'none',
-          borderRadius: '8px',
           cursor: 'pointer',
           fontWeight: '600',
-          fontSize: '14px',
-          transition: 'all 0.2s ease'
-        }}
-        onMouseOver={(e) => {
-          e.target.style.transform = 'translateY(-2px)';
-          e.target.style.boxShadow = '0 8px 16px rgba(47, 47, 47, 0.2)';
-        }}
-        onMouseOut={(e) => {
-          e.target.style.transform = 'translateY(0)';
-          e.target.style.boxShadow = 'none';
+          fontSize: '14px'
         }}
       >
         Try again

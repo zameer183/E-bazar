@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Navbar from "@/components/Navbar/Navbar";
 import styles from "./page.module.css";
 
 export default function Login() {
@@ -59,8 +58,6 @@ export default function Login() {
 
   return (
     <div className={styles.page} suppressHydrationWarning>
-      <Navbar />
-
       <main className={styles.main}>
         <div className={styles.formContainer} suppressHydrationWarning>
           <div className={styles.formHeader} suppressHydrationWarning>
@@ -72,27 +69,29 @@ export default function Login() {
             <div className={styles.fieldGroup} suppressHydrationWarning>
               <label htmlFor="email">Email Address</label>
               <input
-                id="email"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="your@email.com"
-                required
-              />
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="your@email.com"
+              required
+            />
             </div>
 
             <div className={styles.fieldGroup} suppressHydrationWarning>
               <label htmlFor="password">Password</label>
               <input
-                id="password"
-                name="password"
-                type="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="Enter your password"
-                required
-              />
+              id="password"
+              name="password"
+              type="password"
+              autoComplete="current-password"
+              value={formData.password}
+              onChange={handleChange}
+              placeholder="Enter your password"
+              required
+            />
             </div>
 
             {status.type !== "idle" && (

@@ -1,0 +1,67 @@
+.starRating {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #f2c94c;
+}
+
+.star {
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  cursor: default;
+  color: inherit;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.star span {
+  display: block;
+  transform: translateY(-1px);
+}
+
+.size-sm .star span {
+  font-size: 14px;
+}
+
+.size-md .star span {
+  font-size: 18px;
+}
+
+.size-lg .star span {
+  font-size: 24px;
+}
+
+.interactive {
+  cursor: pointer;
+}
+
+.interactive .star {
+  cursor: pointer;
+  transition: none;
+}
+
+.empty {
+  color: rgba(242, 201, 76, 0.3);
+}
+
+.half {
+  position: relative;
+}
+
+.half span::before {
+  content: "★";
+  position: absolute;
+  width: 50%;
+  overflow: hidden;
+  color: rgba(242, 201, 76, 0.4);
+}
+
+.half span {
+  position: relative;
+  color: rgba(242, 201, 76, 0.7);
+}

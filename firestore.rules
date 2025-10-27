@@ -1,273 +1,70 @@
-// Firebase Firestore Security Rules for E-Bazar
-//
-// IMPORTANT: These rules MUST be deployed to your Firebase project!
-//
-// How to deploy:
-// 1. Open Firebase Console: https://console.firebase.google.com
-// 2. Select your project (e-bazar-a9714)
-// 3. Go to Firestore Database > Rules
-// 4. Copy and paste these rules
-// 5. Click "Publish"
-//
-// Testing:
-// - Use the "Rules Playground" in Firebase Console to test
-// - Test with different user UIDs and scenarios
-
 rules_version = '2';
+
 service cloud.firestore {
-  match /databases/{database}/documents {
+    match /databases/{database}/documents {
 
-    // ============================================
-    // HELPER FUNCTIONS
-    // ============================================
+      // Users collection
+      match /users/{userId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
 
-    // Check if user is authenticated
-    function isAuthenticated() {
-      return request.auth != null;
-    }
+      // User profiles
+      match /userProfiles/{userId} {
+        allow read: if request.auth != null;
+        allow write: if request.auth != null && request.auth.uid == userId;
+      }
 
-    // Check if user owns the resource
-    function isOwner(userId) {
-      return isAuthenticated() && request.auth.uid == userId;
-    }
+      // User settings
+      match /userSettings/{userId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
 
-    // Check if user is admin (add your admin UIDs here)
-    function isAdmin() {
-      return isAuthenticated() &&
-             request.auth.uid in [
-               // Admin user IDs
-               '3EM1qAgpHMZEwic5EEreIhjzN272',
-             ];
-    }
+      // Shops - anyone can read, only owner can modify
+      match /shops/{shopId} {
+        allow read: if true;
+        allow create: if request.auth != null;
+        allow update, delete: if request.auth != null &&
+                                 resource.data.ownerId == request.auth.uid;
+      }
 
-    // Validate email format
-    function isValidEmail(email) {
-      return email.matches('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$');
-    }
+      // Shop images
+      match /shopImages/{imageId} {
+        allow read: if true;
+        allow create: if request.auth != null;
+        allow delete: if request.auth != null;
+      }
 
-    // ============================================
-    // USER COLLECTIONS
-    // ============================================
+      // Shop videos
+      match /shopVideos/{shopId} {
+        allow read: if true;
+        allow write: if request.auth != null;
+      }
 
-    // Users collection - basic user data
-    match /users/{userId} {
-      // Anyone can read user data (for public profiles)
-      allow read: if true;
+      // Product images
+      match /productImages/{imageId} {
+        allow read: if true;
+        allow write: if request.auth != null;
+      }
 
-      // Only the user can create their own document
-      allow create: if isOwner(userId) &&
-                      request.resource.data.keys().hasAll(['email', 'createdAt']) &&
-                      isValidEmail(request.resource.data.email);
+      // Product reviews
+      match /productReviews/{reviewId} {
+        allow read: if true;
+        allow create: if request.auth != null;
+        allow update, delete: if request.auth != null &&
+                               request.auth.uid == resource.data.userId;
+      }
 
-      // Only the user can update their own data
-      allow update: if isOwner(userId);
+      // Seller reviews
+      match /sellerReviews/{reviewId} {
+        allow read: if true;
+        allow create: if request.auth != null;
+        allow update, delete: if request.auth != null &&
+                               request.auth.uid == resource.data.userId;
+      }
 
-      // Only the user or admin can delete
-      allow delete: if isOwner(userId) || isAdmin();
-    }
-
-    // User profiles - extended profile information
-    match /userProfiles/{userId} {
-      // Anyone can read profiles (adjust based on privacy settings)
-      allow read: if true;
-
-      // Only the user can create/update their profile
-      allow create, update: if isOwner(userId);
-
-      // Only the user or admin can delete
-      allow delete: if isOwner(userId) || isAdmin();
-    }
-
-    // User settings - private user settings
-    match /userSettings/{userId} {
-      // Only the user can read their settings
-      allow read: if isOwner(userId);
-
-      // Only the user can create/update their settings
-      allow create, update: if isOwner(userId);
-
-      // Only the user or admin can delete
-      allow delete: if isOwner(userId) || isAdmin();
-    }
-
-    // ============================================
-    // SHOP COLLECTIONS
-    // ============================================
-
-    // Shops collection - main shop data
-    match /shops/{shopId} {
-      // Anyone can read shop data (public marketplace)
-      allow read: if true;
-
-      // Authenticated users can create shops
-      allow create: if isAuthenticated() &&
-                      request.resource.data.ownerId == request.auth.uid &&
-                      request.resource.data.keys().hasAll([
-                        'ownerId', 'name', 'city', 'category',
-                        'contact', 'address', 'createdAt'
-                      ]);
-
-      // Only shop owner can update their shop
-      allow update: if isAuthenticated() &&
-                      resource.data.ownerId == request.auth.uid;
-
-      // Only shop owner or admin can delete
-      allow delete: if isAuthenticated() &&
-                      (resource.data.ownerId == request.auth.uid || isAdmin());
-    }
-
-    // Shop images - shop photo galleries
-    match /shopImages/{imageId} {
-      // Anyone can read shop images
-      allow read: if true;
-
-      // Must check shop ownership before allowing create
-      allow create: if isAuthenticated() &&
-                      request.resource.data.keys().hasAll(['shopId', 'imageUrl']) &&
-                      exists(/databases/$(database)/documents/shops/$(request.resource.data.shopId)) &&
-                      get(/databases/$(database)/documents/shops/$(request.resource.data.shopId)).data.ownerId == request.auth.uid;
-
-      // Check ownership through shop document
-      allow update, delete: if isAuthenticated() &&
-                               exists(/databases/$(database)/documents/shops/$(resource.data.shopId)) &&
-                               get(/databases/$(database)/documents/shops/$(resource.data.shopId)).data.ownerId == request.auth.uid;
-    }
-
-    // Shop videos - shop promotional videos
-    match /shopVideos/{videoId} {
-      // Anyone can read shop videos
-      allow read: if true;
-
-      // Must check shop ownership before allowing create
-      allow create: if isAuthenticated() &&
-                      request.resource.data.keys().hasAll(['shopId', 'videoUrl']) &&
-                      exists(/databases/$(database)/documents/shops/$(request.resource.data.shopId)) &&
-                      get(/databases/$(database)/documents/shops/$(request.resource.data.shopId)).data.ownerId == request.auth.uid;
-
-      // Check ownership through shop document
-      allow update, delete: if isAuthenticated() &&
-                               exists(/databases/$(database)/documents/shops/$(resource.data.shopId)) &&
-                               get(/databases/$(database)/documents/shops/$(resource.data.shopId)).data.ownerId == request.auth.uid;
-    }
-
-    // Product images - images for individual products
-    match /productImages/{imageId} {
-      // Anyone can read product images
-      allow read: if true;
-
-      // Must check shop ownership before allowing create
-      allow create: if isAuthenticated() &&
-                      request.resource.data.keys().hasAll(['shopId', 'productName', 'imageUrl']) &&
-                      exists(/databases/$(database)/documents/shops/$(request.resource.data.shopId)) &&
-                      get(/databases/$(database)/documents/shops/$(request.resource.data.shopId)).data.ownerId == request.auth.uid;
-
-      // Check ownership through shop document
-      allow update, delete: if isAuthenticated() &&
-                               exists(/databases/$(database)/documents/shops/$(resource.data.shopId)) &&
-                               get(/databases/$(database)/documents/shops/$(resource.data.shopId)).data.ownerId == request.auth.uid;
-    }
-
-    // ============================================
-    // ADMIN COLLECTIONS (Optional - for future use)
-    // ============================================
-
-    // Admin users list
-    match /admins/{adminId} {
-      // Only admins can read the admin list
-      allow read: if isAdmin();
-
-      // Only admins can manage admin list
-      allow write: if isAdmin();
-    }
-
-    // ============================================
-    // CATCH-ALL - Deny all other access
-    // ============================================
-
-    // Deny access to any other collections
-    match /{document=**} {
-      allow read, write: if false;
+      // Test collection (for debugging)
+      match /test/{document=**} {
+        allow read, write: if true;
+      }
     }
   }
-}
-
-/*
- * FIREBASE STORAGE RULES
- *
- * Copy these to Firebase Console > Storage > Rules
- */
-
-/*
-rules_version = '2';
-service firebase.storage {
-  match /b/{bucket}/o {
-
-    // Helper function to check authentication
-    function isAuthenticated() {
-      return request.auth != null;
-    }
-
-    // Profile pictures
-    match /profile-pictures/{userId}/{filename} {
-      // Anyone can read profile pictures
-      allow read: if true;
-
-      // Only the user can upload their own profile picture
-      allow write: if isAuthenticated() && request.auth.uid == userId;
-
-      // Validate file size (max 5MB) and type (images only)
-      allow create: if isAuthenticated() &&
-                      request.auth.uid == userId &&
-                      request.resource.size < 5 * 1024 * 1024 &&
-                      request.resource.contentType.matches('image/.*');
-    }
-
-    // Shop images
-    match /shops/{shopId}/images/{filename} {
-      // Anyone can read shop images
-      allow read: if true;
-
-      // Shop owners can upload images (validate via Firestore)
-      allow write: if isAuthenticated();
-
-      // Validate file size (max 10MB) and type (images only)
-      allow create: if isAuthenticated() &&
-                      request.resource.size < 10 * 1024 * 1024 &&
-                      request.resource.contentType.matches('image/.*');
-    }
-
-    // Shop videos
-    match /shops/{shopId}/video/{filename} {
-      // Anyone can read shop videos
-      allow read: if true;
-
-      // Shop owners can upload videos
-      allow write: if isAuthenticated();
-
-      // Validate file size (max 50MB) and type (videos only)
-      allow create: if isAuthenticated() &&
-                      request.resource.size < 50 * 1024 * 1024 &&
-                      request.resource.contentType.matches('video/.*');
-    }
-
-    // Product images
-    match /shops/{shopId}/products/{productName}/{filename} {
-      // Anyone can read product images
-      allow read: if true;
-
-      // Shop owners can upload product images
-      allow write: if isAuthenticated();
-
-      // Validate file size (max 10MB) and type (images only)
-      allow create: if isAuthenticated() &&
-                      request.resource.size < 10 * 1024 * 1024 &&
-                      request.resource.contentType.matches('image/.*');
-    }
-
-    // Deny all other access
-    match /{allPaths=**} {
-      allow read, write: if false;
-    }
-  }
-}
-*/

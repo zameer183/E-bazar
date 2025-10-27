@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { onAuthChange } from "@/lib/auth";
@@ -13,11 +13,12 @@ export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [hasShop, setHasShop] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [isHamburgerActive, setIsHamburgerActive] = useState(false);
   const [userProfile, setUserProfile] = useState(null);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
   const [showAccountDeleteModal, setShowAccountDeleteModal] = useState(false);
+  const profileActionsRef = useRef(null);
 
   useEffect(() => {
     // Listen to Firebase Auth state changes
@@ -47,6 +48,7 @@ export default function Navbar() {
         setIsLoggedIn(false);
         setHasShop(false);
         setUserProfile(null);
+        setIsHamburgerActive(false);
         window.localStorage.removeItem("eBazarLoggedIn");
         window.localStorage.removeItem("eBazarCurrentUser");
       }
@@ -68,6 +70,7 @@ export default function Navbar() {
       setShowLogoutModal(false);
       setIsLoggedIn(false);
       setHasShop(false);
+      setIsHamburgerActive(false);
       router.push("/");
     }
   };
@@ -108,11 +111,37 @@ export default function Navbar() {
       setIsLoggedIn(false);
       setHasShop(false);
       setUserProfile(null);
+      setIsHamburgerActive(false);
 
       // Redirect to login page
       router.push("/login");
     }
   };
+
+  useEffect(() => {
+    if (!isHamburgerActive) {
+      return undefined;
+    }
+    const handleClickOutside = (event) => {
+      if (
+        profileActionsRef.current &&
+        !profileActionsRef.current.contains(event.target)
+      ) {
+        setIsHamburgerActive(false);
+      }
+    };
+    const handleEscape = (event) => {
+      if (event.key === "Escape") {
+        setIsHamburgerActive(false);
+      }
+    };
+    window.addEventListener("mousedown", handleClickOutside);
+    window.addEventListener("keydown", handleEscape);
+    return () => {
+      window.removeEventListener("mousedown", handleClickOutside);
+      window.removeEventListener("keydown", handleEscape);
+    };
+  }, [isHamburgerActive]);
 
   return (
     <>
@@ -138,36 +167,81 @@ export default function Navbar() {
                   Register Shop
                 </Link>
               )}
-              <button
-                onClick={() => setShowLogoutModal(true)}
-                className={styles.logoutButton}
-              >
-                Logout
-              </button>
-              <div className={styles.profileContainer}>
+              <div className={styles.profileActions} ref={profileActionsRef}>
                 <button
-                  className={styles.profileButton}
-                  onClick={() => setShowProfileMenu(!showProfileMenu)}
+                  type="button"
+                  className={`${styles.hamburger} ${isHamburgerActive ? styles.hamburgerActive : ""}`}
+                  onClick={() => setIsHamburgerActive((prev) => !prev)}
+                  aria-label="Toggle profile actions"
+                  aria-pressed={isHamburgerActive}
+                  aria-expanded={isHamburgerActive}
+                  aria-controls="profile-actions-menu"
                 >
-                  {userProfile ? (
-                    <img src={userProfile.image} alt="Profile" className={styles.profileImage} />
-                  ) : (
-                    <div className={styles.profilePlaceholder}>
-                      <span>👤</span>
-                    </div>
-                  )}
+                  <span className={styles.hamburgerContainer}>
+                    <span className={styles.hamburgerInner} />
+                    <span className={styles.hamburgerHidden} />
+                  </span>
                 </button>
-                {showProfileMenu && (
-                  <div className={styles.profileMenu}>
-                    <Link
-                      href="/profile"
-                      className={styles.profileMenuItem}
-                      onClick={() => setShowProfileMenu(false)}
-                    >
-                      ⚙️ Profile Settings
-                    </Link>
-                  </div>
+                {isHamburgerActive && (
+                  <button
+                    type="button"
+                    className={styles.profileDropdownOverlay}
+                    onClick={() => setIsHamburgerActive(false)}
+                    aria-label="Close account menu"
+                    aria-hidden="true"
+                    tabIndex={-1}
+                  />
                 )}
+                <div
+                  id="profile-actions-menu"
+                  className={`${styles.profileDropdown} ${isHamburgerActive ? styles.profileDropdownOpen : ""}`}
+                  role="menu"
+                  aria-hidden={!isHamburgerActive}
+                >
+                  <div className={styles.profileDropdownContent}>
+                    <div className={styles.profileDropdownHeader}>
+                      <span className={styles.profileDropdownTitle}>Account Controls</span>
+                      <span className={styles.profileDropdownSubtitle}>
+                        Manage your profile and sessions.
+                      </span>
+                    </div>
+                    <ul className={styles.profileDropdownList}>
+                      <li>
+                        <Link
+                          href="/profile"
+                          className={styles.profileDropdownItem}
+                          role="menuitem"
+                          tabIndex={isHamburgerActive ? 0 : -1}
+                          onClick={() => setIsHamburgerActive(false)}
+                        >
+                          <span className={styles.profileDropdownIcon}>⚙️</span>
+                          <span>
+                            Profile Settings
+                            <small>Update details, avatar, and password.</small>
+                          </span>
+                        </Link>
+                      </li>
+                      <li>
+                        <button
+                          type="button"
+                          className={`${styles.profileDropdownItem} ${styles.profileDropdownDanger}`}
+                          role="menuitem"
+                          tabIndex={isHamburgerActive ? 0 : -1}
+                          onClick={() => {
+                            setIsHamburgerActive(false);
+                            setShowLogoutModal(true);
+                          }}
+                        >
+                          <span className={styles.profileDropdownIcon}>⏻</span>
+                          <span>
+                            Logout
+                            <small>Sign out from this device.</small>
+                          </span>
+                        </button>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
               </div>
             </>
           ) : pathname === "/login" ? (
@@ -202,6 +276,8 @@ export default function Navbar() {
                 type="file"
                 accept="image/*"
                 onChange={handleProfilePicUpload}
+                name="profile-image-upload"
+                id="profile-image-upload"
                 style={{ display: "none" }}
               />
               <span className={styles.uploadButtonModal}>
@@ -222,8 +298,8 @@ export default function Navbar() {
 
       {/* Logout Modal */}
       {showLogoutModal && (
-        <div className={styles.modal}>
-          <div className={styles.modalContent}>
+        <div className={styles.modal} onClick={() => setShowLogoutModal(false)}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
             <h2>Logout Confirmation</h2>
             <p>Are you sure you want to logout?</p>
             <div className={styles.modalActions}>

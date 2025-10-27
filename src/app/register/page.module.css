@@ -2,181 +2,209 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  padding: 32px clamp(16px, 5vw, 64px);
-  gap: 32px;
   background: linear-gradient(135deg, var(--color-sand), var(--color-warm-gray));
-}
-
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-}
-
-.logo {
-  font-size: 22px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  padding: 12px 18px;
-  border-radius: 999px;
-  border: 2px solid rgba(47, 47, 47, 0.3);
-  background: rgba(255, 255, 255, 0.45);
-  box-shadow: 0 6px 12px var(--color-card-shadow);
-}
-
-.backLink {
-  font-size: 14px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
   color: var(--color-deep-gray);
-  border-bottom: 1px solid rgba(47, 47, 47, 0.3);
+  padding: 80px clamp(16px, 6vw, 120px);
 }
 
 .main {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 32px;
 }
 
-.hero {
-  max-width: 680px;
+.pricingSection {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.container {
+  width: min(1100px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(32px, 5vw, 56px);
+}
+
+.intro {
+  text-align: center;
+  display: grid;
+  gap: 16px;
+}
+
+.intro h1 {
+  font-size: clamp(32px, 5vw, 44px);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--color-deep-gray);
+}
+
+.intro p {
+  font-size: clamp(16px, 2.6vw, 18px);
+  line-height: 1.6;
+  color: rgba(47, 47, 47, 0.7);
+  margin: 0 auto;
+  max-width: 700px;
+}
+
+.cardGrid {
+  display: grid;
+  gap: clamp(24px, 4vw, 32px);
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--color-deep-gray);
+  border: 1px solid rgba(47, 47, 47, 0.1);
+  border-radius: 0;
+  box-shadow: 0 18px 40px rgba(47, 47, 47, 0.12);
+  padding: clamp(24px, 5vw, 32px);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 28px 56px rgba(47, 47, 47, 0.18);
+}
+
+.cardDetails {
   display: grid;
   gap: 12px;
 }
 
-.hero h1 {
-  font-size: clamp(28px, 5vw, 40px);
+.cardDetails h2 {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  font-weight: 700;
 }
 
-.hero p {
-  font-size: 16px;
-  line-height: 1.6;
-  color: rgba(47, 47, 47, 0.75);
+.cardTagline {
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(47, 47, 47, 0.5);
 }
 
-.packageGrid {
-  display: grid;
-  gap: clamp(20px, 4vw, 32px);
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-}
-
-.packageCard {
-  background: rgba(255, 255, 255, 0.8);
+.priceBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 18px;
   border: 1px solid rgba(47, 47, 47, 0.12);
-  border-radius: 24px;
-  padding: 24px;
-  display: grid;
-  gap: 16px;
-  box-shadow: 0 16px 30px rgba(47, 47, 47, 0.12);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.packageCard:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 24px 42px rgba(47, 47, 47, 0.15);
-}
-
-.packageCard h2 {
-  font-size: 20px;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
-.packagePrice {
+  background: rgba(182, 140, 87, 0.12);
   font-size: 14px;
   font-weight: 600;
-  letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: rgba(47, 47, 47, 0.8);
+  letter-spacing: 0.08em;
+  color: rgba(47, 47, 47, 0.7);
 }
 
-.packageDescription {
-  font-size: 14px;
-  line-height: 1.5;
-  color: rgba(47, 47, 47, 0.75);
+.cardDescription {
+  font-size: 15px;
+  line-height: 1.6;
+  color: rgba(47, 47, 47, 0.78);
 }
 
-.packageFeatures {
-  list-style: disc inside;
-  display: grid;
-  gap: 8px;
-  font-size: 13px;
-  color: rgba(47, 47, 47, 0.75);
-}
-
-.selectButton {
+.cardCta {
+  justify-self: stretch;
   margin-top: 8px;
-  border: 1px solid var(--color-deep-gray);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: clamp(12px, 2.6vw, 16px) clamp(22px, 5vw, 28px);
+  border: none;
   border-radius: 999px;
-  background: var(--color-deep-gray);
-  color: var(--color-sand);
-  padding: 10px 18px;
-  font-size: 13px;
+  background: linear-gradient(135deg, var(--color-accent) 0%, #a67b4a 100%);
+  color: #ffffff;
+  font-size: clamp(13px, 1vw, 15px);
+  font-weight: 600;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  text-align: center;
 }
 
-.selectButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 20px rgba(47, 47, 47, 0.15);
+.cardCta:focus-visible {
+  outline: 3px solid rgba(182, 140, 87, 0.5);
+  outline-offset: 4px;
+}
+
+.cardFeatures {
+  border-top: 1px solid rgba(47, 47, 47, 0.1);
+  padding-top: 20px;
+  display: grid;
+  gap: 12px;
+}
+
+.cardFeaturesHeading {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(47, 47, 47, 0.55);
+}
+
+.cardFeatures ul {
+  list-style: none;
+  display: grid;
+  gap: 8px;
+  font-size: 14px;
+  color: rgba(47, 47, 47, 0.75);
+  padding: 0;
+  margin: 0;
+}
+
+.cardFeatures li {
+  position: relative;
+  padding-left: 18px;
+}
+
+.cardFeatures li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 7px;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--color-accent) 0%, #a67b4a 100%);
+}
+
+.disclaimer {
+  text-align: center;
+  font-size: 13px;
+  color: rgba(47, 47, 47, 0.6);
+  max-width: 680px;
+  margin: 0 auto;
+  line-height: 1.5;
 }
 
 @media (max-width: 768px) {
   .page {
-    padding: 24px 16px 40px;
-    gap: 24px;
+    padding: 48px 16px 72px;
   }
 
-  .header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-  }
-
-  .logo {
-    font-size: 18px;
-    padding: 10px 16px;
-  }
-
-  .backLink {
-    border-bottom: none;
-  }
-
-  .hero h1 {
-    font-size: 24px;
-  }
-
-  .hero p {
-    font-size: 14px;
-  }
-
-  .packageGrid {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-
-  .packageCard {
-    padding: 20px;
-  }
-
-  .packageCard h2 {
-    font-size: 18px;
+  .card {
+    padding: 24px;
   }
 }
 
-@media (max-width: 400px) {
-  .logo {
-    font-size: 16px;
+@media (max-width: 520px) {
+  .cardGrid {
+    grid-template-columns: 1fr;
   }
 
-  .hero h1 {
-    font-size: 22px;
+  .card {
+    gap: 20px;
+  }
+
+  .cardCta {
+    width: 100%;
   }
 }

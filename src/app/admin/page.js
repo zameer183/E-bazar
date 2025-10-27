@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Navbar from "@/components/Navbar/Navbar";
 import { seedMockShops, clearMockShops, getDataStats } from "@/lib/seedData";
 import { checkIsAdmin } from "@/lib/adminAuth";
 import { onAuthChange } from "@/lib/auth";
@@ -167,7 +166,6 @@ export default function AdminPanel() {
   if (!isAuthorized) {
     return (
       <div className={styles.loginContainer}>
-        <Navbar />
         <div className={styles.loginBox}>
           <h1>🔒 Admin Access Required</h1>
           <p style={{ marginBottom: '20px' }}>
@@ -216,8 +214,6 @@ export default function AdminPanel() {
 
   return (
     <div className={styles.adminContainer}>
-      <Navbar />
-
       {/* Notification Toast */}
       {notification.show && (
         <div className={`${styles.notification} ${styles[notification.type]}`}>
