@@ -64,6 +64,24 @@ NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=<your-value>
 NEXT_PUBLIC_FIREBASE_APP_ID=<your-value>
 NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=<your-value>
 NEXT_PUBLIC_ADMIN_UIDS=3EM1qAgpHMZEwic5EEreIhjzN272
+STRIPE_SECRET_KEY=<your-value>
+# Optional redirect overrides
+# STRIPE_SUCCESS_URL=https://your-app.com/payment/success
+# STRIPE_CANCEL_URL=https://your-app.com/payment/cancel
+EASYPAISA_API_URL=<your-value>
+EASYPAISA_USERNAME=<your-value>
+EASYPAISA_PASSWORD=<your-value>
+JAZZCASH_API_URL=<your-value>
+JAZZCASH_MERCHANT_ID=<your-value>
+JAZZCASH_PASSWORD=<your-value>
+# Optional when JazzCash issues a separate key
+# JAZZCASH_API_KEY=<your-value>
+TCS_API_URL=<your-value>
+TCS_API_KEY=<your-value>
+LEOPARDS_API_URL=<your-value>
+LEOPARDS_API_KEY=<your-value>
+MNP_API_URL=<your-value>
+MNP_API_KEY=<your-value>
 ```
 
 > The repo ships with `vercel.json` that maps environment variables to Vercel [secrets](https://vercel.com/docs/projects/environment-variables#secrets) (e.g. `@firebase_api_key`). You can create those secrets once and reuse them across environments:
@@ -83,6 +101,22 @@ vercel env add AWS_ACCESS_KEY_ID aws_access_key_id
 vercel env add AWS_SECRET_ACCESS_KEY aws_secret_access_key
 vercel env add AWS_S3_PUBLIC_URL aws_s3_public_url
 vercel env add NEXT_PUBLIC_STORAGE_DRIVER storage_driver
+vercel env add STRIPE_SECRET_KEY stripe_secret_key
+vercel env add STRIPE_SUCCESS_URL stripe_success_url
+vercel env add STRIPE_CANCEL_URL stripe_cancel_url
+vercel env add EASYPAISA_API_URL easypaisa_api_url
+vercel env add EASYPAISA_USERNAME easypaisa_username
+vercel env add EASYPAISA_PASSWORD easypaisa_password
+vercel env add JAZZCASH_API_URL jazzcash_api_url
+vercel env add JAZZCASH_MERCHANT_ID jazzcash_merchant_id
+vercel env add JAZZCASH_PASSWORD jazzcash_password
+vercel env add JAZZCASH_API_KEY jazzcash_api_key
+vercel env add TCS_API_URL tcs_api_url
+vercel env add TCS_API_KEY tcs_api_key
+vercel env add LEOPARDS_API_URL leopards_api_url
+vercel env add LEOPARDS_API_KEY leopards_api_key
+vercel env add MNP_API_URL mnp_api_url
+vercel env add MNP_API_KEY mnp_api_key
 ```
 
 **Important Notes**:

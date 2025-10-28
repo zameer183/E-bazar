@@ -13,6 +13,7 @@ import {
 } from "@/lib/storage";
 import { STORAGE_KEY } from "@/data/markets";
 import { buildImageProps } from "@/lib/images";
+import PaymentDeliveryPanel from "@/components/dashboard/PaymentDeliveryPanel";
 import styles from "./page.module.css";
 
 const PRODUCT_LIMITS = {
@@ -1411,6 +1412,8 @@ export default function SellerDashboard() {
             </div>
           </div>
         </div>
+
+        <PaymentDeliveryPanel shop={shop} />
 
         {/* Shop Information */}
         <div className={styles.section}>

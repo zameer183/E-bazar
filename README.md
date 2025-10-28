@@ -28,7 +28,49 @@ NEXT_PUBLIC_FIREBASE_APP_ID=your-app-id
 # NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=G-XXXXXXX
 ```
 
+### Payments & Courier Integrations
+
+Activate checkout flows for EasyPaisa, JazzCash, and Stripe alongside courier quotes for TCS, Leopards, and M&P by supplying the following secrets:
+
+```
+# Stripe Checkout (required for Stripe payments)
+STRIPE_SECRET_KEY=sk_live_xxx
+# Optional: override post-checkout redirects
+# STRIPE_SUCCESS_URL=https://your-app.com/payment/success
+# STRIPE_CANCEL_URL=https://your-app.com/payment/cancel
+
+# EasyPaisa
+EASYPAISA_API_URL=https://easypaisa.example.com/api
+EASYPAISA_USERNAME=merchant-username
+EASYPAISA_PASSWORD=merchant-password
+
+# JazzCash
+JAZZCASH_API_URL=https://jazzcash.example.com/api
+JAZZCASH_MERCHANT_ID=your-merchant-id
+JAZZCASH_PASSWORD=merchant-password
+# Optional: use if JazzCash issues an API key
+# JAZZCASH_API_KEY=your-api-key
+
+# Courier Quotes
+TCS_API_URL=https://tcs.example.com/api
+TCS_API_KEY=your-api-key
+LEOPARDS_API_URL=https://leopards.example.com/api
+LEOPARDS_API_KEY=your-api-key
+MNP_API_URL=https://mnpcourier.example.com/api
+MNP_API_KEY=your-api-key
+```
+
+Each endpoint is expected to accept JSON payloads for quick configuration during onboarding. Replace the sample URLs with the production endpoints provided by your account managers.
+
 > The sample data bundled with the app uses Firestore collections `shops`, `shopImages`, `shopVideos`, `productImages`, `productReviews`, and `sellerReviews`. Apply the security rules in `firestore.rules` and deploy the indexes from `FIREBASE_INDEXES.md` before going live.
+
+### Bilingual Interface
+
+The interface ships with an English ↔ Urdu toggle available from the main navigation bar. Text strings that power the core buyer and seller journeys are translated via `src/lib/i18n.js`; extend the dictionaries whenever you add new UI copy.
+
+### Styling & Theming
+
+Tailwind CSS drives the visual system. The configuration in `tailwind.config.mjs` extends the palette with E-Bazar brand colors, gradient helpers, bespoke shadows, and Urdu/English font families (Poppins + Noto Nastaliq). Always run `npm install` after pulling to ensure `tailwindcss`, `postcss`, and `autoprefixer` are available, then use the existing `npm run dev` script—Next.js will compile Tailwind automatically. Dark mode is enabled via the standard `class="dark"` strategy if you want to preview the optional midnight theme.
 
 Run the development server after installing dependencies:
 

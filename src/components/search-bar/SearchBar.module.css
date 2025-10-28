@@ -67,9 +67,9 @@
 .submitButton {
   padding: 14px 32px;
   border-radius: 999px;
-  border: none;
-  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-strong) 100%);
-  color: white;
+  border: 1px solid rgba(14, 159, 110, 0.25);
+  background: linear-gradient(135deg, #ff6b00 0%, #d4af37 100%);
+  color: #ffffff;
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
@@ -77,8 +77,20 @@
   letter-spacing: 0.08em;
   white-space: nowrap;
   transition: all 0.3s ease;
-  box-shadow: 0 10px 24px rgba(242, 125, 66, 0.28);
+  box-shadow: 0 16px 32px rgba(255, 107, 0, 0.28);
   height: fit-content;
+}
+
+.submitButton:hover,
+.submitButton:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 22px 45px rgba(14, 159, 110, 0.35);
+  outline: none;
+}
+
+.submitButton:active {
+  transform: translateY(0);
+  box-shadow: 0 12px 28px rgba(255, 107, 0, 0.25);
 }
 
 .resultsPanel {

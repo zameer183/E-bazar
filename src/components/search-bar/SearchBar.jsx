@@ -10,6 +10,7 @@ import {
   getCitySellersFromCollection,
 } from "@/data/markets";
 import { useCities } from "@/lib/cities";
+import { useI18n } from "@/lib/i18n";
 import styles from "./SearchBar.module.css";
 
 const slugify = (text) =>
@@ -24,6 +25,7 @@ const mapCategoryToBazaar = (categorySlug) =>
 export default function SearchBar({ citySlug, lockCity = false, enableCityFilter = false, bazaarSlug = null }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { t } = useI18n();
   const cityFromUrl = searchParams.get("city");
   const cities = useCities();
   const cityOptions = useMemo(
@@ -117,12 +119,12 @@ export default function SearchBar({ citySlug, lockCity = false, enableCityFilter
           id: `${selectedCity}-${slug}-bazaar`,
           type: "bazaar",
           label: bazaar?.title ?? slug,
-          meta: "Bazaar",
+          meta: t("search.bazaar"),
           path: `/city/${selectedCity}/bazar/${slug}`,
           keywords: [bazaar?.title ?? slug, slug, "bazaar"],
         };
       }),
-    [selectedCity],
+    [selectedCity, t],
   );
 
   // Removed subcategoryEntries - no longer showing subcategories in search
@@ -149,11 +151,11 @@ export default function SearchBar({ citySlug, lockCity = false, enableCityFilter
         id: `history-${index}`,
         type: "history",
         label: item.query,
-        meta: "Recent search",
+        meta: t("search.recent"),
         path: item.path,
         keywords: [item.query],
       })),
-    [searchHistory],
+    [searchHistory, t],
   );
 
   const baseSellers = useMemo(
@@ -209,14 +211,14 @@ const dynamicSellers = useMemo(
           id: `${seller.id}-product-${productSlug}`,
           type: "product",
           label: `${product.name} (${seller.label})`,
-          meta: "Product",
+          meta: t("search.product"),
           path: `${seller.path}?product=${productSlug}`,
           keywords: [product.name, seller.label, seller.categorySlug, seller.bazaarSlug],
         });
       });
     });
     return entries;
-  }, [sellerEntries]);
+  }, [sellerEntries, t]);
 
   const highlightEntries = useMemo(() => {
     const fragrance = getBazaarDefinition("fragrance");
@@ -225,11 +227,11 @@ const dynamicSellers = useMemo(
       id: `${selectedCity}-fragrance-highlight-${slugify(item.name)}`,
       type: "highlight",
       label: item.name,
-      meta: "Fragrance Highlight",
+      meta: t("search.fragranceHighlight"),
       path: `/city/${selectedCity}/bazar/fragrance?focus=${slugify(item.name)}`,
       keywords: [item.name, item.origin, "fragrance", "perfume", "attar"],
     }));
-  }, [selectedCity]);
+  }, [selectedCity, t]);
 
   const allEntries = useMemo(
     () => [
@@ -285,11 +287,11 @@ const dynamicSellers = useMemo(
       return;
     }
     if (showFallbackMessage) {
-      setSearchMessage("Product Will Be Listed Soon InshAllah");
+      setSearchMessage(t("search.noResults"));
     } else {
       setSearchMessage("");
     }
-  }, [query, showFallbackMessage]);
+  }, [query, showFallbackMessage, t]);
 
   const handleNavigate = (entry) => {
     if (!entry?.path) return;
@@ -318,18 +320,18 @@ const dynamicSellers = useMemo(
     // Validation: ensure both city and search query are provided
     const trimmedQuery = query.trim();
     if (!selectedCity) {
-      alert("Please select a city first");
+      alert(t("search.validation.city"));
       return;
     }
 
     if (!trimmedQuery) {
-      alert("Please enter a category, subcategory, seller, or product to search");
+      alert(t("search.validation.query"));
       return;
     }
 
     if (!hasMatches) {
       setShowResults(true);
-      setSearchMessage("Product Will Be Listed Soon InshAllah");
+      setSearchMessage(t("search.validation.noMatches"));
       return;
     }
 
@@ -342,7 +344,7 @@ const dynamicSellers = useMemo(
     <div className={styles.wrapper} suppressHydrationWarning>
       <form className={styles.form} onSubmit={handleSubmit}>
         <div className={styles.citySelect} suppressHydrationWarning>
-          <label htmlFor="search-city">City</label>
+          <label htmlFor="search-city">{t("search.cityLabel")}</label>
           <select
             id="search-city"
             value={selectedCity}
@@ -358,11 +360,11 @@ const dynamicSellers = useMemo(
         </div>
 
         <div className={styles.inputGroup} suppressHydrationWarning>
-          <label htmlFor="search-query">Search the bazaar</label>
+          <label htmlFor="search-query">{t("search.bazaarLabel")}</label>
           <input
             id="search-query"
             type="search"
-            placeholder="Enter category, subcategory, seller, or product name..."
+            placeholder={t("search.placeholder")}
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             onFocus={() => setShowResults(true)}
@@ -372,7 +374,7 @@ const dynamicSellers = useMemo(
         </div>
 
         <button type="submit" className={styles.submitButton}>
-          Search
+          {t("search.submit")}
         </button>
       </form>
 
@@ -400,7 +402,7 @@ const dynamicSellers = useMemo(
       {showResults && derivedResults.length === 0 && (
         <div className={styles.resultsPanel}>
           <span className={styles.empty}>
-            {searchMessage || "Product Will Be Listed Soon InshAllah"}
+            {searchMessage || t("search.noResults")}
           </span>
         </div>
       )}

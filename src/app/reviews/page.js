@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import styles from "./page.module.css";
 import ReviewSummary from "@/components/reviews/ReviewSummary";
@@ -255,56 +255,88 @@ const ReviewList = ({ title, storageKey, emptyMessage, renderMeta }) => {
 export default function ReviewsPage() {
   return (
     <div className={styles.page}>
-      <header className={styles.header}>
-        <nav className={styles.breadcrumbs}>
-          <Link href="/">Home</Link>
-          <span>/</span>
-          <span>Reviews</span>
-        </nav>
-      </header>
+      <main className={styles.main}>
+        <header className={styles.header}>
+          <nav className={styles.breadcrumbs}>
+            <Link href="/">Home</Link>
+            <span>/</span>
+            <span>Reviews</span>
+          </nav>
+          <div className={styles.headerActions}>
+            <Link href="/top-rated" className={styles.headerLink}>
+              Top Sellers
+            </Link>
+            <Link href="/cities" className={styles.headerLinkSecondary}>
+              Explore Cities
+            </Link>
+          </div>
+        </header>
 
-      <div className={styles.hero}>
-        <h1>Marketplace Stories & Experiences</h1>
-        <p>
-          Real voices from sellers and buyers across Pakistan. Share your story and help the
-          community discover trusted partners.
-        </p>
-      </div>
+        <section className={styles.hero}>
+          <div className={styles.heroContent}>
+            <p className={styles.heroTag}>Community Voices</p>
+            <h1>Marketplace Stories & Experiences</h1>
+            <p>
+              Real voices from sellers and buyers across Pakistan. Share your story and help the
+              community discover trusted partners.
+            </p>
+            <div className={styles.heroActions}>
+              <Link href="#reviews-form" className={styles.heroPrimary}>
+                Share Your Review
+              </Link>
+              <Link href="#seller-stories" className={styles.heroSecondary}>
+                Read Seller Stories
+              </Link>
+            </div>
+          </div>
+          <div className={styles.heroStats}>
+            {[
+              { label: "Active bazaars", value: "26" },
+              { label: "Verified vendors", value: "320+" },
+              { label: "New reviews this week", value: "48" },
+            ].map((item) => (
+              <div key={item.label} className={styles.heroStatCard}>
+                <span className={styles.heroStatValue}>{item.value}</span>
+                <span className={styles.heroStatLabel}>{item.label}</span>
+              </div>
+            ))}
+          </div>
+        </section>
 
-      <div className={styles.layout}>
-        <div id="reviews-form" className={styles.formsColumn}>
-          <ReviewForm
-            title="Seller Stories"
-            storageKey={SELLER_REVIEWS_KEY}
-            allowBusinessField
-          />
-          <ReviewForm
-            title="Buyer Experiences"
-            storageKey={BUYER_REVIEWS_KEY}
-          />
+        <div className={styles.layout}>
+          <div id="reviews-form" className={styles.formsColumn}>
+            <ReviewForm
+              title="Seller Stories"
+              storageKey={SELLER_REVIEWS_KEY}
+              allowBusinessField
+            />
+            <ReviewForm title="Buyer Experiences" storageKey={BUYER_REVIEWS_KEY} />
+          </div>
+
+          <div className={styles.listColumn}>
+            <section id="seller-stories">
+              <ReviewList
+                title="Seller Stories"
+                storageKey={SELLER_REVIEWS_KEY}
+                emptyMessage="Sellers from every lane are invited to share their journey."
+                renderMeta={(entry) => (
+                  <p className={styles.reviewMeta}>
+                    {entry.business ? `${entry.business} — ` : ""}
+                    {entry.city}
+                  </p>
+                )}
+              />
+            </section>
+
+            <ReviewList
+              title="Buyer Experiences"
+              storageKey={BUYER_REVIEWS_KEY}
+              emptyMessage="Buyers, tell others about the sellers who impressed you."
+              renderMeta={(entry) => <p className={styles.reviewMeta}>{entry.city}</p>}
+            />
+          </div>
         </div>
-
-        <div className={styles.listColumn}>
-          <ReviewList
-            title="Seller Stories"
-            storageKey={SELLER_REVIEWS_KEY}
-            emptyMessage="Sellers from every lane are invited to share their journey."
-            renderMeta={(entry) => (
-              <p className={styles.reviewMeta}>
-                {entry.business ? `${entry.business} — ` : ""}
-                {entry.city}
-              </p>
-            )}
-          />
-
-          <ReviewList
-            title="Buyer Experiences"
-            storageKey={BUYER_REVIEWS_KEY}
-            emptyMessage="Buyers, tell others about the sellers who impressed you."
-            renderMeta={(entry) => <p className={styles.reviewMeta}>{entry.city}</p>}
-          />
-        </div>
-      </div>
+      </main>
     </div>
   );
 }

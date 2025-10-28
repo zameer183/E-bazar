@@ -10,6 +10,17 @@ const slugify = (text = "") =>
 
 export const createSellerSlug = (city, name) => slugify(`${city} ${name}`);
 
+export const ACTIVE_CITY_SLUGS = ["islamabad", "karachi", "lahore", "faisalabad", "peshawar"];
+
+const isActiveCitySlug = (slug) => {
+  if (!slug) return false;
+  if (!Array.isArray(ACTIVE_CITY_SLUGS) || ACTIVE_CITY_SLUGS.length === 0) {
+    return true;
+  }
+  const normalized = slug.toLowerCase();
+  return ACTIVE_CITY_SLUGS.includes(normalized);
+};
+
 const PRIMARY_CATEGORIES = [
   { name: "Clothes", slug: "clothes" },
   { name: "Perfumes", slug: "perfumes" },
@@ -418,76 +429,148 @@ export const BASE_CITY_MARKETS = [
     slug: "islamabad",
     image: "/images/islamabad.jpg",
     detailImage: "/images/islamabad.jpg",
-    defaultCategory: "electronics",
+    defaultCategory: "clothes",
     industries: {
-      electronics: [
+      clothes: [
         {
-          name: "Blue Area Innovation Hub",
+          name: "Aabpara Fabric Collective",
           plan: "Premium",
-          address: "Jinnah Avenue, Blue Area, Islamabad",
-          contact: "+92 333 0099911",
+          address: "Shop 27, Cloth Street, Aabpara Market, Islamabad",
+          contact: "+92 51 2814455",
           description:
-            "Enterprise IT deployments, co-working hardware labs, and smart-home integrations for the capital's tech community.",
+            "Wholesale lawn, khaddar rolls, and stitched three-piece suits supplied daily from Aabpara's cloth lanes.",
           rating: 4.8,
-          reviews: 88,
+          reviews: 126,
+          shopImage: "/images/islamabad.jpg",
           products: [
             {
-              name: "Remote Office Power Pack",
-              price: "PKR 145,000",
-              description: "Enterprise laptop, docking station, and noise-cancelling headset bundle.",
+              name: "Summer Lawn Volume (20 pieces)",
+              price: "PKR 62,000",
+              description: "Breathable prints with matching dupattas bundled for boutique re-sellers.",
+              image:
+                "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80",
             },
             {
-              name: "Smart Villa Automation",
-              price: "PKR 195,000",
-              description: "Modular automation kit with multi-zone climate and security control.",
+              name: "Handloom Khaddar Rolls",
+              price: "PKR 18,500",
+              description: "10-yard khaddar rolls in earthy palettes sourced from Kashmir Road looms.",
+              image:
+                "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80",
+            },
+          ],
+        },
+        {
+          name: "Meena Bazaar Stitchery",
+          plan: "Standard",
+          address: "Shop 8, Fashion Arcade, Aabpara Market, Islamabad",
+          contact: "+92 333 5044419",
+          description:
+            "Ready-to-wear kurta and abaya lines stitched overnight for retailers needing quick replenishment.",
+          rating: 4.6,
+          reviews: 64,
+          shopImage: "/images/islamabad.jpg",
+          products: [
+            {
+              name: "Semi-formal Kurta Capsule",
+              price: "PKR 38,000",
+              description: "12-piece semi-formal kurtas finished with adda work and pearl detailing.",
+            },
+            {
+              name: "Everyday Abaya Bundle",
+              price: "PKR 54,500",
+              description: "Six neutral-tone abayas with matching scarfs ready for retail racks.",
             },
           ],
         },
       ],
-      clothes: [
+      electronics: [
         {
-          name: "Saidpur Artisan Collective",
-          plan: "Standard",
-          address: "Saidpur Village, Islamabad",
-          contact: "+92 300 6654321",
+          name: "Aabpara Tech Cooperative",
+          plan: "Premium",
+          address: "Shop 12, Electronics Lane, Aabpara Market, Islamabad",
+          contact: "+92 345 1112272",
           description:
-            "Handcrafted shawls, truck-art inspired casuals, and ethically sourced accessories from Potohar artisans.",
-          rating: 4.5,
-          reviews: 52,
+            "Smartphone sourcing, POS terminals, and solar backup systems geared for twin-city wholesalers.",
+          rating: 4.7,
+          reviews: 94,
           products: [
             {
-              name: "Potohari Wool Shawl",
-              price: "PKR 15,500",
-              description: "Undyed lambswool with hand-embroidered motifs inspired by Margalla flora.",
+              name: "Solar Hybrid Backup Kit",
+              price: "PKR 165,000",
+              description: "5kVA hybrid inverter with lithium battery stack and installation support.",
             },
             {
-              name: "Truck Art Denim Jacket",
-              price: "PKR 9,200",
-              description: "Statement outerwear painted by local artists using weather-sealed pigments.",
+              name: "Retail POS Starter Pack",
+              price: "PKR 58,500",
+              description: "Android POS terminal, Bluetooth printer, and cash drawer configured for outlets.",
+            },
+          ],
+        },
+        {
+          name: "Aabpara Repair & Parts Hub",
+          plan: "Standard",
+          address: "Unit 19, Radio Market, Aabpara Islamabad",
+          contact: "+92 312 9904433",
+          description:
+            "Component level phone repairs, board-level diagnostics, and bulk accessories for resellers.",
+          rating: 4.4,
+          reviews: 71,
+          products: [
+            {
+              name: "Smartphone Refurb Kit (10 units)",
+              price: "PKR 145,000",
+              description: "Grade-A refurbished Android handsets with tempered glass and cases.",
+            },
+            {
+              name: "Express Repair Subscription",
+              price: "PKR 12,000",
+              description: "Monthly rapid repair plan covering board-level fixes for five devices.",
             },
           ],
         },
       ],
       perfumes: [
         {
-          name: "Margalla Botanical Perfumery",
+          name: "Aabpara Attar Street",
           plan: "Standard",
-          address: "F-7 Markaz, Islamabad",
-          contact: "+92 312 4478901",
+          address: "Lane 4, Perfume Gallery, Aabpara Market, Islamabad",
+          contact: "+92 300 8533399",
           description:
-            "Nature-forward perfume oils, reed diffusers, and candle blends inspired by the Margalla foothills.",
-          rating: 4.6,
-          reviews: 47,
+            "Heritage attars, mukhallat blends, and prayer oils hand-filled for bazaar distributors.",
+          rating: 4.5,
+          reviews: 58,
           products: [
             {
-              name: "Pine Mist Diffuser",
-              price: "PKR 4,600",
-              description: "Evergreen diffuser blend layered with vetiver and Himalayan cedar.",
+              name: "Aabpara Amber Mukhallat",
+              price: "PKR 7,800",
+              description: "Deep amber accord aged in oud chips with rose absolute undertones.",
             },
             {
-              name: "Lotus Dawn Attar",
-              price: "PKR 6,800",
-              description: "Morning lotus accord balanced with neroli for daytime wear.",
+              name: "Masjid Collection Gift Set",
+              price: "PKR 5,200",
+              description: "Set of four prayer-friendly oils packed for nationwide gifting.",
+            },
+          ],
+        },
+        {
+          name: "Margalla Essence Lab",
+          plan: "Premium",
+          address: "Shop 4-B, Perfume Lane, Aabpara Islamabad",
+          contact: "+92 345 7741185",
+          description:
+            "Small batch diffuser oils and signature sprays inspired by Margalla foothills mornings.",
+          rating: 4.7,
+          reviews: 63,
+          products: [
+            {
+              name: "Cedar Breeze Diffuser",
+              price: "PKR 4,950",
+              description: "Reed diffuser with cedar, basil, and cool mist notes blended in-house.",
+            },
+            {
+              name: "Nastaliq Evening Spray",
+              price: "PKR 6,200",
+              description: "Amber floral EDP crafted for boutique retailers across the twin cities.",
             },
           ],
         },
@@ -975,7 +1058,7 @@ export const getBazaarHeroImage = (citySlug, bazaarSlug) => {
 };
 
 export const getCityBySlug = (slug) =>
-  BASE_CITY_MARKETS.find((city) => city.slug === slug.toLowerCase());
+  BASE_CITY_MARKETS.find((city) => city.slug === slug.toLowerCase() && isActiveCitySlug(city.slug));
 
 export const getIndustryFromCity = (city, industrySlug) =>
   city?.industries?.[industrySlug] || null;
@@ -1005,7 +1088,9 @@ export const getCitySellersFromCollection = (cities, citySlug) => {
 };
 
 export const getCitySellers = (citySlug) => {
-  const city = BASE_CITY_MARKETS.find((entry) => entry.slug === citySlug.toLowerCase());
+  const city = BASE_CITY_MARKETS.find(
+    (entry) => entry.slug === citySlug.toLowerCase() && isActiveCitySlug(entry.slug),
+  );
   if (!city) return [];
   return getCitySellersFromCollection([city], citySlug);
 };
@@ -1018,7 +1103,7 @@ export const getPerfumeSellersForCity = (citySlug) => {
 export const mergeCityCollections = (base, additions) => {
   const map = new Map();
   base.forEach((city) => {
-    if (city?.slug) {
+    if (city?.slug && isActiveCitySlug(city.slug)) {
       map.set(city.slug.toLowerCase(), city);
     }
   });
@@ -1033,8 +1118,11 @@ export const mergeCityCollections = (base, additions) => {
 };
 
 const flattenBaseSellers = () =>
-  BASE_CITY_MARKETS.flatMap((city) =>
-    Object.entries(city.industries || {}).flatMap(([categorySlug, industry]) =>
+  BASE_CITY_MARKETS.flatMap((city) => {
+    if (!isActiveCitySlug(city.slug)) {
+      return [];
+    }
+    return Object.entries(city.industries || {}).flatMap(([categorySlug, industry]) =>
       (industry.sellers || []).map((seller) => ({
         ...seller,
         citySlug: city.slug,
@@ -1044,8 +1132,8 @@ const flattenBaseSellers = () =>
         bazaarSlug: CATEGORY_TO_BAZAAR[categorySlug] ?? seller.bazaarSlug ?? null,
         path: `/city/${city.slug}/${categorySlug}/${seller.slug}`,
       }))
-    )
-  );
+    );
+  });
 
 export const createProductShowcase = (limit = 12) => {
   const entries = [];
